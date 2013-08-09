@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='utf-8'?>
+<list>
+	<announce>Welcome to the best server Tera-online!
+Приветствуем на лучшем сервере Tera-online!</announce>
+	<announce>Новости касательно сервера, смотрите на нашем сайте teraonline.org
+Visit our website teraonline.org to know more about our server</announce>
+	<announce interval="1400000" >Не кликайте более 1 раза в день по рекламе на teraonline.org</announce>
+	<announce interval="900000" >По техническим вопросам, обращайтесь по скайпу к ronn-l2f.
+Contact 'Skype ronn-l2f' to solve technical problems.</announce>
+	<announce interval="600000" >Для получения списка команд, введите --help.</announce>
+	<announce interval="900000" >Посетите базу знаний для нашего сервера: shock-tera.com</announce>
+</list>
