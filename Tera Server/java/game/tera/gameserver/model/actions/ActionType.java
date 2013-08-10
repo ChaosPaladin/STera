@@ -14,7 +14,7 @@ import tera.gameserver.model.playable.Player;
 
 /**
  * Перечисление типов акшенов.
- *
+ * 
  * @author Ronn
  * @created 07.03.2012
  */
@@ -54,21 +54,20 @@ public enum ActionType
 	NONE31(null),
 	BIND_ITEM(BindItemAction.class),
 	NONE32(null),
-	ENCHANT_ITEM(EnchantItemAction.class),
-	;
+	ENCHANT_ITEM(EnchantItemAction.class), ;
 
 	/** массив типов */
 	public static final ActionType[] ELEMENTS = values();
 
 	/**
 	 * Получение типа акшена по индексу.
-	 *
+	 * 
 	 * @param index индекс типа акшена.
 	 * @return тип акшена.
 	 */
 	public static ActionType valueOf(int index)
 	{
-		if(index < 0 || index >= ELEMENTS.length)
+		if (index < 0 || index >= ELEMENTS.length)
 			return ActionType.NONE;
 
 		return ELEMENTS[index];
@@ -102,35 +101,29 @@ public enum ActionType
 		return type != null;
 	}
 
-
 	/**
 	 * Создание нового экземпляра акшена.
-	 *
+	 * 
 	 * @param actor инициатор акшена.
 	 * @param name имя цели.
 	 * @return новый акшен.
 	 */
 	public Action newInstance(Player actor, String name)
 	{
-		// извлекаем экземпляр из пула
 		Action action = pool.take();
 
-		// если такого нету
-		if(action == null)
+		if (action == null)
 			try
 			{
-				// создаем новый экземпляр
 				action = type.newInstance();
 			}
-			catch(InstantiationException | IllegalAccessException e)
+			catch (InstantiationException | IllegalAccessException e)
 			{
 				Loggers.warning(this, e);
 			}
 
-		// переинициализировали акшен
 		action.init(actor, name);
 
-		// возвращаем
 		return action;
 	}
 }

@@ -6,7 +6,7 @@ import rlib.util.pools.Pools;
 
 /**
  * Перечисление типов диалогов акшенов.
- *
+ * 
  * @author Ronn
  */
 public enum ActionDialogType
@@ -44,17 +44,14 @@ public enum ActionDialogType
 	 */
 	public ActionDialog newInstance()
 	{
-		// пробуем вытянуть из пула
 		ActionDialog dialog = pool.take();
 
-		// если нету
-		if(dialog == null)
+		if (dialog == null)
 			try
 			{
-				// создаем новый
 				dialog = type.newInstance();
 			}
-			catch(InstantiationException | IllegalAccessException e)
+			catch (InstantiationException | IllegalAccessException e)
 			{
 				Loggers.warning(this, e);
 			}

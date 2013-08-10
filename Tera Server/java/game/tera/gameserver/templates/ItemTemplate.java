@@ -21,7 +21,7 @@ import tera.gameserver.model.skillengine.funcs.Func;
 
 /**
  * Базовая модель шаблона итемов.
- *
+ * 
  * @author Ronn
  */
 public abstract class ItemTemplate implements Reloadable<ItemTemplate>
@@ -101,7 +101,7 @@ public abstract class ItemTemplate implements Reloadable<ItemTemplate>
 			guildBank = vars.getBoolean("guildBank", true);
 			deletable = vars.getBoolean("deletable", true);
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			log.warning(this, e);
 			throw e;
@@ -110,27 +110,23 @@ public abstract class ItemTemplate implements Reloadable<ItemTemplate>
 
 	/**
 	 * Выдача функций персонажу.
-	 *
+	 * 
 	 * @param character персонаж.
 	 */
 	public void addFuncsTo(Character character)
 	{
-		// получаем функции
 		Func[] funcs = getFuncs();
 
-		// если их нет, выходим
-		if(funcs.length < 1)
+		if (funcs.length < 1)
 			return;
 
-		// перебираем функции
-		for(int i = 0, length = funcs.length; i < length; i++)
-			// выдаем функцию игроку
+		for (int i = 0, length = funcs.length; i < length; i++)
 			funcs[i].addFuncTo(character);
 	}
 
 	/**
 	 * Проверка на одеваемость итема.
-	 *
+	 * 
 	 * @param player игрок, который хочет одеть итем.
 	 * @return можно ли игроку одеть этот итем.
 	 */
@@ -342,7 +338,7 @@ public abstract class ItemTemplate implements Reloadable<ItemTemplate>
 	/**
 	 * @return можно ли точить итем.
 	 */
-	public  boolean isEnchantable()
+	public boolean isEnchantable()
 	{
 		return false;
 	}
@@ -392,31 +388,22 @@ public abstract class ItemTemplate implements Reloadable<ItemTemplate>
 	 */
 	public ItemInstance newInstance()
 	{
-		// извлекаем итем из пула
 		ItemInstance item = itemPool.take();
 
-		// получаем фабрику ИД
 		IdFactory idFactory = IdFactory.getInstance();
 
-		// получаем новый ид итема
 		int objectId = idFactory.getNextItemId();
 
-		// если итема нет
-		if(item == null)
-			// создаем новый
+		if (item == null)
 			item = itemClass.newInstance(objectId, this);
 
-		// применяем новый ид
 		item.setObjectId(idFactory.getNextItemId());
 
-		// получаем менеджера БД
 		DataBaseManager dbManager = DataBaseManager.getInstance();
 
-		// если не смогли записть в БД, выходим
-		if(!dbManager.createItem(item))
+		if (!dbManager.createItem(item))
 			return null;
 
-		// возвращаем итем
 		return item;
 	}
 
@@ -425,15 +412,11 @@ public abstract class ItemTemplate implements Reloadable<ItemTemplate>
 	 */
 	public ItemInstance newInstance(int objectId)
 	{
-		// извлекаем из пула
 		ItemInstance item = itemPool.take();
 
-		// если итема нет
-		if(item == null)
-			// создаем новый
+		if (item == null)
 			item = itemClass.newInstance(objectId, this);
 
-		// применяем нужный ид
 		item.setObjectId(objectId);
 
 		return item;
@@ -441,19 +424,18 @@ public abstract class ItemTemplate implements Reloadable<ItemTemplate>
 
 	/**
 	 * Положить указанный итем в пул итемов.
-	 *
+	 * 
 	 * @param item итем, который нужно положить.
 	 */
 	public void put(ItemInstance item)
 	{
-		// ложим в пул
 		itemPool.put(item);
 	}
 
 	@Override
 	public void reload(ItemTemplate update)
 	{
-		if(getClass() != update.getClass())
+		if (getClass() != update.getClass())
 			return;
 
 		Objects.reload(this, update);
@@ -461,21 +443,17 @@ public abstract class ItemTemplate implements Reloadable<ItemTemplate>
 
 	/**
 	 * Удаление функций у персонажа.
-	 *
+	 * 
 	 * @param character персонаж.
 	 */
 	public void removeFuncsTo(Character character)
 	{
-		// получаем функции
 		Func[] funcs = getFuncs();
 
-		// если их нет, выходим
-		if(funcs.length < 1)
+		if (funcs.length < 1)
 			return;
 
-		// перебираем функции
-		for(int i = 0, length = funcs.length; i < length; i++)
-			// удаляем функцию у персонажа
+		for (int i = 0, length = funcs.length; i < length; i++)
 			funcs[i].removeFuncTo(character);
 	}
 
