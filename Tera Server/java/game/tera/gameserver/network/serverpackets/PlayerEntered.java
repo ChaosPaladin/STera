@@ -4,17 +4,17 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import rlib.util.Strings;
-
 import tera.gameserver.model.base.Experience;
 import tera.gameserver.model.equipment.Equipment;
 import tera.gameserver.model.equipment.SlotType;
+import tera.gameserver.model.items.ItemInstance;
 import tera.gameserver.model.playable.Player;
 import tera.gameserver.model.playable.PlayerAppearance;
 import tera.gameserver.network.ServerPacketType;
 
 /**
  * Пакет с информаций о игроке, который входит в мир.
- *
+ * 
  * @author Ronn
  */
 public class PlayerEntered extends ServerPacket
@@ -25,13 +25,10 @@ public class PlayerEntered extends ServerPacket
 	{
 		PlayerEntered packet = (PlayerEntered) instance.newInstance();
 
-		// получаем экиперовку
 		Equipment equipment = player.getEquipment();
 
-		// получаем внешность игрока
 		PlayerAppearance appearance = player.getAppearance();
 
-		// получаем промежуточный буффер
 		ByteBuffer buffer = packet.getPrepare();
 
 		try
@@ -84,6 +81,8 @@ public class PlayerEntered extends ServerPacket
 			packet.writeInt(buffer, 0x000001A3);
 			packet.writeLong(buffer, 0x0000000000000000);
 
+			ItemInstance weapon = equipment.getItem(SlotType.SLOT_WEAPON);
+
 			equipment.lock();
 			try
 			{
@@ -99,15 +98,14 @@ public class PlayerEntered extends ServerPacket
 				equipment.unlock();
 			}
 
-			packet.writeInt(buffer, 0);//бан чата // player.getObjectId());
+			packet.writeInt(buffer, 0);// бан чата // player.getObjectId());
 			packet.writeInt(buffer, 0);
 
 			packet.writeLong(buffer, 1);
 			packet.writeByte(buffer, 0);
 			packet.writeInt(buffer, 0);// 03 00 00 00 если 3, то надпись "Ангел смерти"
 			packet.writeInt(buffer, 0);// 00 00 00 00
-			
-			
+
 			packet.writeInt(buffer, 0);// 00 00 00 00
 			packet.writeInt(buffer, 0);// 00 00 00 00
 			packet.writeInt(buffer, 0);// 00 00 00 00
@@ -115,24 +113,18 @@ public class PlayerEntered extends ServerPacket
 			packet.writeInt(buffer, 0);// 00 00 00 00
 			packet.writeInt(buffer, 0);// 00 00 00 00
 			packet.writeInt(buffer, 0);// 00 00 00 00
-			packet.writeInt(buffer, 9);// точка
-			
-			
-			
+			packet.writeInt(buffer, weapon == null ? 0 : weapon.getEnchantLevel());// точка
+
 			packet.writeByte(buffer, 0);// 00
-			
-			
+
 			packet.writeInt(buffer, player.getKarma());// 78 00 00 00 .//карма
-			packet.writeInt(buffer, 1);// 01 00 00 00 
-			
+			packet.writeInt(buffer, 1);// 01 00 00 00
+
 			packet.writeInt(buffer, 0);// 00 00 00 00//00 00 00 00
-			
-			
+
 			packet.writeInt(buffer, 0);// 00 00 00 00
 			packet.writeInt(buffer, 0);// 00 00 00 00
-			
-			
-			
+
 			packet.writeByte(buffer, 0);// 00
 
 			packet.writeString(buffer, player.getName());
@@ -179,7 +171,7 @@ public class PlayerEntered extends ServerPacket
 	}
 
 	/** промежуточный буффер */
-	private ByteBuffer prepare;
+	private final ByteBuffer prepare;
 
 	public PlayerEntered()
 	{

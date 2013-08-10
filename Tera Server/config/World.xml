@@ -4,12 +4,12 @@
 	<set name="WORLD_LIFE_TIME_DROP_ITEM" value="300" />
 	<!-- время блокировки выпавшего итема на поднятие чужаком в секундах (20) -->
 	<set name="WORLD_BLOCK_TIME_DROP_ITEM" value="20" />
-	
+
 	<!-- ширина региона в мире (2048)-->
 	<set name="WORLD_WIDTH_REGION" value="2048" />
 	<!-- высота региона в мире (2048) -->
 	<set name="WORLD_HEIGHT_REGION" value="2048" />
-	
+
 	<!-- минимальный уровень доступа для входа в мир (0) -->
 	<set name="WORLD_MIN_ACCESS_LEVEL" value="0" />
 	<!-- максимальный уровень игрока (60) -->
@@ -32,21 +32,23 @@
 	<set name="WORLD_MAX_COLLECT_LEVEL" value="300" />
 	<!-- кол-во континентов в мире (3) -->
 	<set name="WORLD_CONTINENT_COUNT" value="3" />
-	
+
 	<!-- модификатор цен вмагазине (1) -->
 	<set name="WORLD_SHOP_PRICE_MOD" value="1" />
 	<!-- максимальный размер банка игрока (288) -->
 	<set name="WORLD_BANK_MAX_SIZE" value="288" />
 	<!-- максимальный размер банка гильдии (288) -->
 	<set name="WORLD_GUILD_BANK_MAX_SIZE" value="288" />
-	
+
 	<!-- максимальный онлайн (~) -->
 	<set name="WORLD_MAXIMUM_ONLINE" value="5000" />
-	
-	
+
+	<!-- базовый шанс заточки (30) -->
+	<set name="WORLD_ENCHANT_ITEM_CHANCE" value="30" />
+
 	<!-- максимальный онлайн (~) -->
 	<set name="WORLD_DONATE_ITEMS" value="18555,18556,18557,18558,18559,18560,18561,18562,18563,13230,13231,13232,13233,13234,13235,13236,13237,13238" />
- 
+
 	<!-- максимальная дистанция для работы трейда (150) -->
 	<set name="WORLD_TRADE_MAX_RANGE" value="150" />
 	<!-- максимальная дистанция для работы дуэли (150) -->
@@ -55,17 +57,17 @@
 	<set name="WORLD_GUILD_INVITE_MAX_RANGE" value="150" />
 	<!-- максимальная погрешность между клиентским положением и серверным при старте каста скила (300) -->
 	<set name="WORLD_MAX_SKILL_DESYNC" value="300" />
-	
+
 	<!-- доступен ли ПК режим игрокам (true) -->
 	<set name="WORLD_PK_AVAILABLE" value="true" />
-	
+
 	<!-- модификатор отката ближних скилов (1) -->
- <set name="WORLD_SHORT_SKILL_REUSE_MOD" value="1" />
- <!-- модификатор отката дальних скилов (1) -->
- <set name="WORLD_RANGE_SKILL_REUSE_MOD" value="1" />
- <!-- модификатор остальных скилов (1) -->
- <set name="WORLD_OTHER_SKILL_REUSE_MOD" value="1" />
-	
-	
-	
-</list>    
+ 	<set name="WORLD_SHORT_SKILL_REUSE_MOD" value="1" />
+ 	<!-- модификатор отката дальних скилов (1) -->
+ 	<set name="WORLD_RANGE_SKILL_REUSE_MOD" value="1" />
+ 	<!-- модификатор остальных скилов (1) -->
+ 	<set name="WORLD_OTHER_SKILL_REUSE_MOD" value="1" />
+
+
+
+</list>

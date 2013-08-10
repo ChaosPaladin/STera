@@ -39,6 +39,5 @@ public class EnchantFinish extends ClientPacket
 
 		EnchantItemDialog enchantDialog = (EnchantItemDialog) dialog;
 		enchantDialog.apply();
-		enchantDialog.cancel(null);
 	}
 }

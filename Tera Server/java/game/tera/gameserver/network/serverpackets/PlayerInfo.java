@@ -4,16 +4,16 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import rlib.util.Strings;
-
 import tera.gameserver.model.equipment.Equipment;
 import tera.gameserver.model.equipment.SlotType;
+import tera.gameserver.model.items.ItemInstance;
 import tera.gameserver.model.playable.Player;
 import tera.gameserver.model.playable.PlayerAppearance;
 import tera.gameserver.network.ServerPacketType;
 
 /**
  * Пакет показывает информацию игроку об другом игроке
- *
+ * 
  * @author Ronn
  */
 public class PlayerInfo extends ServerPacket
@@ -66,7 +66,7 @@ public class PlayerInfo extends ServerPacket
 		packet.writeShort(buffer, 0); // поза перса
 		packet.writeShort(buffer, 0);
 		packet.writeByte(buffer, 1);
-		packet.writeByte(buffer, newPlayer.isDead()? 0 : 1); // смерть
+		packet.writeByte(buffer, newPlayer.isDead() ? 0 : 1); // смерть
 
 		// внешность
 		packet.writeByte(buffer, 65); // temp[9]
@@ -77,6 +77,8 @@ public class PlayerInfo extends ServerPacket
 		packet.writeByte(buffer, appearance.getFeaturesColor());
 		packet.writeByte(buffer, appearance.getVoice());
 		packet.writeByte(buffer, 0); // temp[14]
+
+		ItemInstance weapon = equipment.getItem(SlotType.SLOT_WEAPON);
 
 		equipment.lock();
 		try
@@ -103,32 +105,29 @@ public class PlayerInfo extends ServerPacket
 		packet.writeLong(buffer, 0);
 		packet.writeLong(buffer, 0);
 		packet.writeLong(buffer, 0);
-		
+
 		packet.writeShort(buffer, 0);
-		packet.writeByte(buffer, 0);		
-		
-		packet.writeInt(buffer, 0);	//точка ствола			
-		
-		packet.writeByte(buffer, 0);		
-		packet.writeByte(buffer, newPlayer.isPvPMode()? 1 : 0); // включен ли пвп режим
+		packet.writeByte(buffer, 0);
+
+		packet.writeInt(buffer, weapon == null ? 0 : weapon.getEnchantLevel()); // точка ствола
+
+		packet.writeByte(buffer, 0);
+		packet.writeByte(buffer, newPlayer.isPvPMode() ? 1 : 0); // включен ли пвп режим
 
 		packet.writeInt(buffer, newPlayer.getLevel());
 		packet.writeInt(buffer, 0);
-		
-		
-		packet.writeInt(buffer, 0);//что-то тоже нательное		
-		
+
+		packet.writeInt(buffer, 0);// что-то тоже нательное
+
 		packet.writeInt(buffer, 1);
-		
-		packet.writeInt(buffer, 0);//лифчики
+
+		packet.writeInt(buffer, 0);// лифчики
 		packet.writeInt(buffer, 0);
-		
-		
+
 		packet.writeInt(buffer, 0);
-		
-		
+
 		packet.writeByte(buffer, 0);
-		
+
 		packet.writeString(buffer, name);// имя
 		packet.writeString(buffer, guildName);// название клана
 		packet.writeString(buffer, title); // титул
@@ -175,7 +174,7 @@ public class PlayerInfo extends ServerPacket
 	}
 
 	/** подготавливаемый буффер */
-	private ByteBuffer prepare;
+	private final ByteBuffer prepare;
 
 	public PlayerInfo()
 	{

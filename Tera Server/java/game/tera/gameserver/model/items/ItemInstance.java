@@ -32,7 +32,7 @@ import tera.gameserver.templates.SkillTemplate;
 
 /**
  * Модель итема.
- *
+ * 
  * @author Ronn
  */
 public abstract class ItemInstance extends TObject implements Foldable
@@ -106,7 +106,7 @@ public abstract class ItemInstance extends TObject implements Foldable
 
 		this.skills = new Skill[templates.length];
 
-		for(int i = 0, length = templates.length; i < length; i++)
+		for (int i = 0, length = templates.length; i < length; i++)
 			skills[i] = templates[i].newInstance();
 
 		this.lifeTask = new SafeTask()
@@ -114,7 +114,7 @@ public abstract class ItemInstance extends TObject implements Foldable
 			@Override
 			protected void runImpl()
 			{
-				if(System.currentTimeMillis() - spawnTime < (Config.WORLD_LIFE_TIME_DROP_ITEM * 100 - 1000))
+				if (System.currentTimeMillis() - spawnTime < (Config.WORLD_LIFE_TIME_DROP_ITEM * 100 - 1000))
 					log.warning(this, new Exception("it's fast despawn"));
 
 				deleteMe();
@@ -134,13 +134,13 @@ public abstract class ItemInstance extends TObject implements Foldable
 
 	/**
 	 * Выдача владельцу итема скилы итема.
-	 *
+	 * 
 	 * @param owner владелец итема.
 	 */
 	public final void addFuncsTo(Character owner)
 	{
 		// если персонажа нет
-		if(owner == null)
+		if (owner == null)
 			return;
 
 		// добавляем функции итема
@@ -150,7 +150,7 @@ public abstract class ItemInstance extends TObject implements Foldable
 		CrystalList crystals = getCrystals();
 
 		// если их нет ,выходим
-		if(crystals == null || crystals.isEmpty())
+		if (crystals == null || crystals.isEmpty())
 			return;
 
 		// добавляем функции кристалов
@@ -173,7 +173,7 @@ public abstract class ItemInstance extends TObject implements Foldable
 
 	/**
 	 * Проверка на совместимость игрока с итемом.
-	 *
+	 * 
 	 * @param player проверяемый игрок.
 	 * @return совместим ли.
 	 */
@@ -184,7 +184,7 @@ public abstract class ItemInstance extends TObject implements Foldable
 
 	/**
 	 * Проверка, можно ли вставить крист в итем.
-	 *
+	 * 
 	 * @param crystal вставляемый кристал.
 	 */
 	public boolean checkCrystal(CrystalInstance crystal)
@@ -197,23 +197,23 @@ public abstract class ItemInstance extends TObject implements Foldable
 	{
 		super.deleteMe();
 
-		synchronized(this)
+		synchronized (this)
 		{
 			// если есть таск жизни, отменяем и зануляем
-			if(lifeSchedule != null)
+			if (lifeSchedule != null)
 			{
 				lifeSchedule.cancel(false);
 				lifeSchedule = null;
 			}
 
 			// если есть таск блокировки, отменяем и зануляем
-			if(blockSchedule != null)
+			if (blockSchedule != null)
 			{
 				blockSchedule.cancel(false);
 				blockSchedule = null;
 			}
 
-			if(isDeleted())
+			if (isDeleted())
 				return;
 
 			// складируем в пул
@@ -223,7 +223,7 @@ public abstract class ItemInstance extends TObject implements Foldable
 
 	/**
 	 * Проверка на возможность одевания итема персонажем.
-	 *
+	 * 
 	 * @param character персонаж.
 	 * @return можно ли.
 	 */
@@ -444,6 +444,7 @@ public abstract class ItemInstance extends TObject implements Foldable
 	/**
 	 * @return название итема.
 	 */
+	@Override
 	public final String getName()
 	{
 		return template.getName();
@@ -701,11 +702,11 @@ public abstract class ItemInstance extends TObject implements Foldable
 	public boolean pickUpMe(TObject target)
 	{
 		// если объект не видим, выходим
-		if(!isVisible())
+		if (!isVisible())
 			return false;
 
 		// если поднимающего нет, выходим
-		if(target == null)
+		if (target == null)
 		{
 			log.warning(this, new Exception("not found target"));
 			return false;
@@ -715,14 +716,14 @@ public abstract class ItemInstance extends TObject implements Foldable
 		Character character = target.getCharacter();
 
 		// если его нет, выходим
-		if(character == null)
+		if (character == null)
 		{
 			log.warning(this, new Exception("not found character"));
 			return false;
 		}
 
 		// если персонаж в движении
-		if(character.isMoving())
+		if (character.isMoving())
 		{
 			character.sendMessage("Нельзя поднимать во время движения.");
 			return false;
@@ -734,16 +735,16 @@ public abstract class ItemInstance extends TObject implements Foldable
 		// был ли поднят итем
 		boolean pickUped = false;
 
-		synchronized(this)
+		synchronized (this)
 		{
 			// если объект не видим, выходим
-			if(!isVisible())
+			if (!isVisible())
 				return false;
 
 			try
 			{
 				// если группа есть
-				if(party != null)
+				if (party != null)
 					// передаем группе
 					pickUped = party.pickUpItem(this, character);
 				else
@@ -752,20 +753,20 @@ public abstract class ItemInstance extends TObject implements Foldable
 					Inventory inventory = character.getInventory();
 
 					// если его нет, выходим
-					if(inventory == null)
+					if (inventory == null)
 					{
 						log.warning(this, new Exception("not found inventory"));
 						return false;
 					}
 
 					// если объект не видим, выходим
-					if(!isVisible())
+					if (!isVisible())
 						return false;
 
 					long itemCount = getItemCount();
 
 					// пробуем положить итем в инвентарь
-					if(inventory.putItem(this))
+					if (inventory.putItem(this))
 					{
 						// получаем логгер игровых событий
 						GameLogManager gameLogger = GameLogManager.getInstance();
@@ -777,12 +778,11 @@ public abstract class ItemInstance extends TObject implements Foldable
 						ServerPacket packet = null;
 
 						// если это деньги
-						if(template.getItemId() != Inventory.MONEY_ITEM_ID)
+						if (template.getItemId() != Inventory.MONEY_ITEM_ID)
 							packet = MessageAddedItem.getInstance(character.getName(), template.getItemId(), (int) itemCount);
 						else
 						{
-							packet = SystemMessage.getInstance(MessageType.ADD_MONEY)
-									.addMoney(character.getName(), (int) itemCount);
+							packet = SystemMessage.getInstance(MessageType.ADD_MONEY).addMoney(character.getName(), (int) itemCount);
 						}
 
 						// отправляем сообщение
@@ -793,13 +793,13 @@ public abstract class ItemInstance extends TObject implements Foldable
 
 						return true;
 					}
-					else if(character.isPlayer())
+					else if (character.isPlayer())
 						character.sendMessage(MessageType.INVENTORY_IS_FULL);
 				}
 			}
 			finally
 			{
-				if(pickUped)
+				if (pickUped)
 				{
 					// получаем менеджер событий
 					ObjectEventManager eventManager = ObjectEventManager.getInstance();
@@ -813,7 +813,7 @@ public abstract class ItemInstance extends TObject implements Foldable
 					character.broadcastPacket(CharPickUpItem.getInstance(character, this));
 
 					// если итем сам добавился в инвентарь
-					if(hasOwner())
+					if (hasOwner())
 						// удаляем отображение итема в мире
 						decayMe(DeleteCharacter.DISAPPEARS);
 					else
@@ -821,14 +821,14 @@ public abstract class ItemInstance extends TObject implements Foldable
 						deleteMe();
 
 					// останавливаем таск жизни
-					if(lifeSchedule != null)
+					if (lifeSchedule != null)
 					{
 						lifeSchedule.cancel(true);
 						lifeSchedule = null;
 					}
 
 					// останавливаем таск блока
-					if(blockSchedule != null)
+					if (blockSchedule != null)
 					{
 						blockSchedule.cancel(true);
 						blockSchedule = null;
@@ -845,17 +845,19 @@ public abstract class ItemInstance extends TObject implements Foldable
 	}
 
 	@Override
-	public void reinit(){}
+	public void reinit()
+	{
+	}
 
 	/**
 	 * Удаление скилов итема у персонажа.
-	 *
+	 * 
 	 * @param owner персонаж.
 	 */
 	public final void removeFuncsTo(Character owner)
 	{
 		// если персонажа нет
-		if(owner == null)
+		if (owner == null)
 			return;
 
 		// удаляем функции итема
@@ -865,7 +867,7 @@ public abstract class ItemInstance extends TObject implements Foldable
 		CrystalList crystals = getCrystals();
 
 		// если их нет, выходим
-		if(crystals == null || crystals.isEmpty())
+		if (crystals == null || crystals.isEmpty())
 			return;
 
 		// удаляем функции кристалов
@@ -905,7 +907,7 @@ public abstract class ItemInstance extends TObject implements Foldable
 	/**
 	 * @param enchantLevel уровень заточки.
 	 */
-	public final void setEnchantLevel(int enchantLevel)
+	public void setEnchantLevel(int enchantLevel)
 	{
 		this.enchantLevel = enchantLevel;
 	}
@@ -937,6 +939,7 @@ public abstract class ItemInstance extends TObject implements Foldable
 	/**
 	 * @param objectId уникальный ид итема.
 	 */
+	@Override
 	public void setObjectId(int objectId)
 	{
 		this.objectId = objectId;
@@ -953,7 +956,9 @@ public abstract class ItemInstance extends TObject implements Foldable
 	/**
 	 * @param ownerName имя владельца итема.
 	 */
-	public void setOwnerName(String ownerName){}
+	public void setOwnerName(String ownerName)
+	{
+	}
 
 	/**
 	 * @param tempOwner выбивший итем.
@@ -974,9 +979,9 @@ public abstract class ItemInstance extends TObject implements Foldable
 	@Override
 	public void spawnMe()
 	{
-		synchronized(this)
+		synchronized (this)
 		{
-			if(isVisible())
+			if (isVisible())
 				return;
 
 			// получаем время спавна
@@ -992,7 +997,7 @@ public abstract class ItemInstance extends TObject implements Foldable
 			this.lifeSchedule = executor.scheduleGeneral(lifeTask, Config.WORLD_LIFE_TIME_DROP_ITEM * 1000);
 
 			// если есть владелец, блокируем итем
-			if(tempOwner != null || tempOwnerParty != null)
+			if (tempOwner != null || tempOwnerParty != null)
 				this.blockSchedule = executor.scheduleGeneral(blockTask, Config.WORLD_BLOCK_TIME_DROP_ITEM * 1000);
 		}
 
@@ -1006,7 +1011,7 @@ public abstract class ItemInstance extends TObject implements Foldable
 	{
 		itemCount -= count;
 
-		if(itemCount < 0)
+		if (itemCount < 0)
 			itemCount = 0;
 	}
 

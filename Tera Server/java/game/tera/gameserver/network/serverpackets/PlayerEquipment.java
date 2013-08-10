@@ -1,5 +1,7 @@
 package tera.gameserver.network.serverpackets;
 
+import java.nio.ByteBuffer;
+
 import tera.gameserver.model.Character;
 import tera.gameserver.model.equipment.Equipment;
 import tera.gameserver.model.equipment.SlotType;
@@ -14,40 +16,43 @@ import tera.gameserver.network.ServerPacketType;
 public class PlayerEquipment extends ServerPacket
 {
 	private static final ServerPacket instance = new PlayerEquipment();
-	
+
 	public static PlayerEquipment getInstance(Character owner)
 	{
 		PlayerEquipment packet = (PlayerEquipment) instance.newInstance();
-		
+
 		packet.objectId = owner.getObjectId();
 		packet.subId = owner.getSubId();
-		
+
 		Equipment equipment = owner.getEquipment();
-		
+
 		equipment.lock();
 		try
 		{
 			ItemInstance item = equipment.getItem(SlotType.SLOT_WEAPON);
+
 			packet.weaponId = item == null ? 0 : item.getItemId();
-			item = equipment.getItem(SlotType.SLOT_ARMOR);		
+			packet.enchantLevel = item == null ? 0 : item.getEnchantLevel();
+
+			item = equipment.getItem(SlotType.SLOT_ARMOR);
 			packet.armorId = item == null ? 0 : item.getItemId();
-			item = equipment.getItem(SlotType.SLOT_BOOTS);		
+			item = equipment.getItem(SlotType.SLOT_BOOTS);
 			packet.bootsId = item == null ? 0 : item.getItemId();
-			item = equipment.getItem(SlotType.SLOT_GLOVES);		
+			item = equipment.getItem(SlotType.SLOT_GLOVES);
 			packet.glovesId = item == null ? 0 : item.getItemId();
 			item = equipment.getItem(SlotType.SLOT_HAT);
 			packet.hatId = item == null ? 0 : item.getItemId();
-			item = equipment.getItem(SlotType.SLOT_MASK);		
+			item = equipment.getItem(SlotType.SLOT_MASK);
 			packet.maskId = item == null ? 0 : item.getItemId();
 		}
 		finally
 		{
 			equipment.unlock();
 		}
-		
+
 		return packet;
 	}
-	
+
 	/** обджект ид персонажа */
 	private int objectId;
 	/** саб ид персонажа */
@@ -64,6 +69,8 @@ public class PlayerEquipment extends ServerPacket
 	private int hatId;
 	/** ид маски */
 	private int maskId;
+	/** уровень заточки */
+	private int enchantLevel;
 
 	@Override
 	public ServerPacketType getPacketType()
@@ -72,71 +79,37 @@ public class PlayerEquipment extends ServerPacket
 	}
 
 	@Override
-	protected final void writeImpl()
+	public boolean isSynchronized()
 	{
-		writeOpcode();
-		writeInt(objectId);
-		writeInt(subId);
-		writeInt(weaponId);
-		writeInt(armorId);
-		writeInt(bootsId);
-		writeInt(glovesId);		
-		writeInt(hatId);
-		writeInt(maskId);	
-		writeInt(0);
-		
-		writeInt(0);//лифчик
-		writeInt(0);
-		
-		writeInt(0);
-		
-		writeInt(0);
-		writeInt(0);
-		writeInt(0);
-		writeInt(0);
-		writeInt(0);//точка ствола
-		writeInt(0);
-		writeInt(0);
-		writeInt(0);
-		
-		
-	/*	45 FF 
-		01 00 00 10 
-		E8 03 00 00 
-		11 27 00 00
-		99 3A 00 00 
-		9B 3A 00 00 
-		9A 3A 00 00 
-		00 00 00 00 
-		00 00 00 00 
-		00 00 00 00 
+		return false;
+	}
 
-		B2 80 02 00//лифчик
-		00 00 00 00
+	@Override
+	protected void writeImpl(ByteBuffer buffer)
+	{
+		writeOpcode(buffer);
+		writeInt(buffer, objectId);
+		writeInt(buffer, subId);
+		writeInt(buffer, weaponId);
+		writeInt(buffer, armorId);
+		writeInt(buffer, bootsId);
+		writeInt(buffer, glovesId);
+		writeInt(buffer, hatId);
+		writeInt(buffer, maskId);
+		writeInt(buffer, 0);
 
-		00 00 00 00 
+		writeInt(buffer, 0);// лифчик
+		writeInt(buffer, 0);
 
-		00 00 00 00 
-		00 00 00 00 
-		00 00 00 00
-		00 00 00 00 
-		0C 00 00 00 //на сколько проточен ствол 
-		00 00 00 00 
-		00 00 00 00
-		00 00 00 00
-		
-		*/
-		
-		
-		
-	}	
+		writeInt(buffer, 0);
+
+		writeInt(buffer, 0);
+		writeInt(buffer, 0);
+		writeInt(buffer, 0);
+		writeInt(buffer, 0);
+		writeInt(buffer, enchantLevel);// точка ствола
+		writeInt(buffer, 0);
+		writeInt(buffer, 0);
+		writeInt(buffer, 0);
+	}
 }
-
-
-
-
-
-
-
-
-

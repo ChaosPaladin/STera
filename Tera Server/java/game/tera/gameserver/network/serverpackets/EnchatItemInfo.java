@@ -43,7 +43,7 @@ public class EnchatItemInfo extends ServerPacket
 			packet.writeLong(buffer, 76);// 4C 00 00 00 00 00 00 00
 			packet.writeInt(buffer, dialog.getNeedItemCount(i));
 			packet.writeInt(buffer, dialog.getNeedItemCount(i));
-			packet.writeInt(buffer, 0);// 02 00 00 00 ?
+			packet.writeInt(buffer, dialog.getEnchantLevel(i));// 02 00 00 00
 			packet.writeInt(buffer, 0);// 00 00 00 00
 			packet.writeInt(buffer, dialog.isEnchantItem(i) ? 1 : 0);
 			packet.writeInt(buffer, 0);// 00 80 BC 04 иды бонусов

@@ -1,11 +1,20 @@
 package tera.gameserver.model.actions.dialogs;
 
+import rlib.util.array.Arrays;
 import rlib.util.random.Random;
+import rlib.util.random.Randoms;
+import rlib.util.table.IntKey;
+import rlib.util.table.Table;
+import rlib.util.table.Tables;
+import tera.gameserver.manager.DataBaseManager;
+import tera.gameserver.manager.ObjectEventManager;
+import tera.gameserver.manager.PacketManager;
 import tera.gameserver.model.inventory.Inventory;
 import tera.gameserver.model.items.ItemInstance;
 import tera.gameserver.model.playable.Player;
 import tera.gameserver.network.serverpackets.DialogPanel;
 import tera.gameserver.network.serverpackets.DialogPanel.PanelType;
+import tera.gameserver.network.serverpackets.EnchantResult;
 import tera.gameserver.network.serverpackets.EnchatItemInfo;
 
 /**
@@ -15,11 +24,64 @@ import tera.gameserver.network.serverpackets.EnchatItemInfo;
  */
 public class EnchantItemDialog extends AbstractActionDialog
 {
+	private static final int MAX_ENCHANT_LEVEL = 12;
+
+	public static final int ITEM_COUNTER = 2;
+
 	private static final int ALKAHEST_ITEM_INDEX = 2;
 	private static final int CONSUME_ITEM_INDEX = 1;
 	private static final int SOURCE_ITEM_INDEX = 0;
 
-	public static final int ITEM_COUNTER = 2;
+	/**
+	 * [20:25:19] BrabusX: 1-6 если белое ложишь = 5% если грин = 15% если синька = 30% если голд = 50%
+	 * 
+	 * 7-9 если белое = 3% если грин = 10% если синька = 20% если голд = 35%
+	 * 
+	 * 10-12 если белое = 1% если грин = 3% если синька = 10% если голд = 25%
+	 */
+	private static final int[][] CHANE_TABLE =
+	{
+			// 1 - 6
+			// common/uncommon/rare/epic
+			{ 5, 15, 30, 50
+			},
+			{ 5, 15, 30, 50
+			},
+			{ 5, 15, 30, 50
+			},
+			{ 5, 15, 30, 50
+			},
+			{ 5, 15, 30, 50
+			},
+			{ 5, 15, 30, 50
+			},
+			// 7 - 9
+			{ 3, 10, 20, 35
+			},
+			{ 3, 10, 20, 35
+			},
+			{ 3, 10, 20, 35
+			},
+			// 10 - 12
+			{ 1, 3, 10, 25
+			},
+			{ 1, 3, 10, 25
+			},
+			{ 1, 3, 10, 25
+			},
+	};
+
+	private static final Table<IntKey, int[]> ALKAHEST_TABLE;
+
+	static
+	{
+		ALKAHEST_TABLE = Tables.newIntegerTable();
+
+		ALKAHEST_TABLE.put(15, Arrays.toIntegerArray(0, 6));
+		ALKAHEST_TABLE.put(446, Arrays.toIntegerArray(6, 9));
+		ALKAHEST_TABLE.put(448, Arrays.toIntegerArray(6, 9));
+		ALKAHEST_TABLE.put(447, Arrays.toIntegerArray(9, 12));
+	}
 
 	public static EnchantItemDialog newInstance(Player player)
 	{
@@ -35,7 +97,7 @@ public class EnchantItemDialog extends AbstractActionDialog
 	}
 
 	/** рандоминайзер диалога */
-	private Random random;
+	private final Random random;
 
 	/** целевой затачиваемый итем */
 	private ItemInstance consume;
@@ -44,11 +106,99 @@ public class EnchantItemDialog extends AbstractActionDialog
 	/** ресурс для заточки */
 	private ItemInstance source;
 
+	public EnchantItemDialog()
+	{
+		this.random = Randoms.newRealRandom();
+	}
+
 	@Override
 	public boolean apply()
 	{
-		// TODO Автоматически созданная заглушка метода
-		return false;
+		try
+		{
+			Player actor = getActor();
+
+			if (actor == null)
+				return false;
+
+			Inventory inventory = actor.getInventory();
+
+			if (inventory == null)
+				return false;
+
+			inventory.lock();
+			try
+			{
+				ItemInstance target = getSource();
+				ItemInstance source = inventory.getItemForObjectId(target.getObjectId());
+
+				if (source == null)
+					return false;
+
+				target = getConsume();
+
+				ItemInstance consume = inventory.getItemForObjectId(target.getObjectId());
+
+				if (consume == null || consume == source || consume.getExtractable() < source.getExtractable())
+					return false;
+
+				if (!source.getClass().isInstance(consume))
+					return false;
+
+				target = getAlkahest();
+
+				ItemInstance alkahest = inventory.getItemForItemId(target.getItemId());
+
+				if (alkahest == null || alkahest.getItemCount() < source.getExtractable())
+					return false;
+
+				int[] range = ALKAHEST_TABLE.get(alkahest.getItemId());
+
+				if (source.getEnchantLevel() < range[0] || source.getEnchantLevel() >= range[1])
+					return false;
+
+				int chance = CHANE_TABLE[source.getEnchantLevel()][source.getRank().ordinal()];
+
+				actor.sendMessage("chance " + chance);
+
+				boolean fail = !random.chance(chance);
+
+				consume.setOwnerId(0);
+
+				PacketManager.showDeleteItem(actor, consume);
+
+				inventory.removeItem(consume);
+
+				DataBaseManager manager = DataBaseManager.getInstance();
+				manager.updateLocationItem(consume);
+
+				inventory.removeItem(alkahest.getItemId(), source.getExtractable());
+
+				if (fail)
+					actor.sendPacket(EnchantResult.getFail(), false);
+				else
+				{
+					source.setEnchantLevel(source.getEnchantLevel() + 1);
+
+					manager.updateItem(source);
+
+					actor.sendPacket(EnchantResult.getSuccessful(), false);
+				}
+
+				ObjectEventManager eventManager = ObjectEventManager.getInstance();
+				eventManager.notifyInventoryChanged(actor);
+
+				return true;
+			}
+			finally
+			{
+				inventory.unlock();
+			}
+		}
+		finally
+		{
+			setConsume(null);
+		}
 	}
 
 	@Override
@@ -73,46 +223,63 @@ public class EnchantItemDialog extends AbstractActionDialog
 		return false;
 	}
 
+	/**
+	 * @return разбиваемый предмет.
+	 */
 	public ItemInstance getConsume()
 	{
 		return consume;
 	}
 
+	/**
+	 * @param consume разбиваемый предмет.
+	 */
 	public void setConsume(ItemInstance consume)
 	{
 		this.consume = consume;
 	}
 
+	/**
+	 * @return используемый алкахест.
+	 */
 	public ItemInstance getAlkahest()
 	{
 		return alkahest;
 	}
 
+	/**
+	 * @param alkahest затачиваемый предмет.
+	 */
 	public void setAlkahest(ItemInstance alkahest)
 	{
 		this.alkahest = alkahest;
 	}
 
+	/**
+	 * @return затачиваемый предмет.
+	 */
 	public ItemInstance getSource()
 	{
 		return source;
 	}
 
+	/**
+	 * @param source затачиваемый предмет.
+	 */
 	public void setSource(ItemInstance source)
 	{
 		this.source = source;
 	}
 
+	/**
+	 * Обновление диалога.
+	 */
 	private void updateDialog()
 	{
-		System.out.println("update dialog");
+		Player actor = getActor();
 
-		actor.sendPacket(EnchatItemInfo.getInstance(this), true);
-	}
-
-	public ItemInstance getItem(int index)
-	{
-		return null;
+		if (actor != null)
+			actor.sendPacket(EnchatItemInfo.getInstance(this), true);
 	}
 
 	/**
@@ -273,6 +440,12 @@ public class EnchantItemDialog extends AbstractActionDialog
 					return;
 				}
 
+				if (source.getEnchantLevel() >= MAX_ENCHANT_LEVEL)
+				{
+					actor.sendMessage("Предмет уже максимально зачарован.");
+					return;
+				}
+
 				if (source.getExtractable() < 1)
 				{
 					actor.sayMessage("Этот предмет нельзя зачаровывать.");
@@ -293,12 +466,6 @@ public class EnchantItemDialog extends AbstractActionDialog
 					return;
 				}
 
-				if (getAlkahest() != null)
-				{
-					actor.sendMessage("Нужно очистить alkshest.");
-					return;
-				}
-
 				ItemInstance consume = findItem(objectId, itemId);
 
 				if (consume == null || consume == getSource())
@@ -313,6 +480,12 @@ public class EnchantItemDialog extends AbstractActionDialog
 					return;
 				}
 
+				if (!source.getClass().isInstance(consume))
+				{
+					actor.sendMessage("Этот предмет не подходит по типу.");
+					return;
+				}
+
 				setConsume(consume);
 				updateDialog();
 				break;
@@ -324,6 +497,20 @@ public class EnchantItemDialog extends AbstractActionDialog
 				if (source == null || getConsume() == null)
 				{
 					actor.sendMessage("Заполните остальные ячейки.");
+					return;
+				}
+
+				int[] range = ALKAHEST_TABLE.get(itemId);
+
+				if (range == null)
+				{
+					actor.sendMessage("Этот предмет не является alkahest.");
+					return;
+				}
+
+				if (source.getEnchantLevel() >= range[1] || source.getEnchantLevel() < range[0])
+				{
+					actor.sendMessage("Данный alkahest не подходит.");
 					return;
 				}
 
@@ -367,6 +554,25 @@ public class EnchantItemDialog extends AbstractActionDialog
 			return inventory.getItemForObjectId(objectId);
 
 		return inventory.getItemForItemId(itemId);
+	}
+
+	/**
+	 * Уровень заточки затачиваемого предмета.
+	 * 
+	 * @param index индекс ячейки.
+	 * @return уровень заточки.
+	 */
+	public int getEnchantLevel(int index)
+	{
+		if (index == SOURCE_ITEM_INDEX)
+		{
+			ItemInstance source = getSource();
+
+			if (source != null)
+				return source.getEnchantLevel();
+		}
+
+		return 0;
 	}
 
 	@Override
