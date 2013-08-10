@@ -24,13 +24,13 @@ public class EnchatItemInfo extends ServerPacket
 		int n = 8;
 
 		packet.writeShort(buffer, 3);// 03 00
-		packet.writeShort(n);// 08 00
+		packet.writeShort(buffer, n);// 08 00
 
 		for (int i = 0, length = EnchantItemDialog.ITEM_COUNTER; i <= length; i++)
 		{
 			packet.writeShort(buffer, n);// 08 00
 
-			if (i == length)
+			if (i != length)
 				packet.writeShort(buffer, n += 126);
 			else
 				packet.writeShort(buffer, 0);

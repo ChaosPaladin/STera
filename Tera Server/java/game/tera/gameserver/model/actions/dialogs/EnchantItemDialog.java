@@ -301,7 +301,7 @@ public class EnchantItemDialog extends AbstractActionDialog
 
 				ItemInstance consume = findItem(objectId, itemId);
 
-				if (consume == null)
+				if (consume == null || consume == getSource())
 				{
 					actor.sendMessage("Не найден такой предмет.");
 					return;
@@ -367,5 +367,13 @@ public class EnchantItemDialog extends AbstractActionDialog
 			return inventory.getItemForObjectId(objectId);
 
 		return inventory.getItemForItemId(itemId);
+	}
+
+	@Override
+	public void finalyze()
+	{
+		setAlkahest(null);
+		setConsume(null);
+		setSource(null);
 	}
 }

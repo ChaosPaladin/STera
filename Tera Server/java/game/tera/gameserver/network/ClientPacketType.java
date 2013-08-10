@@ -11,6 +11,7 @@ import tera.gameserver.network.clientpackets.CanBeUsedName;
 import tera.gameserver.network.clientpackets.CancelTrade;
 import tera.gameserver.network.clientpackets.ClientKey;
 import tera.gameserver.network.clientpackets.ClientPacket;
+import tera.gameserver.network.clientpackets.EnchantFinish;
 import tera.gameserver.network.clientpackets.EnteredWorld;
 import tera.gameserver.network.clientpackets.NameChange;
 import tera.gameserver.network.clientpackets.PlayerClimb;
@@ -316,6 +317,8 @@ public enum ClientPacketType
 
 	/** запрос на добавление предмета в диалог заточки */
 	REQUEST_ADD_ENCHANT_ITEM(0x5E4E, new RequestAddEnchantItem()),
+	/** уведомление о завершении анимации заточки */
+	ENCHANT_FINISH(0xDDB4, new EnchantFinish()),
 
 	/** пакет выбора персонажа, версия */
 	PLAYER_SELECTED_PACKET(0xE3A4, new SelectedPlayer()),
