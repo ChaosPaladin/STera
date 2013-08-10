@@ -3,14 +3,12 @@ package tera.gameserver.network.serverpackets;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import rlib.util.Util;
-import tera.gameserver.IdFactory;
 import tera.gameserver.model.actions.dialogs.EnchantItemDialog;
 import tera.gameserver.network.ServerPacketType;
 
 /**
  * Пакет с полной информацией об диалоге зачоравания вещи.
- *
+ * 
  * @author Ronn
  */
 public class EnchatItemInfo extends ServerPacket
@@ -26,34 +24,32 @@ public class EnchatItemInfo extends ServerPacket
 		int n = 8;
 
 		packet.writeShort(buffer, 3);// 03 00
-		packet.writeShort(buffer, n);// 08 00
+		packet.writeShort(n);// 08 00
 
-		for(int i = 0, length = 3; i < length; i++)
+		for (int i = 0, length = EnchantItemDialog.ITEM_COUNTER; i <= length; i++)
 		{
 			packet.writeShort(buffer, n);// 08 00
 
-			if(i == 2)
-				packet.writeShort(buffer, 0);// 86 00 если последний то нуллим как обычно
+			if (i == length)
+				packet.writeShort(buffer, n += 126);
 			else
-				packet.writeShort(buffer, n += 126);// 86 00 если последний то нуллим как обычно
+				packet.writeShort(buffer, 0);
 
 			packet.writeInt(buffer, 0);// 00 00 00 00
 			packet.writeInt(buffer, i);// //номер ячейки с нуля 0,1,2
-			packet.writeInt(buffer, 10940 + i);// 23 28 00 00 ид того что точим
-			packet.writeInt(buffer, 0);//IdFactory.getNextActionId());// 30 6C 72 03 обжект ид того что точим
-			packet.writeInt(buffer, 0);// 00 00 00 00
-			packet.writeInt(buffer, 14408);// 48 38 00 00 00 00 00 00
-			packet.writeLong(buffer, 0);// 4C 00 00 00 00 00 00 00
-			packet.writeInt(buffer, 1);// 01 00 00 00 кол-во
-			packet.writeInt(buffer, 1);// 01 00 00 00 кол-во
+			packet.writeInt(buffer, dialog.getItemId(i));
+			packet.writeLong(buffer, dialog.getObjectId(i));
+			packet.writeLong(buffer, 14408);// 48 38 00 00 00 00 00 00
+			packet.writeLong(buffer, 76);// 4C 00 00 00 00 00 00 00
+			packet.writeInt(buffer, dialog.getNeedItemCount(i));
+			packet.writeInt(buffer, dialog.getNeedItemCount(i));
 			packet.writeInt(buffer, 0);// 02 00 00 00 ?
 			packet.writeInt(buffer, 0);// 00 00 00 00
-			packet.writeInt(buffer, 1);// 01 00 00 00 ?
+			packet.writeInt(buffer, dialog.isEnchantItem(i) ? 1 : 0);
 			packet.writeInt(buffer, 0);// 00 80 BC 04 иды бонусов
 			packet.writeInt(buffer, 0);// 00 B8 BB 04 иды бонусов
 			packet.writeInt(buffer, 0);// 00 D8 BE 04 иды бонусов
 			packet.writeInt(buffer, 0);// 00 10 BE 04 иды бонусов
-
 			packet.writeLong(buffer, 0);// 00 00 00 00 00 00 00 00
 			packet.writeLong(buffer, 0);// 00 00 00 00 00 00 00 00
 			packet.writeLong(buffer, 0);// 00 00 00 00 00 00 00 00
@@ -63,11 +59,13 @@ public class EnchatItemInfo extends ServerPacket
 			packet.writeShort(buffer, 0);// 00 00
 		}
 
+		buffer.flip();
+
 		return packet;
 	}
 
 	/** пати */
-	private ByteBuffer prepare;
+	private final ByteBuffer prepare;
 
 	public EnchatItemInfo()
 	{
@@ -92,15 +90,20 @@ public class EnchatItemInfo extends ServerPacket
 		return false;
 	}
 
+	/**
+	 * @return подготавливаемый буффер.
+	 */
+	private ByteBuffer getPrepare()
+	{
+		return prepare;
+	}
+
 	@Override
 	protected void writeImpl(ByteBuffer buffer)
 	{
 		writeOpcode(buffer);
 
-		prepare.flip();
-
-		buffer.put(prepare);
-
-		System.out.println(Util.hexdump(buffer.array(), buffer.position()));
+		ByteBuffer prepare = getPrepare();
+		buffer.put(prepare.array(), 0, prepare.limit());
 	}
 }
