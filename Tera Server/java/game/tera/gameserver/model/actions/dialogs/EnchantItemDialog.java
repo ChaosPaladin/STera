@@ -208,7 +208,7 @@ public class EnchantItemDialog extends AbstractActionDialog
 
 				int chance = CHANE_TABLE[source.getEnchantLevel()][consume.getRank().ordinal()];
 
-				actor.sendMessage("chance " + chance);
+				//actor.sendMessage("chance " + chance);
 
 				boolean fail = !random.chance(chance);
 
