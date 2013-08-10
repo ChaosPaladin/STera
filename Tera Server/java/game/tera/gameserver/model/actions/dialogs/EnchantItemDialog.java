@@ -33,7 +33,8 @@ public class EnchantItemDialog extends AbstractActionDialog
 	private static final int SOURCE_ITEM_INDEX = 0;
 
 	/**
-	 * [20:25:19] BrabusX: 1-6 если белое ложишь = 5% если грин = 15% если синька = 30% если голд = 50%
+	 * [20:25:19] BrabusX: 1-6 если белое ложишь = 5% если грин = 15% если
+	 * синька = 30% если голд = 50%
 	 * 
 	 * 7-9 если белое = 3% если грин = 10% если синька = 20% если голд = 35%
 	 * 
@@ -41,34 +42,82 @@ public class EnchantItemDialog extends AbstractActionDialog
 	 */
 	private static final int[][] CHANE_TABLE =
 	{
-			// 1 - 6
-			// common/uncommon/rare/epic
-			{ 5, 15, 30, 50
-			},
-			{ 5, 15, 30, 50
-			},
-			{ 5, 15, 30, 50
-			},
-			{ 5, 15, 30, 50
-			},
-			{ 5, 15, 30, 50
-			},
-			{ 5, 15, 30, 50
-			},
-			// 7 - 9
-			{ 3, 10, 20, 35
-			},
-			{ 3, 10, 20, 35
-			},
-			{ 3, 10, 20, 35
-			},
-			// 10 - 12
-			{ 1, 3, 10, 25
-			},
-			{ 1, 3, 10, 25
-			},
-			{ 1, 3, 10, 25
-			},
+		// 1 - 6
+		// common/uncommon/rare/epic
+		{
+			5,
+			15,
+			30,
+			50
+		},
+		{
+			5,
+			15,
+			30,
+			50
+		},
+		{
+			5,
+			15,
+			30,
+			50
+		},
+		{
+			5,
+			15,
+			30,
+			50
+		},
+		{
+			5,
+			15,
+			30,
+			50
+		},
+		{
+			5,
+			15,
+			30,
+			50
+		},
+		// 7 - 9
+		{
+			3,
+			10,
+			20,
+			35
+		},
+		{
+			3,
+			10,
+			20,
+			35
+		},
+		{
+			3,
+			10,
+			20,
+			35
+		},
+		// 10 - 12
+		{
+			1,
+			3,
+			10,
+			25
+		},
+		{
+			1,
+			3,
+			10,
+			25
+		},
+		{
+			1,
+			3,
+			10,
+			25
+		},
 	};
 
 	private static final Table<IntKey, int[]> ALKAHEST_TABLE;
@@ -87,7 +136,7 @@ public class EnchantItemDialog extends AbstractActionDialog
 	{
 		EnchantItemDialog dialog = (EnchantItemDialog) ActionDialogType.ENCHANT_ITEM_DIALOG.newInstance();
 
-		if (dialog == null)
+		if(dialog == null)
 			dialog = new EnchantItemDialog();
 
 		dialog.actor = player;
@@ -118,12 +167,12 @@ public class EnchantItemDialog extends AbstractActionDialog
 		{
 			Player actor = getActor();
 
-			if (actor == null)
+			if(actor == null)
 				return false;
 
 			Inventory inventory = actor.getInventory();
 
-			if (inventory == null)
+			if(inventory == null)
 				return false;
 
 			inventory.lock();
@@ -132,32 +181,32 @@ public class EnchantItemDialog extends AbstractActionDialog
 				ItemInstance target = getSource();
 				ItemInstance source = inventory.getItemForObjectId(target.getObjectId());
 
-				if (source == null)
+				if(source == null)
 					return false;
 
 				target = getConsume();
 
 				ItemInstance consume = inventory.getItemForObjectId(target.getObjectId());
 
-				if (consume == null || consume == source || consume.getExtractable() < source.getExtractable())
+				if(consume == null || consume == source || consume.getExtractable() < source.getExtractable())
 					return false;
 
-				if (!source.getClass().isInstance(consume))
+				if(!source.getClass().isInstance(consume))
 					return false;
 
 				target = getAlkahest();
 
 				ItemInstance alkahest = inventory.getItemForItemId(target.getItemId());
 
-				if (alkahest == null || alkahest.getItemCount() < source.getExtractable())
+				if(alkahest == null || alkahest.getItemCount() < source.getExtractable())
 					return false;
 
 				int[] range = ALKAHEST_TABLE.get(alkahest.getItemId());
 
-				if (source.getEnchantLevel() < range[0] || source.getEnchantLevel() >= range[1])
+				if(source.getEnchantLevel() < range[0] || source.getEnchantLevel() >= range[1])
 					return false;
 
-				int chance = CHANE_TABLE[source.getEnchantLevel()][source.getRank().ordinal()];
+				int chance = CHANE_TABLE[consume.getEnchantLevel()][consume.getRank().ordinal()];
 
 				actor.sendMessage("chance " + chance);
 
@@ -174,7 +223,7 @@ public class EnchantItemDialog extends AbstractActionDialog
 
 				inventory.removeItem(alkahest.getItemId(), source.getExtractable());
 
-				if (fail)
+				if(fail)
 					actor.sendPacket(EnchantResult.getFail(), false);
 				else
 				{
@@ -210,7 +259,7 @@ public class EnchantItemDialog extends AbstractActionDialog
 	@Override
 	public synchronized boolean init()
 	{
-		if (super.init())
+		if(super.init())
 		{
 			Player actor = getActor();
 
@@ -278,7 +327,7 @@ public class EnchantItemDialog extends AbstractActionDialog
 	{
 		Player actor = getActor();
 
-		if (actor != null)
+		if(actor != null)
 			actor.sendPacket(EnchatItemInfo.getInstance(this), true);
 	}
 
@@ -290,13 +339,13 @@ public class EnchantItemDialog extends AbstractActionDialog
 	 */
 	public int getItemId(int index)
 	{
-		switch (index)
+		switch(index)
 		{
 			case SOURCE_ITEM_INDEX:
 			{
 				ItemInstance source = getSource();
 
-				if (source != null)
+				if(source != null)
 					return source.getItemId();
 
 				break;
@@ -305,7 +354,7 @@ public class EnchantItemDialog extends AbstractActionDialog
 			{
 				ItemInstance consume = getConsume();
 
-				if (consume != null)
+				if(consume != null)
 					return consume.getItemId();
 
 				break;
@@ -314,7 +363,7 @@ public class EnchantItemDialog extends AbstractActionDialog
 			{
 				ItemInstance alkahest = getAlkahest();
 
-				if (alkahest != null)
+				if(alkahest != null)
 					return alkahest.getItemId();
 
 				break;
@@ -332,13 +381,13 @@ public class EnchantItemDialog extends AbstractActionDialog
 	 */
 	public int getObjectId(int index)
 	{
-		switch (index)
+		switch(index)
 		{
 			case SOURCE_ITEM_INDEX:
 			{
 				ItemInstance source = getSource();
 
-				if (source != null)
+				if(source != null)
 					return source.getObjectId();
 
 				break;
@@ -347,7 +396,7 @@ public class EnchantItemDialog extends AbstractActionDialog
 			{
 				ItemInstance consume = getConsume();
 
-				if (consume != null)
+				if(consume != null)
 					return consume.getObjectId();
 
 				break;
@@ -356,7 +405,7 @@ public class EnchantItemDialog extends AbstractActionDialog
 			{
 				ItemInstance alkahest = getAlkahest();
 
-				if (alkahest != null)
+				if(alkahest != null)
 					return alkahest.getObjectId();
 
 				break;
@@ -374,7 +423,7 @@ public class EnchantItemDialog extends AbstractActionDialog
 	 */
 	public int getNeedItemCount(int index)
 	{
-		switch (index)
+		switch(index)
 		{
 			case SOURCE_ITEM_INDEX:
 				return 1;
@@ -384,7 +433,7 @@ public class EnchantItemDialog extends AbstractActionDialog
 			{
 				ItemInstance source = getSource();
 
-				if (source != null)
+				if(source != null)
 					return source.getExtractable();
 
 				break;
@@ -395,14 +444,16 @@ public class EnchantItemDialog extends AbstractActionDialog
 	}
 
 	/**
-	 * Является ли ячейка с указанным индексом ,ячейкой для затачиваемого предмета.
+	 * Является ли ячейка с указанным индексом ,ячейкой для затачиваемого
+	 * предмета.
 	 * 
 	 * @param index индекс ячейки.
-	 * @return является ли ячейка с указанным индексом, ячейкой для затачиваемого предмета.
+	 * @return является ли ячейка с указанным индексом, ячейкой для
+	 * затачиваемого предмета.
 	 */
 	public boolean isEnchantItem(int index)
 	{
-		switch (index)
+		switch(index)
 		{
 			case SOURCE_ITEM_INDEX:
 				return true;
@@ -422,11 +473,11 @@ public class EnchantItemDialog extends AbstractActionDialog
 	{
 		Player actor = getActor();
 
-		switch (index)
+		switch(index)
 		{
 			case SOURCE_ITEM_INDEX:
 			{
-				if (getConsume() != null || getAlkahest() != null)
+				if(getConsume() != null || getAlkahest() != null)
 				{
 					actor.sendMessage("Нужно очистить используемый предмет и alkshest.");
 					return;
@@ -434,19 +485,19 @@ public class EnchantItemDialog extends AbstractActionDialog
 
 				ItemInstance source = findItem(objectId, itemId);
 
-				if (source == null)
+				if(source == null)
 				{
 					actor.sendMessage("Не найден такой предмет.");
 					return;
 				}
 
-				if (source.getEnchantLevel() >= MAX_ENCHANT_LEVEL)
+				if(source.getEnchantLevel() >= MAX_ENCHANT_LEVEL)
 				{
 					actor.sendMessage("Предмет уже максимально зачарован.");
 					return;
 				}
 
-				if (source.getExtractable() < 1)
+				if(source.getExtractable() < 1)
 				{
 					actor.sayMessage("Этот предмет нельзя зачаровывать.");
 					return;
@@ -460,7 +511,7 @@ public class EnchantItemDialog extends AbstractActionDialog
 			{
 				ItemInstance source = getSource();
 
-				if (source == null)
+				if(source == null)
 				{
 					actor.sendMessage("Не указан предмет для зачарования.");
 					return;
@@ -468,19 +519,19 @@ public class EnchantItemDialog extends AbstractActionDialog
 
 				ItemInstance consume = findItem(objectId, itemId);
 
-				if (consume == null || consume == getSource())
+				if(consume == null || consume == getSource())
 				{
 					actor.sendMessage("Не найден такой предмет.");
 					return;
 				}
 
-				if (source.getExtractable() != consume.getExtractable())
+				if(source.getExtractable() != consume.getExtractable())
 				{
 					actor.sendMessage("Этот предмет не подходит по уровню зачарования.");
 					return;
 				}
 
-				if (!source.getClass().isInstance(consume))
+				if(!source.getClass().isInstance(consume))
 				{
 					actor.sendMessage("Этот предмет не подходит по типу.");
 					return;
@@ -494,7 +545,7 @@ public class EnchantItemDialog extends AbstractActionDialog
 			{
 				ItemInstance source = getSource();
 
-				if (source == null || getConsume() == null)
+				if(source == null || getConsume() == null)
 				{
 					actor.sendMessage("Заполните остальные ячейки.");
 					return;
@@ -502,13 +553,13 @@ public class EnchantItemDialog extends AbstractActionDialog
 
 				int[] range = ALKAHEST_TABLE.get(itemId);
 
-				if (range == null)
+				if(range == null)
 				{
 					actor.sendMessage("Этот предмет не является alkahest.");
 					return;
 				}
 
-				if (source.getEnchantLevel() >= range[1] || source.getEnchantLevel() < range[0])
+				if(source.getEnchantLevel() >= range[1] || source.getEnchantLevel() < range[0])
 				{
 					actor.sendMessage("Данный alkahest не подходит.");
 					return;
@@ -516,13 +567,13 @@ public class EnchantItemDialog extends AbstractActionDialog
 
 				ItemInstance alkahest = findItem(objectId, itemId);
 
-				if (alkahest == null)
+				if(alkahest == null)
 				{
 					actor.sendMessage("Не найден такой предмет.");
 					return;
 				}
 
-				if (alkahest.getItemCount() < source.getExtractable())
+				if(alkahest.getItemCount() < source.getExtractable())
 				{
 					actor.sendMessage("Недостаточное кол-во.");
 					return;
@@ -545,12 +596,12 @@ public class EnchantItemDialog extends AbstractActionDialog
 	{
 		Player actor = getActor();
 
-		if (actor == null)
+		if(actor == null)
 			return null;
 
 		Inventory inventory = actor.getInventory();
 
-		if (objectId != 0)
+		if(objectId != 0)
 			return inventory.getItemForObjectId(objectId);
 
 		return inventory.getItemForItemId(itemId);
@@ -564,11 +615,11 @@ public class EnchantItemDialog extends AbstractActionDialog
 	 */
 	public int getEnchantLevel(int index)
 	{
-		if (index == SOURCE_ITEM_INDEX)
+		if(index == SOURCE_ITEM_INDEX)
 		{
 			ItemInstance source = getSource();
 
-			if (source != null)
+			if(source != null)
 				return source.getEnchantLevel();
 		}
 
