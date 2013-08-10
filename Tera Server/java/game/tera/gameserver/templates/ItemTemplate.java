@@ -101,7 +101,7 @@ public abstract class ItemTemplate implements Reloadable<ItemTemplate>
 			guildBank = vars.getBoolean("guildBank", true);
 			deletable = vars.getBoolean("deletable", true);
 		}
-		catch (Exception e)
+		catch(Exception e)
 		{
 			log.warning(this, e);
 			throw e;
@@ -117,10 +117,10 @@ public abstract class ItemTemplate implements Reloadable<ItemTemplate>
 	{
 		Func[] funcs = getFuncs();
 
-		if (funcs.length < 1)
+		if(funcs.length < 1)
 			return;
 
-		for (int i = 0, length = funcs.length; i < length; i++)
+		for(int i = 0, length = funcs.length; i < length; i++)
 			funcs[i].addFuncTo(character);
 	}
 
@@ -268,7 +268,7 @@ public abstract class ItemTemplate implements Reloadable<ItemTemplate>
 	 */
 	public Rank getRank()
 	{
-		return Rank.COMMON;
+		return rank;
 	}
 
 	/**
@@ -394,14 +394,14 @@ public abstract class ItemTemplate implements Reloadable<ItemTemplate>
 
 		int objectId = idFactory.getNextItemId();
 
-		if (item == null)
+		if(item == null)
 			item = itemClass.newInstance(objectId, this);
 
 		item.setObjectId(idFactory.getNextItemId());
 
 		DataBaseManager dbManager = DataBaseManager.getInstance();
 
-		if (!dbManager.createItem(item))
+		if(!dbManager.createItem(item))
 			return null;
 
 		return item;
@@ -414,7 +414,7 @@ public abstract class ItemTemplate implements Reloadable<ItemTemplate>
 	{
 		ItemInstance item = itemPool.take();
 
-		if (item == null)
+		if(item == null)
 			item = itemClass.newInstance(objectId, this);
 
 		item.setObjectId(objectId);
@@ -435,7 +435,7 @@ public abstract class ItemTemplate implements Reloadable<ItemTemplate>
 	@Override
 	public void reload(ItemTemplate update)
 	{
-		if (getClass() != update.getClass())
+		if(getClass() != update.getClass())
 			return;
 
 		Objects.reload(this, update);
@@ -450,10 +450,10 @@ public abstract class ItemTemplate implements Reloadable<ItemTemplate>
 	{
 		Func[] funcs = getFuncs();
 
-		if (funcs.length < 1)
+		if(funcs.length < 1)
 			return;
 
-		for (int i = 0, length = funcs.length; i < length; i++)
+		for(int i = 0, length = funcs.length; i < length; i++)
 			funcs[i].removeFuncTo(character);
 	}
 
