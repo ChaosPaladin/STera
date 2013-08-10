@@ -106,14 +106,33 @@ public class PlayerEntered extends ServerPacket
 			packet.writeByte(buffer, 0);
 			packet.writeInt(buffer, 0);// 03 00 00 00 если 3, то надпись "Ангел смерти"
 			packet.writeInt(buffer, 0);// 00 00 00 00
-			packet.writeLong(buffer, 0);// 00 00 00 00 00 00 00 00
-			packet.writeLong(buffer, 0);// 00 00 00 00 00 00 00 00
-			packet.writeLong(buffer, 0);// 00 00 00 00 00 00 00 00
-			packet.writeLong(buffer, 0);// 00 00 00 00 00 00 00 00
+			
+			
+			packet.writeInt(buffer, 0);// 00 00 00 00
+			packet.writeInt(buffer, 0);// 00 00 00 00
+			packet.writeInt(buffer, 0);// 00 00 00 00
+			packet.writeInt(buffer, 0);// 00 00 00 00
+			packet.writeInt(buffer, 0);// 00 00 00 00
+			packet.writeInt(buffer, 0);// 00 00 00 00
+			packet.writeInt(buffer, 0);// 00 00 00 00
+			packet.writeInt(buffer, 9);// точка
+			
+			
+			
 			packet.writeByte(buffer, 0);// 00
+			
+			
 			packet.writeInt(buffer, player.getKarma());// 78 00 00 00 .//карма
-			packet.writeLong(buffer, 1);// 01 00 00 00 00 00 00 00
-			packet.writeLong(buffer, 0);// 00 00 00 00 00 00 00 00
+			packet.writeInt(buffer, 1);// 01 00 00 00 
+			
+			packet.writeInt(buffer, 0);// 00 00 00 00//00 00 00 00
+			
+			
+			packet.writeInt(buffer, 0);// 00 00 00 00
+			packet.writeInt(buffer, 0);// 00 00 00 00
+			
+			
+			
 			packet.writeByte(buffer, 0);// 00
 
 			packet.writeString(buffer, player.getName());

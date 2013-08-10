@@ -3,12 +3,12 @@
 	<!-- класс драйвера базы данных (com.mysql.jdbc.Driver) -->
 	<set name="DATA_BASE_DRIVER" value="com.mysql.jdbc.Driver" />
 	<!-- адресс базы данных (jdbc:mysql://localhost/stdb) -->
-	<set name="DATA_BASE_URL" value="jdbc:mysql://localhost/stdb" />
+	<set name="DATA_BASE_URL" value="jdbc:mysql://localhost/teratest" />
 	
 	<!-- логин для доступа к базе данных (root) -->
 	<set name="DATA_BASE_LOGIN" value="root" />
 	<!-- пароль для доступа к базе данных (000000) -->
-	<set name="DATA_BASE_PASSWORD" value="newlineage2" />
+	<set name="DATA_BASE_PASSWORD" value="1ert5er6d" />
 	
 	<!-- максимальное кол-во коннектов к базе в пуле (10) -->
 	<set name="DATA_BASE_MAX_CONNECTIONS" value="10" />

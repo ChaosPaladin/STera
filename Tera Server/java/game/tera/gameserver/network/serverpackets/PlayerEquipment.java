@@ -82,12 +82,61 @@ public class PlayerEquipment extends ServerPacket
 		writeInt(bootsId);
 		writeInt(glovesId);		
 		writeInt(hatId);
-		writeInt(maskId);		
-		writeLong(0);
-		writeLong(0);
-		writeLong(0);
-		writeLong(0);
-		writeLong(0);
-		writeLong(0);
-	}
+		writeInt(maskId);	
+		writeInt(0);
+		
+		writeInt(0);//лифчик
+		writeInt(0);
+		
+		writeInt(0);
+		
+		writeInt(0);
+		writeInt(0);
+		writeInt(0);
+		writeInt(0);
+		writeInt(0);//точка ствола
+		writeInt(0);
+		writeInt(0);
+		writeInt(0);
+		
+		
+	/*	45 FF 
+		01 00 00 10 
+		E8 03 00 00 
+		11 27 00 00
+		99 3A 00 00 
+		9B 3A 00 00 
+		9A 3A 00 00 
+		00 00 00 00 
+		00 00 00 00 
+		00 00 00 00 
+
+		B2 80 02 00//лифчик
+		00 00 00 00
+
+		00 00 00 00 
+
+		00 00 00 00 
+		00 00 00 00 
+		00 00 00 00
+		00 00 00 00 
+		0C 00 00 00 //на сколько проточен ствол 
+		00 00 00 00 
+		00 00 00 00
+		00 00 00 00
+		
+		*/
+		
+		
+		
+	}	
 }
+
+
+
+
+
+
+
+
+

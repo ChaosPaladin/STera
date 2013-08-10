@@ -103,17 +103,32 @@ public class PlayerInfo extends ServerPacket
 		packet.writeLong(buffer, 0);
 		packet.writeLong(buffer, 0);
 		packet.writeLong(buffer, 0);
-		packet.writeLong(buffer, 0);
-
+		
+		packet.writeShort(buffer, 0);
+		packet.writeByte(buffer, 0);		
+		
+		packet.writeInt(buffer, 0);	//точка ствола			
+		
+		packet.writeByte(buffer, 0);		
 		packet.writeByte(buffer, newPlayer.isPvPMode()? 1 : 0); // включен ли пвп режим
 
 		packet.writeInt(buffer, newPlayer.getLevel());
-		packet.writeLong(buffer, 0);
-		packet.writeInt(buffer, 1);
-		packet.writeLong(buffer, 0);
 		packet.writeInt(buffer, 0);
+		
+		
+		packet.writeInt(buffer, 0);//что-то тоже нательное		
+		
+		packet.writeInt(buffer, 1);
+		
+		packet.writeInt(buffer, 0);//лифчики
+		packet.writeInt(buffer, 0);
+		
+		
+		packet.writeInt(buffer, 0);
+		
+		
 		packet.writeByte(buffer, 0);
-
+		
 		packet.writeString(buffer, name);// имя
 		packet.writeString(buffer, guildName);// название клана
 		packet.writeString(buffer, title); // титул

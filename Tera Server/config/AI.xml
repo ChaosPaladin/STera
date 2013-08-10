@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='utf-8'?>
 <list>
 	<!-- максимальный радиус действия моба -->
-	<set name="AI_MAX_ACTIVE_RANGE" value="2000" />
+	<set name="AI_MAX_ACTIVE_RANGE" value="0" />
 	<!-- максимальный радиус реагирования моба -->
-	<set name="AI_MAX_REACTION_RANGE" value="1500" />
+	<set name="AI_MAX_REACTION_RANGE" value="0" />
 	
 	<!-- минимальный ренж случайного брождения от точки респавна -->
 	<set name="AI_MIN_RANDOM_WALK_RANGE" value="60" />
