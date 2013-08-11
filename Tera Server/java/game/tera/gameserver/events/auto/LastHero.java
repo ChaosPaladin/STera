@@ -5,7 +5,6 @@ import rlib.util.Rnd;
 import rlib.util.array.Array;
 import rlib.util.table.IntKey;
 import rlib.util.table.Table;
-
 import tera.Config;
 import tera.gameserver.events.EventConstant;
 import tera.gameserver.events.EventPlayer;
@@ -33,14 +32,14 @@ import tera.util.Location;
 
 /**
  * Ивент Последний Герой.
- *
+ * 
  * @author Ronn
  * @created 11.04.2012
  */
 public final class LastHero extends AbstractAutoEvent
 {
 	/** название ивента */
-	public static final String EVENT_NAME = "LastHero";
+	public static final String EVENT_NAME = "LH";
 
 	/** ид ивент территории */
 	public static final int TERRITORY_ID = 54;
@@ -51,7 +50,7 @@ public final class LastHero extends AbstractAutoEvent
 	/**
 	 * Обработка нажатия регистрации.
 	 */
-	private final Reply REPLY_REGISTER= new Reply()
+	private final Reply REPLY_REGISTER = new Reply()
 	{
 		@Override
 		public void reply(Npc npc, Player player, Link link)
@@ -63,7 +62,7 @@ public final class LastHero extends AbstractAutoEvent
 	/**
 	 * обработка нажатия отрегистрации.
 	 */
-	private final Reply REPLY_UNREGISTER= new Reply()
+	private final Reply REPLY_UNREGISTER = new Reply()
 	{
 		@Override
 		public void reply(Npc npc, Player player, Link link)
@@ -216,7 +215,9 @@ public final class LastHero extends AbstractAutoEvent
 			switch(state)
 			{
 				case REGISTER:
-				case PREPARE_START: getPrepare().fastRemove(player); break;
+				case PREPARE_START:
+					getPrepare().fastRemove(player);
+					break;
 				case PREPARE_END:
 				case RUNNING:
 				{

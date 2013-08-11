@@ -7,7 +7,7 @@ import rlib.logging.Loggers;
 
 /**
  * Перечисление доступных команд.
- *
+ * 
  * @author Ronn
  * @created 04.03.2012
  */
@@ -19,15 +19,17 @@ public enum CommandType
 	/** территориальные команды */
 	WORLD_COMMANDS(WorldCommand.class, 100, "loc", "region", "territory", "goto", "recall"),
 	/** команды над скилами */
-	SKILL_COMMANDS(SkillCommand.class, 100, "start_skill",  "add_skills", "learn_next_skills", "reload_skills", "clear_skills", "get_base_skills", "effect", "charm"),
+	SKILL_COMMANDS(SkillCommand.class, 100, "start_skill", "add_skills", "learn_next_skills", "reload_skills", "clear_skills", "get_base_skills", "effect", "charm"),
 	/** целительные команды */
 	HEAL_COMMANDS(HealCommand.class, 100, "set_hp", "set_mp", "heal"),
 	/** команды разработчиков */
-	DEVELOPER_COMMANDS(DeveloperCommand.class, 100, "change_class", "kick", "check_geo", "send_event", "send_system", "send_state", "add_attack",  "start_event", "sub_attack", "start_gc", "reload_dialogs", "send_packet", "set_access_level", "get_access_level", "set_heart", "set_level", "send_bytes", "send_file", "get_my_id", "invul", "set_ower_dist", "my_funcs", "save_point", "a", "save_all", "gm_speed"),
+	DEVELOPER_COMMANDS(DeveloperCommand.class, 100, "change_class", "kick", "check_geo", "send_event", "send_system", "send_state", "add_attack", "start_event", "sub_attack", "start_gc",
+			"reload_dialogs", "send_packet", "set_access_level", "get_access_level", "set_heart", "set_level", "send_bytes", "send_file", "get_my_id", "invul", "set_ower_dist", "my_funcs",
+			"save_point", "a", "save_all", "gm_speed"),
 	/** команды над итемами */
 	ITEM_COMMANDS(ItemCommand.class, 100, "item_info", "create_item", "spawn_item", "reload_items"),
 	/** пользовательские команды */
-	USER_COMMANDS(UserCommand.class, 0, "change_appearance", "change_race", "restore_characters", "pk", "player_info", "help", "version", "end_pay", "time", "equip", "kill_me", "online", "restore_skills"),
+	USER_COMMANDS(UserCommand.class, 0, "event_reg", "restore_characters", "player_info", "help", "version", "end_pay", "time", "kill_me", "online", "restore_skills"),
 	/** команды цензоров */
 	CENSORE_COMMANDS(CensoreCommand.class, 40, "chat_ban", "chat_unban"),
 	/** команды цензоров */
@@ -37,7 +39,8 @@ public enum CommandType
 	/** команды для переменных */
 	VAR_COMMANDS(VariablesCommand.class, 100, "set_player_var", "get_player_var"),
 	/** команды над нпс */
-	NPC_COMMANDS(NpcCommands.class, 100, "go_to_npc", "send_dialog", "test_spawn", "stop_spawns", "start_spawns", "npc_cast", "around_npc_spawn", "around_npc", "reload_npcs", "reload_spawns", "spawn", "around_npc_cast", "around_npc_long_cast");
+	NPC_COMMANDS(NpcCommands.class, 100, "go_to_npc", "send_dialog", "test_spawn", "stop_spawns", "start_spawns", "npc_cast", "around_npc_spawn", "around_npc", "reload_npcs", "reload_spawns",
+			"spawn", "around_npc_cast", "around_npc_long_cast");
 
 	/** список команд */
 	private String[] commands;

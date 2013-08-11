@@ -32,14 +32,14 @@ import tera.util.Location;
 
 /**
  * Ивент ТвТ
- *
+ * 
  * @author Ronn
  * @created 11.04.2012
  */
 public final class TeamVsTeam extends AbstractAutoEvent
 {
 	/** название ивента */
-	public static final String EVENT_NAME = "TeamVsTeam";
+	public static final String EVENT_NAME = "TvT";
 
 	/** ид территории, на которой ивент проводится */
 	public static final int TERRITORY_ID = 54;
@@ -82,7 +82,7 @@ public final class TeamVsTeam extends AbstractAutoEvent
 	/**
 	 * обработка нажатия отрегистрации.
 	 */
-	private final Reply REPLY_UNREGISTER= new Reply()
+	private final Reply REPLY_UNREGISTER = new Reply()
 	{
 		@Override
 		public void reply(Npc npc, Player player, Link link)
@@ -97,9 +97,9 @@ public final class TeamVsTeam extends AbstractAutoEvent
 	private final Link LINK_UNREGISTER = new NpcLink("Отрег. TeamVsTeam", LinkType.DIALOG, IconType.GREEN, REPLY_UNREGISTER);
 
 	/** состав первой команды */
-	private Array<Player> fisrtTeam;
+	private final Array<Player> fisrtTeam;
 	/** состав второй команды */
-	private Array<Player> secondTeam;
+	private final Array<Player> secondTeam;
 
 	public TeamVsTeam()
 	{
@@ -246,7 +246,9 @@ public final class TeamVsTeam extends AbstractAutoEvent
 			switch(state)
 			{
 				case REGISTER:
-				case PREPARE_START: getPrepare().fastRemove(player); break;
+				case PREPARE_START:
+					getPrepare().fastRemove(player);
+					break;
 				case PREPARE_END:
 				case RUNNING:
 				{
@@ -307,15 +309,15 @@ public final class TeamVsTeam extends AbstractAutoEvent
 	protected void onExit(Player player)
 	{
 		// если он не мертвый
-    	if(!player.isDead())
-    	{
-    		// зануляем хп
-    		player.setCurrentHp(0);
-    		// убиваем
-    		player.doDie(player);
-    		// сообщаем
-    		player.sendMessage("You are out of the event-zone.");
-    	}
+		if(!player.isDead())
+		{
+			// зануляем хп
+			player.setCurrentHp(0);
+			// убиваем
+			player.doDie(player);
+			// сообщаем
+			player.sendMessage("You are out of the event-zone.");
+		}
 	}
 
 	@Override
