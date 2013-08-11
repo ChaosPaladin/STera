@@ -3,7 +3,6 @@ package tera.gameserver.scripts.commands;
 import rlib.logging.Loggers;
 import rlib.util.array.Array;
 import rlib.util.array.Arrays;
-
 import tera.gameserver.manager.ExecutorManager;
 import tera.gameserver.model.World;
 import tera.gameserver.model.ai.npc.NpcAIClass;
@@ -27,7 +26,7 @@ import tera.util.Location;
 
 /**
  * Список команд, для работы с нпс.
- *
+ * 
  * @author Ronn
  */
 public class NpcCommands extends AbstractCommand
@@ -44,19 +43,21 @@ public class NpcCommands extends AbstractCommand
 	@Override
 	public void execution(String command, Player player, String values)
 	{
-		// получаем таблицу спавна
 		SpawnTable spawnTable = SpawnTable.getInstance();
 
 		switch(command)
 		{
-			case "stop_spawns": spawnTable.stopSpawns(); break;
-			case "start_spawns": spawnTable.startSpawns(); break;
+			case "stop_spawns":
+				spawnTable.stopSpawns();
+				break;
+			case "start_spawns":
+				spawnTable.startSpawns();
+				break;
 			case "send_dialog":
 			{
 				Array<Link> array = Arrays.toArray(Link.class);
 
 				int id = Integer.parseInt(values);
-
 
 				for(int i = id, length = id + 10; i < length; i++)
 					array.add(new NpcLink("@npc:" + i, LinkType.DIALOG, IconType.DIALOG, null));
@@ -148,9 +149,7 @@ public class NpcCommands extends AbstractCommand
 						}
 					};
 
-					// получаем исполнительного менеджера
 					ExecutorManager executor = ExecutorManager.getInstance();
-
 					executor.scheduleGeneral(run, 1000);
 				}
 
@@ -175,9 +174,7 @@ public class NpcCommands extends AbstractCommand
 						}
 					};
 
-					// получаем исполнительного менеджера
 					ExecutorManager executor = ExecutorManager.getInstance();
-
 					executor.scheduleGeneral(run, 4000);
 				}
 
@@ -185,10 +182,7 @@ public class NpcCommands extends AbstractCommand
 			}
 			case "reload_npcs":
 			{
-				// получаем таблицу НПС
 				NpcTable npcTable = NpcTable.getInstance();
-
-				// перезагружаем таблицу
 				npcTable.reload();
 
 				player.sendMessage("Таблица НПС перезагружена.");
@@ -197,37 +191,27 @@ public class NpcCommands extends AbstractCommand
 			}
 			case "spawn":
 			{
-				// разбиваем параметры
 				String vals[] = values.split(" ");
 
-				// получаем ид
 				int id = Integer.parseInt(vals[0]);
-				// получаем тип
 				int type = Integer.parseInt(vals[1]);
 
-				// получаем таблицу шаблонов НПС
 				NpcTable npcTable = NpcTable.getInstance();
 
-				// получаем шаблон НПС
 				NpcTemplate template = npcTable.getTemplate(id, type);
 
-				// если не нашли такого, выходим
 				if(template == null)
 				{
 					player.sendMessage("Нет такого НПС.");
 					return;
 				}
 
-				// получаем конфиг АИ
-				String aiConfig = vals.length > 2? vals[2] : "DefaultMonster";
+				String aiConfig = vals.length > 2 ? vals[2] : "DefaultMonster";
 
-				// получаем таблицу конфигов АИ
 				ConfigAITable configTable = ConfigAITable.getInstance();
 
-				// создаем спавн
 				NpcSpawn spawn = new NpcSpawn(null, null, template, player.getLoc(), 45, 0, 120, 0, configTable.getConfig(aiConfig), NpcAIClass.DEFAULT);
-
-				// запускаем
+				spawn.setRespawnTime(Integer.MAX_VALUE / 100);
 				spawn.start();
 
 				break;
@@ -257,7 +241,7 @@ public class NpcCommands extends AbstractCommand
 							continue;
 
 						text.append(" id = ").append(npc.getTemplateId()).append(", type = ").append(npc.getTemplateType()).append(", objectId = ").append(npc.getObjectId()).append(", ");
-						//text.append(" id = ").append(npc.getNpcId()).append(npc.getSpawnLoc());
+						// text.append(" id = ").append(npc.getNpcId()).append(npc.getSpawnLoc());
 
 						npc.broadcastPacket(NpcState.getInstance(player, npc, 1));
 					}
