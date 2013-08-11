@@ -8,7 +8,7 @@ import tera.gameserver.templates.NpcTemplate;
 
 /**
  * Модель НПС, который работает с захватиываемым регионом.
- *
+ * 
  * @author Ronn
  */
 public class RegionWarShop extends FriendNpc implements TaxationNpc, RegionWarNpc
@@ -24,7 +24,6 @@ public class RegionWarShop extends FriendNpc implements TaxationNpc, RegionWarNp
 	@Override
 	public int getTax()
 	{
-		// получаем текущий регион НПС
 		Region region = getRegion();
 
 		if(region == null)
@@ -33,17 +32,13 @@ public class RegionWarShop extends FriendNpc implements TaxationNpc, RegionWarNp
 			return 0;
 		}
 
-		// получаем владеющую гильдию
 		Guild owner = region.getOwner();
-
-		// если есть, то возвращаем налог
-		return owner == null? 0 : region.getTax();
+		return owner == null ? 0 : region.getTax();
 	}
 
 	@Override
 	public Bank getTaxBank()
 	{
-		// получаем текущий регион НПС
 		Region region = getRegion();
 
 		if(region == null)
@@ -52,11 +47,8 @@ public class RegionWarShop extends FriendNpc implements TaxationNpc, RegionWarNp
 			return null;
 		}
 
-		// получаем владеющую гильдию
 		Guild owner = region.getOwner();
-
-		// возвращаем банк гильдии, если есть владелец
-		return owner == null? null : owner.getBank();
+		return owner == null ? null : owner.getBank();
 	}
 
 	@Override
@@ -72,7 +64,9 @@ public class RegionWarShop extends FriendNpc implements TaxationNpc, RegionWarNp
 	}
 
 	@Override
-	public void setGuildOwner(Guild guild){}
+	public void setGuildOwner(Guild guild)
+	{
+	}
 
 	@Override
 	public Guild getGuildOwner()

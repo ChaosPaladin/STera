@@ -9,7 +9,7 @@ import tera.gameserver.model.skillengine.Skill;
 
 /**
  * Клиентский пакет старта мили скила.
- *
+ * 
  * @author Ronn
  */
 public class RequestUseShortSkill extends ClientPacket
@@ -152,20 +152,15 @@ public class RequestUseShortSkill extends ClientPacket
 	@Override
 	public void runImpl()
 	{
-		// получаем игрока
 		Player player = getPlayer();
 
-		// если его нет, выходим
 		if(player == null)
 			return;
 
-		// пробуем получить скил игрока
 		Skill skill = player.getSkill(skillId);
 
-		// если его у него нету
 		if(skill == null)
 		{
-			// сообщаем и выходим
 			player.sendMessage("Этого скила у вас нету.");
 			return;
 		}
@@ -174,10 +169,8 @@ public class RequestUseShortSkill extends ClientPacket
 		float startY = getStartY();
 		float startZ = getStartZ();
 
-		// ссылка на возможную цель
 		Character target = null;
 
-		// если сильная дессинхронизация, берем серверный старт
 		if(player.getSquareDistance(startX, startY) > Config.WORLD_MAX_SKILL_DESYNC)
 		{
 			startX = player.getX();
@@ -187,12 +180,9 @@ public class RequestUseShortSkill extends ClientPacket
 		int targetId = getTargetId();
 		int targetSubId = getTargetSubId();
 
-		// если игрок был нацелен на кого-то
-		if(targetId > 0 && targetSubId == Config.SERVER_PLAYER_SUB_ID)
-			// ищем его
+		if(targetId > 0)
 			target = World.getAroundById(Character.class, player, targetId, targetSubId);
 
-		// запоминаем цель
 		player.setTarget(target);
 
 		float targetX = getTargetX();
@@ -201,19 +191,15 @@ public class RequestUseShortSkill extends ClientPacket
 
 		int heading = getHeading();
 
-		// если цель есть и скил корректируемый
-		if(target != null && skill.isCorrectableTarget())
+		if(target != null && skill.isCorrectableTarget() && targetSubId == Config.SERVER_PLAYER_SUB_ID)
 		{
-			// правим координаты выстрела
 			targetX = target.getX();
 			targetY = target.getY();
 			targetZ = target.getZ() + target.getGeomHeight() * 0.5F;
 
-			// правим направление
 			heading = Angles.calcHeading(startX, startY, targetX, targetY);
 		}
 
-		// отправляем на обработку запрос каста
 		player.getAI().startCast(startX, startY, startZ, skill, 0, heading, targetX, targetY, targetZ);
 	}
 

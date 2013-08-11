@@ -4,7 +4,6 @@ import java.util.concurrent.ScheduledFuture;
 
 import rlib.util.SafeTask;
 import rlib.util.VarTable;
-
 import tera.gameserver.manager.ExecutorManager;
 import tera.gameserver.model.Character;
 import tera.gameserver.model.EmotionType;
@@ -20,7 +19,7 @@ import tera.gameserver.templates.NpcTemplate;
 
 /**
  * Базовая модель игрокоподобного суммона.
- *
+ * 
  * @author Ronn
  */
 public class PlayableSummon extends Summon
@@ -97,31 +96,24 @@ public class PlayableSummon extends Summon
 	@Override
 	public boolean startBattleStance(Character enemy)
 	{
-		// если цели нету
 		if(enemy == null)
 		{
-			// если уже не в боевой стойке, выходим
 			if(!isBattleStanced())
 				return false;
 
-			// отображаем выход из боевой стойки
 			broadcastPacket(PlayerBattleStance.getInstance(this, PlayerBattleStance.STANCE_OFF));
 
-			// ставим флаг выхода
 			setBattleStanced(false);
 
 			return true;
 		}
 		else
 		{
-			// если уже в боевой, выходим
 			if(isBattleStanced())
 				return false;
 
-			// отображаем вход в боевую стойку
 			broadcastPacket(PlayerBattleStance.getInstance(this, PlayerBattleStance.STANCE_ON));
 
-			// ставим флаг нахождения
 			setBattleStanced(true);
 
 			return true;
@@ -131,9 +123,7 @@ public class PlayableSummon extends Summon
 	@Override
 	public void stopBattleStance()
 	{
-		// отображаем выход из боевой стойки
 		broadcastPacket(PlayerBattleStance.getInstance(this, PlayerBattleStance.STANCE_OFF));
-		// ставим флаг выхода
 		setBattleStanced(false);
 	}
 
@@ -142,13 +132,9 @@ public class PlayableSummon extends Summon
 	{
 		super.doDie(attacker);
 
-		// отправляем пакет о смерти
 		broadcastPacket(CharDead.getInstance(this, true));
 
-		// получаем исполнительного менеджера
 		ExecutorManager executorManager = ExecutorManager.getInstance();
-
-		// запускаем задание по удалению
 		setSchedule(executorManager.scheduleGeneral(deleteTask, DEAD_TIME));
 	}
 

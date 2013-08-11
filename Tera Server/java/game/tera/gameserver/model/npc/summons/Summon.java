@@ -2,7 +2,6 @@ package tera.gameserver.model.npc.summons;
 
 import rlib.idfactory.IdGenerator;
 import rlib.idfactory.IdGenerators;
-
 import tera.gameserver.IdFactory;
 import tera.gameserver.model.Character;
 import tera.gameserver.model.MessageType;
@@ -13,7 +12,7 @@ import tera.gameserver.templates.NpcTemplate;
 
 /**
  * Базовая модель суммона.
- *
+ * 
  * @author Ronn
  */
 public class Summon extends Npc
@@ -29,10 +28,14 @@ public class Summon extends Npc
 	}
 
 	@Override
-	public void addAggro(Character aggressor, long aggro, boolean damage){}
+	public void addAggro(Character aggressor, long aggro, boolean damage)
+	{
+	}
 
 	@Override
-	public void subAggro(Character aggressor, long aggro){}
+	public void subAggro(Character aggressor, long aggro)
+	{
+	}
 
 	@Override
 	public Character getMostDamager()
@@ -41,7 +44,9 @@ public class Summon extends Npc
 	}
 
 	@Override
-	public void clearAggroList(){}
+	public void clearAggroList()
+	{
+	}
 
 	@Override
 	public long getAggro(Character aggressor)
@@ -52,53 +57,44 @@ public class Summon extends Npc
 	@Override
 	public boolean checkTarget(Character target)
 	{
-		// владелец самоа
 		Character owner = getOwner();
 
-		// если он есть
 		if(owner != null)
-			// определяем через него
 			return owner.checkTarget(target);
 
 		return false;
 	}
 
 	@Override
-	protected void addCounter(Character attacker){}
+	protected void addCounter(Character attacker)
+	{
+	}
 
 	@Override
 	public void doDie(Character attacker)
 	{
-		// получаем владельца
 		Character owner = getOwner();
 
-		// уведомление владельца о том, кто убил пета
 		if(owner != null && owner.isPlayer())
 		{
 			if(owner == attacker)
 				owner.sendMessage(MessageType.YOUR_PET_HAS_BEEN_DESTRUYED);
 			else
-			{
-				owner.sendPacket(SystemMessage
-				.getInstance(MessageType.ATTACKER_DESTROYED_YOUR_PET)
-				.addAttacker(attacker.getName()), true);
-			}
+				owner.sendPacket(SystemMessage.getInstance(MessageType.ATTACKER_DESTROYED_YOUR_PET).addAttacker(attacker.getName()), true);
 		}
 
-		// если есть владелец
 		if(owner != null)
-			// зануляем ему сумона
 			owner.setSummon(null);
 
-		// обрабатываем смерть
 		super.doDie(attacker);
 
-		// выключаем АИ
 		getAI().stopAITask();
 	}
 
 	@Override
-	protected void calculateRewards(Character killer){}
+	protected void calculateRewards(Character killer)
+	{
+	}
 
 	@Override
 	public Character getMostHated()
@@ -107,7 +103,9 @@ public class Summon extends Npc
 	}
 
 	@Override
-	public void removeAggro(Character agressor){}
+	public void removeAggro(Character agressor)
+	{
+	}
 
 	@Override
 	public int getOwerturnTime()
@@ -124,13 +122,10 @@ public class Summon extends Npc
 	@Override
 	public void reinit()
 	{
-		// получаем фабрику ид
 		IdFactory idFactory = IdFactory.getInstance();
 
-		// обновляем уникальный ид
 		setObjectId(idFactory.getNextNpcId());
 
-		// запускаем АИ
 		getAI().startAITask();
 	}
 
@@ -139,12 +134,9 @@ public class Summon extends Npc
 	 */
 	public void remove()
 	{
-		// если сумон еще не мертв
 		if(!isDead())
 		{
-			// зануляем хп
 			setCurrentHp(0);
-			// обрабатываем смерть
 			doDie(owner);
 		}
 	}
@@ -164,12 +156,9 @@ public class Summon extends Npc
 	@Override
 	public void updateHp()
 	{
-		// получаем владельца сумона
 		Character owner = getOwner();
 
-		// если он есть и он игрок
 		if(owner != null && owner.isPlayer())
-			// высылаем ему пакет с текущим хп сумона
 			owner.sendPacket(TargetHp.getInstance(this, TargetHp.BLUE), true);
 	}
 
@@ -182,24 +171,19 @@ public class Summon extends Npc
 	@Override
 	public void effectHealHp(int heal, Character healer)
 	{
-		// применяем хил
 		super.effectHealHp(heal, healer);
 
-		// обновляем хп
 		updateHp();
 	}
 
 	@Override
 	public void doRegen()
 	{
-		// получаем текущее хп суммона
 		int currentHp = getCurrentHp();
 
 		super.doRegen();
 
-		// если оно изменилось
 		if(currentHp != getCurrentHp())
-			// обновляем
 			updateHp();
 	}
 }

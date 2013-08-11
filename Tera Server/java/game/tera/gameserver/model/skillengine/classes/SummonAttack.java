@@ -26,26 +26,20 @@ public class SummonAttack extends AbstractSkill
 		return super.checkCondition(attacker, targetX, targetY, targetZ);
 	}
 
-
 	@Override
 	public void useSkill(Character character, float targetX, float targetY, float targetZ)
 	{
 		super.useSkill(character, targetX, targetY, targetZ);
 
-		// получаем цель кастера
 		Character target = character.getTarget();
 
-		// получаем суммон кастера
 		Summon summon = character.getSummon();
 
-		// если кого-то из них нет, выходим
 		if(target == null || summon == null)
 			return;
 
-		// указываем суммону атаковать
 		summon.getAI().startAttack(target);
 
-		// зануляем кастеру цель
 		character.setTarget(null);
 	}
 }

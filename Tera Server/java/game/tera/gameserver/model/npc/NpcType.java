@@ -7,7 +7,6 @@ import org.w3c.dom.Node;
 
 import rlib.logging.Loggers;
 import rlib.util.VarTable;
-
 import tera.gameserver.model.ai.npc.ConfigAI;
 import tera.gameserver.model.ai.npc.NpcAIClass;
 import tera.gameserver.model.npc.playable.EventEpicBattleNpc;
@@ -16,14 +15,14 @@ import tera.gameserver.model.npc.spawn.BossSpawn;
 import tera.gameserver.model.npc.spawn.NpcSpawn;
 import tera.gameserver.model.npc.spawn.RegionWarSpawn;
 import tera.gameserver.model.npc.spawn.Spawn;
+import tera.gameserver.model.npc.summons.DefaultSummon;
 import tera.gameserver.model.npc.summons.PlayerSummon;
-import tera.gameserver.model.npc.summons.Summon;
 import tera.gameserver.templates.NpcTemplate;
 import tera.util.Location;
 
 /**
  * Перечисление видов НПС.
- *
+ * 
  * @author Ronn
  */
 public enum NpcType
@@ -76,10 +75,9 @@ public enum NpcType
 	/** --------------------------- SUMMONS ------------------------- */
 
 	/** стандартная модель суммона */
-	DEFAULT_SUMMON(Summon.class),
+	DEFAULT_SUMMON(DefaultSummon.class),
 	/** игрокоподобный суммон */
-	PLAYER_SUMMON(PlayerSummon.class),
-	;
+	PLAYER_SUMMON(PlayerSummon.class), ;
 
 	/** кноструктор НПС */
 	private Constructor<? extends Npc> constructor;
@@ -98,7 +96,7 @@ public enum NpcType
 
 	/**
 	 * Создание нового экземпляра НПС.
-	 *
+	 * 
 	 * @param objectId уникальный ид нпс.
 	 * @param template шаблон нпс.
 	 * @return новый нпс.
@@ -117,7 +115,7 @@ public enum NpcType
 
 	/**
 	 * Создание спавна НПс.
-	 *
+	 * 
 	 * @param template шаблон НПС.
 	 * @param location позиция спавна.
 	 * @param respawn время респа.
@@ -132,12 +130,15 @@ public enum NpcType
 	{
 		switch(this)
 		{
-			case RAID_BOSS: return new BossSpawn(node, vars, template, location, respawn, random, minRadius, maxRadius, config, aiClass);
+			case RAID_BOSS:
+				return new BossSpawn(node, vars, template, location, respawn, random, minRadius, maxRadius, config, aiClass);
 			case REGION_WAR_SHOP:
 			case REGION_WAR_DEFENSE:
 			case REGION_WAR_BARRIER:
-			case REGION_WAR_CONTROL: return new RegionWarSpawn(node, vars, template, location, respawn, random, minRadius, maxRadius, config, aiClass);
-			default: return new NpcSpawn(node, vars, template, location, respawn, random, minRadius, maxRadius, config, aiClass);
+			case REGION_WAR_CONTROL:
+				return new RegionWarSpawn(node, vars, template, location, respawn, random, minRadius, maxRadius, config, aiClass);
+			default:
+				return new NpcSpawn(node, vars, template, location, respawn, random, minRadius, maxRadius, config, aiClass);
 		}
 	}
 }
