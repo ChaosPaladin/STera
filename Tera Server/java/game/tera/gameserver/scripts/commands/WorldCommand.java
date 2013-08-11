@@ -10,7 +10,7 @@ import tera.util.Location;
 
 /**
  * Список команд, для работы с территориями.
- *
+ * 
  * @author Ronn
  */
 public class WorldCommand extends AbstractCommand
@@ -25,8 +25,12 @@ public class WorldCommand extends AbstractCommand
 	{
 		switch(command)
 		{
-			case "loc": player.sendMessage("Char: " + player.getName() + " Location X: " + player.getX() + "  Y: " + player.getY() + "  Z: " + player.getZ() + " heading: " + player.getHeading()); break;
-			case "region": player.sendMessage("Region: " + player.getCurrentRegion() + ", id = " + player.getCurrentRegion().hashCode()); break;
+			case "loc":
+				player.sendMessage("Char: " + player.getName() + " Location X: " + player.getX() + "  Y: " + player.getY() + "  Z: " + player.getZ() + " heading: " + player.getHeading());
+				break;
+			case "region":
+				player.sendMessage("Region: " + player.getCurrentRegion() + ", id = " + player.getCurrentRegion().hashCode());
+				break;
 			case "territory":
 			{
 				Array<Territory> terrs = player.getTerritories();
@@ -54,6 +58,15 @@ public class WorldCommand extends AbstractCommand
 			{
 				String[] args = values.split(" ");
 
+				if(args.length > 1 && "-p".equals(args[1]))
+				{
+					Player target = World.getPlayer(args[0]);
+
+					if(target != null)
+						player.teleToLocation(target.getLoc());
+
+					break;
+				}
 				if(args.length == 4)
 				{
 					float x = Float.parseFloat(args[0]);

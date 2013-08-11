@@ -24,7 +24,10 @@ import com.jolbox.bonecp.BoneCPConfig;
  */
 public final class Config
 {
-	/** ---------------------------- Настройки аккаунтов ---------------------------------- */
+	/**
+	 * ---------------------------- Настройки аккаунтов
+	 * ----------------------------------
+	 */
 
 	/** минимальный уровень прав для входа на сервер */
 	public static int ACCOUNT_MIN_ACCESS_LEVEL;
@@ -51,7 +54,10 @@ public final class Config
 	/** имеют ли проплаченные аккаунты бонус дропа */
 	public static boolean ACCOUNT_PREMIUM_QUEST;
 
-	/** ---------------------------- Настройки сервера ---------------------------------- */
+	/**
+	 * ---------------------------- Настройки сервера
+	 * ----------------------------------
+	 */
 
 	/** допустимые ники на сервере */
 	public static String SERVER_NAME_TEMPLATE;
@@ -105,7 +111,10 @@ public final class Config
 	/** использовать ли реальный рандоминайзер для опрокидывания */
 	public static boolean SERVER_OWERTURN_REAL_RANDOM;
 
-	/** ---------------------------- Настройки гео движка ------------------------------------- */
+	/**
+	 * ---------------------------- Настройки гео движка
+	 * -------------------------------------
+	 */
 
 	/** размер гео карты по Х */
 	public static int GEO_ENGINE_OFFSET_X;
@@ -116,7 +125,10 @@ public final class Config
 	/** высота гео квадрата */
 	public static int GEO_ENGINE_QUARD_HEIGHT;
 
-	/** ---------------------------- Настройки игрового мира ---------------------------------- */
+	/**
+	 * ---------------------------- Настройки игрового мира
+	 * ----------------------------------
+	 */
 
 	/** время жизни выпавшего итема */
 	public static int WORLD_LIFE_TIME_DROP_ITEM;
@@ -181,7 +193,10 @@ public final class Config
 	/** изучать только реализованные скилы */
 	public static boolean WORLD_LEARN_ONLY_IMPLEMENTED_SKILLS;
 
-	/** ---------------------------- Настройки базы данных ---------------------------------- */
+	/**
+	 * ---------------------------- Настройки базы данных
+	 * ----------------------------------
+	 */
 
 	/** экземпляр конфига для БД */
 	public static final BoneCPConfig DATA_BASE_CONFIG = new BoneCPConfig();
@@ -203,7 +218,10 @@ public final class Config
 	/** чистить ли БД при старте сервера */
 	public static boolean DATA_BASE_CLEANING_START;
 
-	/** ---------------------------- Настройки потоков ---------------------------------- */
+	/**
+	 * ---------------------------- Настройки потоков
+	 * ----------------------------------
+	 */
 
 	/** размер пула основных потоков */
 	public static int THREAD_POOL_SIZE_GENERAL;
@@ -224,7 +242,10 @@ public final class Config
 	/** размер пула потоков, исполняющий асинхронно клиентские пакеты */
 	public static int THREAD_POOL_PACKET_RUNNER;
 
-	/** ---------------------------- Настройки для разработки ---------------------------------- */
+	/**
+	 * ---------------------------- Настройки для разработки
+	 * ----------------------------------
+	 */
 
 	/** установки принудительной скорости атаки */
 	public static int DEVELOPER_FORCE_ATTACK_SPEED;
@@ -246,7 +267,10 @@ public final class Config
 	/** активировать ли логирование перемещения игроков */
 	public static boolean DEVELOPER_GEO_LOGING;
 
-	/** ---------------------------- Настройки АИ ---------------------------------- */
+	/**
+	 * ---------------------------- Настройки АИ
+	 * ----------------------------------
+	 */
 
 	/** максимальный радиус действия моба */
 	public static int AI_MAX_ACTIVE_RANGE;
@@ -273,7 +297,10 @@ public final class Config
 	public static int AI_SIDE_RATE;
 	public static int AI_SPRINT_RATE;
 
-	/** ---------------------------- Настройки асинхронной сети ---------------------------------- */
+	/**
+	 * ---------------------------- Настройки асинхронной сети
+	 * ----------------------------------
+	 */
 	/**
 	 * /** кол-во потоков в асинхронной сети
 	 */
@@ -292,7 +319,10 @@ public final class Config
 	/** отображать ли эксепшены записываемой сети */
 	public static boolean NETWORK_VISIBLE_WRITE_EXCEPTION;
 
-	/** --------------------------------------- Настройки ивентов ----------------------------------------- */
+	/**
+	 * --------------------------------------- Настройки ивентов
+	 * -----------------------------------------
+	 */
 
 	/** минимальный интервал между авто ивентами */
 	public static int EVENT_MIN_TIMEOUT;
@@ -358,7 +388,10 @@ public final class Config
 	/** сколько денег за 1 очко славы */
 	public static int EVENT_HERO_POINT_TO_GOLD;
 
-	/** ---------------------------- Настройки дистанционного управления ---------------------------------- */
+	/**
+	 * ---------------------------- Настройки дистанционного управления
+	 * ----------------------------------
+	 */
 
 	/** логин для подключения уонтрола */
 	public static String DIST_CONTROL_LOGIN;
@@ -373,14 +406,19 @@ public final class Config
 	/** включено ли дистанционное управление */
 	public static boolean DIST_CONTROL_ENABLED;
 
-	/** ---------------------------- Настройки ивентов ---------------------------------- */
+	/**
+	 * ---------------------------- Настройки ивентов
+	 * ----------------------------------
+	 */
 
 	public static String EVENT_TEAM_VS_TEAM_NAME;
 
 	public static int EVENT_TEAM_VS_TEAM_MIN_COUNT_PLAYERS;
 	public static int EVENT_TEAM_VS_TEAM_MAX_COUNT_PLAYERS;
 
-	/** ---------------------------- Остальное ---------------------------------- */
+	/**
+	 * ---------------------------- Остальное ----------------------------------
+	 */
 
 	public static String SERVER_DIR;
 
@@ -521,7 +559,6 @@ public final class Config
 		WORLD_DUEL_MAX_RANGE = vars.getInteger("WORLD_DUEL_MAX_RANGE");
 		WORLD_GUILD_INVITE_MAX_RANGE = vars.getInteger("WORLD_GUILD_INVITE_MAX_RANGE");
 		WORLD_MAX_SKILL_DESYNC = vars.getInteger("WORLD_MAX_SKILL_DESYNC") * vars.getInteger("WORLD_MAX_SKILL_DESYNC");
-		WORLD_ENCHANT_ITEM_CHANCE = vars.getInteger("WORLD_ENCHANT_ITEM_CHANCE");
 		WORLD_PLAYER_MAX_LEVEL = vars.getInteger("WORLD_PLAYER_MAX_LEVEL");
 		WORLD_CHANCE_DELETE_CRYSTAL = vars.getInteger("WORLD_CHANCE_DELETE_CRYSTAL", 13);
 
@@ -658,21 +695,21 @@ public final class Config
 	private static void parseFiles(File[] files, VarTable vars)
 	{
 		// пробегаемся по всем файлам в папке конфига
-		for (File file : files)
+		for(File file : files)
 		{
 			// если фаил скрытый, пропускаем
-			if (file.isHidden())
+			if(file.isHidden())
 				continue;
 
 			// если папка дефолт, пропускаем
-			if (file.isDirectory() && !file.getName().contains("defaults"))
+			if(file.isDirectory() && !file.getName().contains("defaults"))
 			{
 				parseFiles(file.listFiles(), vars);
 				continue;
 			}
 
 			// если фаил хмл, парсим
-			if (file.getName().endsWith(".xml"))
+			if(file.getName().endsWith(".xml"))
 				vars.set(new DocumentConfig(file).parse());
 		}
 	}
