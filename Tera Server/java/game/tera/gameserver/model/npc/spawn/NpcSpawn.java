@@ -12,7 +12,6 @@ import rlib.util.VarTable;
 import rlib.util.array.Array;
 import rlib.util.array.Arrays;
 import rlib.util.random.Random;
-
 import tera.gameserver.manager.ExecutorManager;
 import tera.gameserver.manager.RandomManager;
 import tera.gameserver.model.ai.npc.ConfigAI;
@@ -23,7 +22,7 @@ import tera.util.Location;
 
 /**
  * Модель спавна с новый движком АИ.
- *
+ * 
  * @author Ronn
  */
 public class NpcSpawn extends SafeTask implements Spawn
@@ -102,11 +101,8 @@ public class NpcSpawn extends SafeTask implements Spawn
 	@Override
 	public synchronized void doDie(Npc npc)
 	{
-		// зануляем отспавненый нпс
 		setSpawned(null);
-		// запоминаем убитого
 		setDead(npc);
-		// запускаем отсчет респавна
 		doRespawn();
 	}
 
@@ -115,29 +111,20 @@ public class NpcSpawn extends SafeTask implements Spawn
 	 */
 	public synchronized void doRespawn()
 	{
-		// если остановлен, не респавним
 		if(isStoped())
 			return;
 
-		// если уже идет таск респавна, выходим
 		if(schedule != null)
 			return;
 
-		// получаем рандомный бонус
 		int randomTime = getRandomTime();
-
-		// получаем время респа
 		int respawnTime = getRespawnTime();
 
-		// получаем исполнительного менеджера
 		ExecutorManager executor = ExecutorManager.getInstance();
 
-		// если время респа статичное
 		if(randomTime == 0)
-			// создаем таск со статичным временем
 			schedule = executor.scheduleGeneral(this, respawnTime * 1000);
 		else
-			// создаем таск с рандом временем
 			schedule = executor.scheduleGeneral(this, getRandom().nextInt(Math.max(0, respawnTime - randomTime), respawnTime + randomTime) * 1000);
 	}
 
@@ -151,83 +138,59 @@ public class NpcSpawn extends SafeTask implements Spawn
 	 */
 	public synchronized void doSpawn()
 	{
-		// если респ остановлен, выходим
 		if(isStoped())
 			return;
 
-		// если уже отспавненный есть, выходим
 		if(spawned != null)
 			return;
 
-		// если есть ссылка на таск респавна
 		if(schedule != null)
 		{
-			// выключаем
 			schedule.cancel(false);
-			// зануляем
 			schedule = null;
 		}
 
-		// получаем мертвого нпс
 		Npc newNpc = getDead();
 
-		// получаем локацию спавна
 		Location location = getLocation();
 
-		// если мертвого нпс нету
 		if(newNpc == null)
 		{
-			// создаем нового
 			newNpc = template.newInstance();
-			// запоминаем спавн
 			newNpc.setSpawn(this);
-			// создаем АИ ему
 			newNpc.setAi(aiClass.newInstance(newNpc, config));
 
-			// точка спавна
 			Location spawnLoc = null;
 
-			// если рандоминизированная
 			if(maxRadius > 0)
-				// генерируем точку
-				spawnLoc = Coords.randomCoords(new Location(), location.getX(), location.getY(), location.getZ(), location.getHeading() == -1? getRandom().nextInt(35000) : location.getHeading(), minRadius, maxRadius);
+				spawnLoc = Coords.randomCoords(new Location(), location.getX(), location.getY(), location.getZ(), location.getHeading() == -1 ? getRandom().nextInt(35000) : location.getHeading(),
+						minRadius, maxRadius);
 			else
-				// иначе делаем статичную
-				spawnLoc = new Location(location.getX(), location.getY(), location.getZ(), location.getHeading() == -1? getRandom().nextInt(0, 65000) : location.getHeading());
+				spawnLoc = new Location(location.getX(), location.getY(), location.getZ(), location.getHeading() == -1 ? getRandom().nextInt(0, 65000) : location.getHeading());
 
-			// вносим ид континента
 			spawnLoc.setContinentId(location.getContinentId());
 
-			// спавним в мир
 			newNpc.spawnMe(spawnLoc);
 		}
 		else
 		{
-			// зануляем мертвого нпс
 			setDead(null);
 
-			// переинициализиуем старого
 			newNpc.reinit();
 
-			// рассчитываем точку спавна
 			Location spawnLoc = null;
 
-			// если точка рандомная
 			if(maxRadius > 0)
-				// рассчитываем новую
-				spawnLoc = Coords.randomCoords(newNpc.getSpawnLoc(), location.getX(), location.getY(), location.getZ(), location.getHeading() == -1? getRandom().nextInt(35000) : location.getHeading(), minRadius, maxRadius);
+				spawnLoc = Coords.randomCoords(newNpc.getSpawnLoc(), location.getX(), location.getY(), location.getZ(),
+						location.getHeading() == -1 ? getRandom().nextInt(35000) : location.getHeading(), minRadius, maxRadius);
 			else
-				// берем старую
 				spawnLoc = newNpc.getSpawnLoc();
 
-			// вносим ид континента
 			spawnLoc.setContinentId(location.getContinentId());
 
-			// спавним в мир
 			newNpc.spawnMe(spawnLoc);
 		}
 
-		// сохраняем отспавненное нпс
 		setSpawned(newNpc);
 	}
 
@@ -250,7 +213,7 @@ public class NpcSpawn extends SafeTask implements Spawn
 	/**
 	 * @return мертвый нпс.
 	 */
-	public final  Npc getDead()
+	public final Npc getDead()
 	{
 		return dead;
 	}
@@ -462,14 +425,10 @@ public class NpcSpawn extends SafeTask implements Spawn
 		this.template = template;
 	}
 
-
 	@Override
 	public void start()
 	{
-		// убираем флаг остановки респа
 		setStoped(false);
-
-		// респавним
 		doSpawn();
 	}
 
@@ -479,29 +438,20 @@ public class NpcSpawn extends SafeTask implements Spawn
 		if(isStoped())
 			return;
 
-		// ставим флаг остановки
 		setStoped(true);
 
-		// получаем отспавненого нпс
 		Npc spawned = getSpawned();
 
-		// если такой имеется
 		if(spawned != null)
 		{
-			// удаляем его из мира
 			spawned.deleteMe();
-			// запоминаем как мертвого
 			setDead(spawned);
-			// зануляем отспавненого
 			setSpawned(null);
 		}
 
-		// если есть таск респавна
 		if(schedule != null)
 		{
-			// обрываем его
 			schedule.cancel(false);
-			// зануляем
 			schedule = null;
 		}
 	}

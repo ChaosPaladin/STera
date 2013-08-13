@@ -211,7 +211,10 @@ public class NpcCommands extends AbstractCommand
 				ConfigAITable configTable = ConfigAITable.getInstance();
 
 				NpcSpawn spawn = new NpcSpawn(null, null, template, player.getLoc(), 45, 0, 120, 0, configTable.getConfig(aiConfig), NpcAIClass.DEFAULT);
-				spawn.setRespawnTime(Integer.MAX_VALUE / 100);
+
+				int respawnTime = Integer.MAX_VALUE / 2000;
+
+				spawn.setRespawnTime(respawnTime);
 				spawn.start();
 
 				break;
