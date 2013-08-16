@@ -7,8 +7,18 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import com.jolbox.bonecp.BoneCPConfig;
-
+import rlib.database.ConnectFactory;
+import rlib.database.DBUtils;
+import rlib.logging.Logger;
+import rlib.logging.Loggers;
+import rlib.util.Strings;
+import rlib.util.array.Array;
+import rlib.util.array.Arrays;
+import rlib.util.table.IntKey;
+import rlib.util.table.Table;
+import rlib.util.table.Tables;
+import rlib.util.wraps.Wrap;
+import rlib.util.wraps.Wraps;
 import tera.Config;
 import tera.gameserver.events.global.regionwars.Region;
 import tera.gameserver.events.global.regionwars.RegionState;
@@ -36,8 +46,8 @@ import tera.gameserver.model.items.CrystalInstance;
 import tera.gameserver.model.items.CrystalList;
 import tera.gameserver.model.items.ItemInstance;
 import tera.gameserver.model.items.ItemLocation;
-import tera.gameserver.model.playable.Player;
 import tera.gameserver.model.playable.DeprecatedPlayerFace;
+import tera.gameserver.model.playable.Player;
 import tera.gameserver.model.playable.PlayerAppearance;
 import tera.gameserver.model.playable.PlayerPreview;
 import tera.gameserver.model.quests.Quest;
@@ -61,27 +71,16 @@ import tera.gameserver.templates.SkillTemplate;
 import tera.util.LocalObjects;
 import tera.util.Location;
 
-import rlib.database.ConnectFactory;
-import rlib.database.DBUtils;
-import rlib.logging.Logger;
-import rlib.logging.Loggers;
-import rlib.util.Strings;
-import rlib.util.array.Array;
-import rlib.util.array.Arrays;
-import rlib.util.table.IntKey;
-import rlib.util.table.Table;
-import rlib.util.table.Tables;
-import rlib.util.wraps.Wrap;
-import rlib.util.wraps.Wraps;
+import com.jolbox.bonecp.BoneCPConfig;
 
 /**
  * Менеджер для работы с БД.
- *
+ * 
  * @author Ronn
  * @created 04.03.2012
  */
-public final class DataBaseManager
-{
+public final class DataBaseManager {
+
 	private static final Logger log = Loggers.getLogger(DataBaseManager.class);
 
 	private static final String UPDATE_ITEM = "UPDATE `items` SET `item_count`=?, `owner_id`=?, `location`=?, `index`=?, `has_crystal`=?, `autor`=?, `bonus_id`=?, `enchant_level`=?, `owner_name`=? WHERE `object_id`=? LIMIT 1";
@@ -144,7 +143,8 @@ public final class DataBaseManager
 	private static final String SELECT_PLAYER_FRIENDS = "SELECT `friend_id`, `friend_note` FROM `character_friends` WHERE `object_id` = ?";
 	private static final String SELECT_PLAYER_FRIEND = "SELECT `class_id`, `race_id`, `level`, char_name FROM `characters` WHERE `object_id` = ? LIMIT 1";
 	private static final String INSERT_PLAYER_FRIEND = "INSERT INTO `character_friends` (object_id, friend_id, friend_note) VALUES(?,?,?)";
-	//private static final String UPDATE_PLAYER_FRIEND_NOTE = "UPDATE `character_friends` SET `friend_note` = ? WHERE `object_id` = ? AND `friend_id` = ? LIMIT 1";
+	// private static final String UPDATE_PLAYER_FRIEND_NOTE =
+	// "UPDATE `character_friends` SET `friend_note` = ? WHERE `object_id` = ? AND `friend_id` = ? LIMIT 1";
 	private static final String REMOME_PLAYER_FRIEND = "DELETE FROM `character_friends` WHERE `object_id` = ? AND `friend_id` = ? LIMIT 1";
 
 	private static final String SELECT_REGION_STATUS = "SELECT * FROM `region_status` WHERE `region_id` = ? LIMIT 1";
@@ -158,7 +158,8 @@ public final class DataBaseManager
 	private static final String SELECT_GUILDS = "SELECT * FROM `guilds`";
 	private static final String SELECT_GUILD_NAME = "SELECT id FROM `guilds` WHERE `name`= ?";
 	private static final String SELECT_GUILD_RANKS = "SELECT * FROM `guild_ranks` WHERE `guild_id` = ?";
-	private static final String SELECT_GUILD_BANK_ITEMS = "SELECT * FROM `items` WHERE `owner_id` = ? AND `location` = '" + ItemLocation.GUILD_BANK.ordinal() + "' LIMIT " + (Config.WORLD_GUILD_BANK_MAX_SIZE + 1);
+	private static final String SELECT_GUILD_BANK_ITEMS = "SELECT * FROM `items` WHERE `owner_id` = ? AND `location` = '" + ItemLocation.GUILD_BANK.ordinal() + "' LIMIT "
+			+ (Config.WORLD_GUILD_BANK_MAX_SIZE + 1);
 	private static final String SELECT_GUILD_MEMBERS = "SELECT class_id, level, char_name, guild_note, zone_id, object_id, race_id, guild_rank, sex, last_online FROM `characters` WHERE `guild_id` = ?";
 	private static final String REMOVE_GUILD = "DELETE FROM `guilds` WHERE `id` = ? LIMIT 1";
 	private static final String REMOVE_GUILD_MEMBERS = "UPDATE `characters` SET `guild_id` = '0', `guild_rank` = '0' WHERE `guild_id` = ?";
@@ -180,27 +181,25 @@ public final class DataBaseManager
 	private static final String SELECT_ACCOUNT = "SELECT password, email, last_ip, allow_ips, comments, end_block, end_pay, access_level FROM `accounts` WHERE `login`= ? LIMIT 1";
 	private static final String INSERT_ACCOUNT = "INSERT INTO `accounts` (login, password, email, access_level, end_pay, end_block, last_ip, allow_ips, comments) VALUES (?,?,?,?,?,?,?,?,?)";
 
-	private static final String INSERT_PLAYER_APPEARANCE = "INSERT INTO `character_appearances` (object_id, face_color, face_skin, adorments_skin, features_skin, features_color, voice, bone_structure_brow, " +
-			"bone_structure_cheekbones, bone_structure_jaw, bone_structure_jaw_jut, ears_rotation, ears_extension, ears_trim, ears_size, eyes_width, eyes_height, eyes_separation, eyes_angle," +
-			"eyes_inner_brow, eyes_outer_brow, nose_extension, nose_size, nose_bridge, nose_nostril_width, nose_tip_width, nose_tip, nose_nostril_flare, mouth_pucker," +
-			"mouth_position, mouth_width, mouth_lip_thickness, mouse_corners, eyes_shape, nose_bend, bone_structure_jaw_width, mouth_gape) VALUES " +
-			"(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	private static final String INSERT_PLAYER_APPEARANCE = "INSERT INTO `character_appearances` (object_id, face_color, face_skin, adorments_skin, features_skin, features_color, voice, bone_structure_brow, "
+			+ "bone_structure_cheekbones, bone_structure_jaw, bone_structure_jaw_jut, ears_rotation, ears_extension, ears_trim, ears_size, eyes_width, eyes_height, eyes_separation, eyes_angle,"
+			+ "eyes_inner_brow, eyes_outer_brow, nose_extension, nose_size, nose_bridge, nose_nostril_width, nose_tip_width, nose_tip, nose_nostril_flare, mouth_pucker,"
+			+ "mouth_position, mouth_width, mouth_lip_thickness, mouse_corners, eyes_shape, nose_bend, bone_structure_jaw_width, mouth_gape) VALUES "
+			+ "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-	private static final String UPDATE_PLAYER_APPEARANCE = "UPDATE `character_appearances` SET `face_color` = ?, `face_skin` = ?, `adorments_skin` = ?, `features_skin` = ?, `features_color` = ?, `voice` = ?, `bone_structure_brow` = ?, " +
-			"`bone_structure_cheekbones` = ?, `bone_structure_jaw` = ?, `bone_structure_jaw_jut` = ?, `ears_rotation` = ?, `ears_extension` = ?, `ears_trim` = ?, `ears_size` = ?, `eyes_width` = ?, `eyes_height` = ?, `eyes_separation` = ?, `eyes_angle` = ?," +
-			"`eyes_inner_brow` = ?, `eyes_outer_brow` = ?, `nose_extension` = ?, `nose_size` = ?, `nose_bridge` = ?, `nose_nostril_width` = ?, `nose_tip_width` = ?, `nose_tip` = ?, `nose_nostril_flare` = ?, `mouth_pucker` = ?," +
-			"`mouth_position` = ?, `mouth_width` = ?, `mouth_lip_thickness` = ?, `mouse_corners` = ?, `eyes_shape` = ?, `nose_bend` = ?, `bone_structure_jaw_width` = ?, `mouth_gape` = ? WHERE `object_id` = ? LIMIT 1";
+	private static final String UPDATE_PLAYER_APPEARANCE = "UPDATE `character_appearances` SET `face_color` = ?, `face_skin` = ?, `adorments_skin` = ?, `features_skin` = ?, `features_color` = ?, `voice` = ?, `bone_structure_brow` = ?, "
+			+ "`bone_structure_cheekbones` = ?, `bone_structure_jaw` = ?, `bone_structure_jaw_jut` = ?, `ears_rotation` = ?, `ears_extension` = ?, `ears_trim` = ?, `ears_size` = ?, `eyes_width` = ?, `eyes_height` = ?, `eyes_separation` = ?, `eyes_angle` = ?,"
+			+ "`eyes_inner_brow` = ?, `eyes_outer_brow` = ?, `nose_extension` = ?, `nose_size` = ?, `nose_bridge` = ?, `nose_nostril_width` = ?, `nose_tip_width` = ?, `nose_tip` = ?, `nose_nostril_flare` = ?, `mouth_pucker` = ?,"
+			+ "`mouth_position` = ?, `mouth_width` = ?, `mouth_lip_thickness` = ?, `mouse_corners` = ?, `eyes_shape` = ?, `nose_bend` = ?, `bone_structure_jaw_width` = ?, `mouth_gape` = ? WHERE `object_id` = ? LIMIT 1";
 
-	private static final String SELECT_PLAYER_APPEARANCE = "SELECT face_color, face_skin, adorments_skin, features_skin, features_color, voice, bone_structure_brow, " +
-			"bone_structure_cheekbones, bone_structure_jaw, bone_structure_jaw_jut, ears_rotation, ears_extension, ears_trim, ears_size, eyes_width, eyes_height, eyes_separation, eyes_angle," +
-			"eyes_inner_brow, eyes_outer_brow, nose_extension, nose_size, nose_bridge, nose_nostril_width, nose_tip_width, nose_tip, nose_nostril_flare, mouth_pucker," +
-			"mouth_position, mouth_width, mouth_lip_thickness, mouse_corners, eyes_shape, nose_bend, bone_structure_jaw_width, mouth_gape FROM `character_appearances` WHERE `object_id`= ? LIMIT 1";
-
+	private static final String SELECT_PLAYER_APPEARANCE = "SELECT face_color, face_skin, adorments_skin, features_skin, features_color, voice, bone_structure_brow, "
+			+ "bone_structure_cheekbones, bone_structure_jaw, bone_structure_jaw_jut, ears_rotation, ears_extension, ears_trim, ears_size, eyes_width, eyes_height, eyes_separation, eyes_angle,"
+			+ "eyes_inner_brow, eyes_outer_brow, nose_extension, nose_size, nose_bridge, nose_nostril_width, nose_tip_width, nose_tip, nose_nostril_flare, mouth_pucker,"
+			+ "mouth_position, mouth_width, mouth_lip_thickness, mouse_corners, eyes_shape, nose_bend, bone_structure_jaw_width, mouth_gape FROM `character_appearances` WHERE `object_id`= ? LIMIT 1";
 
 	private static DataBaseManager instance;
 
-	public static DataBaseManager getInstance()
-	{
+	public static DataBaseManager getInstance() {
 		if(instance == null)
 			instance = new DataBaseManager(Config.DATA_BASE_CONFIG, Config.DATA_BASE_DRIVER);
 
@@ -208,27 +207,24 @@ public final class DataBaseManager
 	}
 
 	/** фабрика подключений */
-	private ConnectFactory connectFactory;
+	private final ConnectFactory connectFactory;
 
-	private DataBaseManager(BoneCPConfig config, String driver)
-	{
+	private DataBaseManager(BoneCPConfig config, String driver) {
 		this.connectFactory = ConnectFactory.newBoneCPConnectFactory(config, driver);
 	}
 
 	/**
 	 * Проверка на свободность названия гильдии.
-	 *
+	 * 
 	 * @param name название гильдии.
 	 * @return подходит ли название.
 	 */
-	public final boolean checkGuildName(String name)
-	{
+	public final boolean checkGuildName(String name) {
 		Connection con = null;
 		PreparedStatement statement = null;
 		ResultSet rset = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(SELECT_GUILD_NAME);
@@ -237,13 +233,9 @@ public final class DataBaseManager
 			rset = statement.executeQuery();
 
 			return !rset.next();
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
 
@@ -252,11 +244,10 @@ public final class DataBaseManager
 
 	/**
 	 * Очистка переменных квеста.
-	 *
+	 * 
 	 * @param state состояние квеста.
 	 */
-	public final void clearQuestVar(QuestState state)
-	{
+	public final void clearQuestVar(QuestState state) {
 		Player player = state.getPlayer();
 
 		if(player == null)
@@ -265,40 +256,33 @@ public final class DataBaseManager
 		PreparedStatement statement = null;
 		Connection con = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(CLEAR_QUEST_VAR);
 			statement.setInt(1, player.getObjectId());
 			statement.setInt(2, state.getQuestId());
 			statement.execute();
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 	}
 
 	/**
 	 * Создает в бд новый аккаунт.
-	 *
+	 * 
 	 * @param accountName имя аккаунта.
 	 * @param password пароль аккаунта.
 	 * @param address ип с которого создан аккаунт.
 	 * @return новый аккаунт.
 	 */
-	public final Account createAccount(String accountName, String password, InetAddress address)
-	{
+	public final Account createAccount(String accountName, String password, InetAddress address) {
 		PreparedStatement statement = null;
 		Connection con = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			Account newAccount = Account.valueOf(accountName, password, address != null ? address.getHostAddress() : "", "auto");
@@ -316,13 +300,9 @@ public final class DataBaseManager
 			statement.execute();
 
 			return newAccount;
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 
@@ -331,17 +311,15 @@ public final class DataBaseManager
 
 	/**
 	 * Создает в бд новый банк аккаунта.
-	 *
+	 * 
 	 * @param accountName имя аккаунта.
 	 * @return успешно ли создан банк.
 	 */
-	public final boolean createAccountBank(String accountName)
-	{
+	public final boolean createAccountBank(String accountName) {
 		PreparedStatement statement = null;
 		Connection con = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(INSERT_ACCOUNT_BANK);
@@ -349,13 +327,9 @@ public final class DataBaseManager
 			statement.execute();
 
 			return true;
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 
@@ -364,20 +338,19 @@ public final class DataBaseManager
 
 	/**
 	 * Создает строку в БД с новой внешностью.
-	 *
+	 * 
 	 * @param face внешность игрока.
 	 * @return успешно ли создано поле.
 	 */
-	public final boolean createFace(DeprecatedPlayerFace face)
-	{
+	public final boolean createFace(DeprecatedPlayerFace face) {
 		Connection con = null;
 		PreparedStatement statement = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
-			statement = con.prepareStatement("INSERT INTO `character_faces` (objectId, faceColor, hairColor, eyebrowsFirstVal, eyebrowsSecondVal, eyebrowsThridVal, eyeFirstVal, eyeSecondVal, eyeThridVal, eyePosVertical, eyeWidth, eyeHeight, chin, cheekbonePos, earsFirstVal, earsSecondVal, earsThridVal, earsFourthVal, noseFirstVal, noseSecondVal, noseThridVal, noseFourthVal, noseFifthVal, lipsFirstVal, lipsSecondVal, lipsThridVal, lipsFourthVal, lipsFifthVal, lipsSixthVal, cheeks, bridgeFirstVal, bridgeSecondVal, bridgeThridVal, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8, temp9, temp10, temp11, temp12, temp13, temp14, temp15, temp16, temp17, temp18) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+			statement = con
+					.prepareStatement("INSERT INTO `character_faces` (objectId, faceColor, hairColor, eyebrowsFirstVal, eyebrowsSecondVal, eyebrowsThridVal, eyeFirstVal, eyeSecondVal, eyeThridVal, eyePosVertical, eyeWidth, eyeHeight, chin, cheekbonePos, earsFirstVal, earsSecondVal, earsThridVal, earsFourthVal, noseFirstVal, noseSecondVal, noseThridVal, noseFourthVal, noseFifthVal, lipsFirstVal, lipsSecondVal, lipsThridVal, lipsFourthVal, lipsFifthVal, lipsSixthVal, cheeks, bridgeFirstVal, bridgeSecondVal, bridgeThridVal, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8, temp9, temp10, temp11, temp12, temp13, temp14, temp15, temp16, temp17, temp18) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
 			statement.setInt(1, face.getObjectId());
 			statement.setInt(2, face.getFaceColor());
 			statement.setInt(3, face.getHairColor());
@@ -432,13 +405,9 @@ public final class DataBaseManager
 			statement.execute();
 
 			return true;
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 
@@ -447,24 +416,22 @@ public final class DataBaseManager
 
 	/**
 	 * Создание ранка для гильдии.
-	 *
+	 * 
 	 * @param guild гильдия.
 	 * @param rank ранг.
 	 * @return успешно ли создан.
 	 */
-	public final boolean createGuildRank(Guild guild, GuildRank rank)
-	{
+	public final boolean createGuildRank(Guild guild, GuildRank rank) {
 		if(rank == null || guild == null)
 			return false;
 
 		Connection con = null;
 		PreparedStatement statement = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
-            statement = con.prepareStatement(CREATE_GUILD_RANK);
+			statement = con.prepareStatement(CREATE_GUILD_RANK);
 			statement.setInt(1, guild.getId());
 			statement.setString(2, rank.getName());
 			statement.setInt(3, rank.getIndex());
@@ -472,13 +439,9 @@ public final class DataBaseManager
 			statement.execute();
 
 			return true;
-        }
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 
@@ -487,33 +450,27 @@ public final class DataBaseManager
 
 	/**
 	 * Создание строки в БД нового инвенторя.
-	 *
+	 * 
 	 * @param owner владелец инвенторя.
 	 * @param inventory инвентарь.
 	 * @return успешно ли создан.
 	 */
-	public final boolean createInventory(Character owner, Inventory inventory)
-	{
+	public final boolean createInventory(Character owner, Inventory inventory) {
 		Connection con = null;
 		PreparedStatement statement = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
-            statement = con.prepareStatement(CREATE_INVENTORY);
+			statement = con.prepareStatement(CREATE_INVENTORY);
 			statement.setInt(1, owner.getObjectId());
 			statement.setInt(2, inventory.getLevel());
 			statement.execute();
 
 			return true;
-        }
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 
@@ -522,23 +479,21 @@ public final class DataBaseManager
 
 	/**
 	 * Создание строки в БД нового итема.
-	 *
+	 * 
 	 * @param item новый итем.
 	 * @return успешно ли создан.
 	 */
-	public final boolean createItem(ItemInstance item)
-	{
+	public final boolean createItem(ItemInstance item) {
 		if(item == null)
 			return false;
 
 		Connection con = null;
 		PreparedStatement statement = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
-            statement = con.prepareStatement(CREATE_ITEM);
+			statement = con.prepareStatement(CREATE_ITEM);
 			statement.setInt(1, item.getObjectId());
 			statement.setInt(2, item.getItemId());
 			statement.setLong(3, item.getItemCount());
@@ -546,13 +501,9 @@ public final class DataBaseManager
 			statement.execute();
 
 			return true;
-        }
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 
@@ -561,20 +512,19 @@ public final class DataBaseManager
 
 	/**
 	 * Создает строку в БД с новым игроком.
-	 *
+	 * 
 	 * @param player новый игрок.
 	 * @param accountName имя аккаунта игрока.
 	 * @return успешно ли создан.
 	 */
-	public final boolean createPlayer(Player player, String accountName)
-	{
+	public final boolean createPlayer(Player player, String accountName) {
 		Connection con = null;
 		PreparedStatement statement = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
-            statement = con.prepareStatement("INSERT INTO `characters` (account_name, object_id, class_id, race_id, sex, char_name, heading, online_time, create_time, end_ban, end_chat_ban, title, guild_id, access_level, level, exp, hp, mp, x, y, z, heart, attack_counter, pvp_count, pve_count, guild_rank) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+			statement = con
+					.prepareStatement("INSERT INTO `characters` (account_name, object_id, class_id, race_id, sex, char_name, heading, online_time, create_time, end_ban, end_chat_ban, title, guild_id, access_level, level, exp, hp, mp, x, y, z, heart, attack_counter, pvp_count, pve_count, guild_rank) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
 			statement.setString(1, accountName);
 			statement.setInt(2, player.getObjectId());
 			statement.setInt(3, player.getClassId());
@@ -604,13 +554,9 @@ public final class DataBaseManager
 			statement.execute();
 
 			return true;
-        }
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 
@@ -619,11 +565,10 @@ public final class DataBaseManager
 
 	/**
 	 * Создание записи о начале квеста игроком.
-	 *
+	 * 
 	 * @param state состояние квеста.
 	 */
-	public final void createQuest(QuestState state)
-	{
+	public final void createQuest(QuestState state) {
 		Player player = state.getPlayer();
 
 		if(player == null)
@@ -632,8 +577,7 @@ public final class DataBaseManager
 		PreparedStatement statement = null;
 		Connection con = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(CREATE_QUEST);
@@ -642,71 +586,58 @@ public final class DataBaseManager
 			statement.setInt(3, state.getState());
 			statement.setLong(4, 0);
 			statement.execute();
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 	}
 
 	/**
 	 * Создание строки в БД нового скила.
-	 *
+	 * 
 	 * @param owner владелец скила.
 	 * @param skill скил.
 	 * @return успешно ли создан.
 	 */
-	public final boolean createSkill(Character owner, Skill skill)
-	{
+	public final boolean createSkill(Character owner, Skill skill) {
 		if(!owner.isPlayer())
 			return false;
 
 		Connection con = null;
 		PreparedStatement statement = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
-            statement = con.prepareStatement(CREATE_SKILL);
+			statement = con.prepareStatement(CREATE_SKILL);
 			statement.setInt(1, owner.getObjectId());
 			statement.setInt(2, skill.getClassId());
 			statement.setInt(3, skill.getId());
 			statement.execute();
 
 			return true;
-        }
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 
 		return false;
 	}
 
-
 	/**
 	 * Удаляет игрока с БД.
-	 *
+	 * 
 	 * @param objectId ид игрока.
 	 * @param accountName имя аккаунта.
 	 * @return результат удаления.
 	 */
-	public final int deletePlayer(int objectId, String accountName)
-	{
+	public final int deletePlayer(int objectId, String accountName) {
 		Connection con = null;
 		PreparedStatement statement = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(DELETE_PLAYER);
@@ -715,14 +646,10 @@ public final class DataBaseManager
 
 			int count = statement.executeUpdate();
 
-			return count > 0? PlayerDeleteResult.SUCCESSFUL : PlayerDeleteResult.FAILED;
-		}
-		catch(SQLException e)
-		{
+			return count > 0 ? PlayerDeleteResult.SUCCESSFUL : PlayerDeleteResult.FAILED;
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 
@@ -731,37 +658,31 @@ public final class DataBaseManager
 
 	/**
 	 * Удаление строки в БД нового скила.
-	 *
+	 * 
 	 * @param owner владелец скила.
 	 * @param skill скил.
 	 * @return успешно ли создан.
 	 */
-	public final boolean deleteSkill(Character owner, Skill skill)
-	{
+	public final boolean deleteSkill(Character owner, Skill skill) {
 		if(!owner.isPlayer())
 			return false;
 
 		Connection con = null;
 		PreparedStatement statement = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
-            statement = con.prepareStatement(DELETE_SKILL);
+			statement = con.prepareStatement(DELETE_SKILL);
 			statement.setInt(1, owner.getObjectId());
 			statement.setInt(2, skill.getClassId());
 			statement.setInt(3, skill.getId());
 			statement.execute();
 
 			return true;
-        }
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 
@@ -770,30 +691,24 @@ public final class DataBaseManager
 
 	/**
 	 * Удаление строки в БД ожидающего итема.
-	 *
+	 * 
 	 * @param order индекс итема.
 	 * @return успешно ли удален.
 	 */
-	public final boolean deleteWaitItem(int order)
-	{
+	public final boolean deleteWaitItem(int order) {
 		Connection con = null;
 		PreparedStatement statement = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
-            statement = con.prepareStatement(REMOVE_WAIT_ITEM);
+			statement = con.prepareStatement(REMOVE_WAIT_ITEM);
 			statement.setInt(1, order);
 			statement.execute();
 
 			return true;
-        }
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 
@@ -802,31 +717,25 @@ public final class DataBaseManager
 
 	/**
 	 * Удаление строки в БД ожидающего скила.
-	 *
+	 * 
 	 * @param order индекс скила.
 	 * @return успешно ли удален.
 	 */
-	public final boolean deleteWaitSkill(int order)
-	{
+	public final boolean deleteWaitSkill(int order) {
 		Connection con = null;
 		PreparedStatement statement = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
-            statement = con.prepareStatement(REMOVE_WAIT_SKILL);
+			statement = con.prepareStatement(REMOVE_WAIT_SKILL);
 			statement.setInt(1, order);
 			statement.execute();
 
 			return true;
-        }
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 
@@ -835,20 +744,18 @@ public final class DataBaseManager
 
 	/**
 	 * Завершение квеста.
-	 *
+	 * 
 	 * @param player игрок.
 	 * @param date дата завершения.
 	 */
-	public final void finishQuest(Player player, QuestDate date)
-	{
+	public final void finishQuest(Player player, QuestDate date) {
 		if(player == null || date == null)
 			return;
 
 		PreparedStatement statement = null;
 		Connection con = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(FINISH_QUEST);
@@ -856,26 +763,21 @@ public final class DataBaseManager
 			statement.setInt(2, player.getObjectId());
 			statement.setInt(3, date.getQuestId());
 			statement.execute();
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 	}
 
 	/**
 	 * Загружает игрока с БД.
-	 *
+	 * 
 	 * @param objectId ид игрока.
 	 * @param account аккаунт игрока.
 	 * @return загруженный игрок.
 	 */
-	public final Player fullRestore(int objectId, Account account)
-	{
+	public final Player fullRestore(int objectId, Account account) {
 		Connection con = null;
 		Statement statement = null;
 		ResultSet rset = null;
@@ -898,8 +800,7 @@ public final class DataBaseManager
 		// получаем менеджера гильдии
 		GuildManager guildManager = GuildManager.getInstance();
 
-		try
-		{
+		try {
 			// получаем конект к БД
 			con = connectFactory.getConnection();
 
@@ -915,15 +816,13 @@ public final class DataBaseManager
 				// запрашиваем данные об нужном игроке
 				rset = statement.executeQuery("SELECT * FROM `characters` WHERE `object_id`= " + objectId + " LIMIT 1");
 
-				if(!rset.next())
-				{
+				if(!rset.next()) {
 					log.warning("not found player for " + objectId);
 					return null;
 				}
 
 				// если несходится аккаунт, выходим
-				if(!rset.getString("account_name").equalsIgnoreCase(account.getName()))
-				{
+				if(!rset.getString("account_name").equalsIgnoreCase(account.getName())) {
 					log.warning("incorrect account for player");
 					return null;
 				}
@@ -953,18 +852,15 @@ public final class DataBaseManager
 
 				player.setPvPMode(player.getKarma() > 0);
 
-	            Guild guild = guildManager.getGuild(rset.getInt("guild_id"));
+				Guild guild = guildManager.getGuild(rset.getInt("guild_id"));
 
-	            if(guild != null)
-	            {
-	            	player.setGuild(guild);
-	            	player.setGuildRank(guild.getRank(rset.getInt("guild_rank")));
-	            }
-	            else
-	            {
-	            	player.setGuildId(0);
+				if(guild != null) {
+					player.setGuild(guild);
+					player.setGuildRank(guild.getRank(rset.getInt("guild_rank")));
+				} else {
+					player.setGuildId(0);
 					player.setGuildRank(null);
-	            }
+				}
 
 				player.setAccessLevel(rset.getInt("access_level"));
 				player.setAttackCounter(rset.getByte("attack_counter"));
@@ -993,8 +889,7 @@ public final class DataBaseManager
 			if(appearance != null)
 				// устанавливаем ее
 				player.setAppearance(appearance, false);
-			else
-			{
+			else {
 				log.warning("not found appearance for objectId " + objectId);
 
 				// получаем расу игрока
@@ -1007,14 +902,13 @@ public final class DataBaseManager
 				player.setAppearance(appearance, true);
 			}
 
-			//загрузка скилов
+			// загрузка скилов
 			{
 				// запрашиваем скилы игрока
 				rset = statement.executeQuery("SELECT * FROM `character_skills` WHERE `object_id`= " + objectId);
 
 				// если есть скилы
-				while(rset.next())
-				{
+				while(rset.next()) {
 					// получаем ид скила
 					int id = rset.getInt("skill_id");
 					// получаем класс скила
@@ -1024,8 +918,7 @@ public final class DataBaseManager
 					SkillTemplate skill = skillTable.getSkill(classId, id);
 
 					// если его нет, пропускаем
-					if(skill == null)
-					{
+					if(skill == null) {
 						log.warning("not found skill id " + id + " class " + classId);
 						continue;
 					}
@@ -1041,23 +934,22 @@ public final class DataBaseManager
 				rset = statement.executeQuery("SELECT * FROM `wait_skills` WHERE `char_name` = '" + player.getName() + "';");
 
 				// если такие есть
-				while(rset.next())
-				{
+				while(rset.next()) {
 					// получаем ид скила
 					int id = rset.getInt("skill_id");
 					// получаем класс скила
 					int classId = rset.getInt("skill_class");
 
 					// если этого скила у игрока еще нету
-					if(player.getSkill(id) == null)
-					{
+					if(player.getSkill(id) == null) {
 						// получаем темплейт скила
 						SkillTemplate[] skill = skillTable.getSkills(classId, id);
 
 						// если скила такого неет, сообщаем
 						if(skill == null)
 							log.warning("not found skill id " + id + " class " + classId);
-						else // иначе добавляем игроку
+						else
+							// иначе добавляем игроку
 							player.addSkills(skill, false);
 					}
 
@@ -1106,7 +998,7 @@ public final class DataBaseManager
 			// получаем локальный список итемов
 			Array<ItemInstance> items = local.getNextItemList();
 
-			//загрузка итемов
+			// загрузка итемов
 			{
 				// запрашиваем все итемы, принадлежащие этому игроку
 				rset = statement.executeQuery("SELECT * FROM `items` WHERE `owner_id` = " + objectId + " AND `location` < " + ItemLocation.BANK.ordinal());
@@ -1117,7 +1009,8 @@ public final class DataBaseManager
 				// закрываем результат
 				DBUtils.closeResultSet(rset);
 
-				// запрашиваем итемы в банке, принадлежащие другому игроку с этого же аккаунта
+				// запрашиваем итемы в банке, принадлежащие другому игроку с
+				// этого же аккаунта
 				rset = statement.executeQuery("SELECT * FROM `items` WHERE `owner_id` = " + account.getBankId() + " AND `location` = " + ItemLocation.BANK.ordinal());
 
 				// загружаем итемы из результата запроса
@@ -1130,15 +1023,15 @@ public final class DataBaseManager
 				ItemTable itemTable = ItemTable.getInstance();
 
 				// перебираем их
-				for(int i = 0, length = items.size(); i < length; i++)
-				{
+				for(int i = 0, length = items.size(); i < length; i++) {
 					// получаем итем
 					ItemInstance item = array[i];
 
 					// получаем список кристалов в нем
 					CrystalList crystals = item.getCrystals();
 
-					// если списка нет, значит в него нельзя их вставлять и значит пропускаем
+					// если списка нет, значит в него нельзя их вставлять и
+					// значит пропускаем
 					if(crystals == null)
 						continue;
 
@@ -1146,17 +1039,16 @@ public final class DataBaseManager
 					DBUtils.closeResultSet(rset);
 
 					// запрашиваем кристалы, вставленные в этот итем
-					rset = statement.executeQuery("SELECT * FROM `items` WHERE `owner_id` = " + item.getObjectId() + " AND `location` = " + ItemLocation.CRYSTAL.ordinal() + " LIMIT " + item.getSockets());
+					rset = statement.executeQuery("SELECT * FROM `items` WHERE `owner_id` = " + item.getObjectId() + " AND `location` = " + ItemLocation.CRYSTAL.ordinal() + " LIMIT "
+							+ item.getSockets());
 
 					// если такие есть
-					while(rset.next())
-					{
+					while(rset.next()) {
 						// получаем темплейт итема
 						ItemTemplate template = itemTable.getItem(rset.getInt("item_id"));
 
 						// если его нет, пропускаем
-						if(template == null)
-						{
+						if(template == null) {
 							log.warning("not found item " + rset.getInt("item_id"));
 							continue;
 						}
@@ -1186,18 +1078,23 @@ public final class DataBaseManager
 			ItemInstance[] array = items.array();
 
 			// перебираем их
-			for(int i = 0, length = items.size(); i < length; i++)
-			{
+			for(int i = 0, length = items.size(); i < length; i++) {
 				// получаем итем
 				ItemInstance item = array[i];
 
 				// вставляем его в соотвествующий контейнер
-				switch(item.getLocation())
-				{
-					case INVENTORY: inventory.setItem(item, item.getIndex()); break;
-					case EQUIPMENT: equipment.setItem(item, item.getIndex()); break;
-					case BANK: bank.setItem(item.getIndex(), item); break;
-					default : log.warning("incorrect location for item " + item);
+				switch(item.getLocation()) {
+					case INVENTORY:
+						inventory.setItem(item, item.getIndex());
+						break;
+					case EQUIPMENT:
+						equipment.setItem(item, item.getIndex());
+						break;
+					case BANK:
+						bank.setItem(item.getIndex(), item);
+						break;
+					default:
+						log.warning("incorrect location for item " + item);
 				}
 			}
 
@@ -1231,8 +1128,7 @@ public final class DataBaseManager
 
 				EffectList effectList = player.getEffectList();
 
-				while(rset.next())
-				{
+				while(rset.next()) {
 					classId = rset.getByte("class_id");
 					skillId = rset.getInt("skill_id");
 					order = rset.getByte("effect_order");
@@ -1275,8 +1171,7 @@ public final class DataBaseManager
 
 				Table<IntKey, ReuseSkill> reuses = player.getReuseSkills();
 
-				while(rset.next())
-				{
+				while(rset.next()) {
 					ReuseSkill reuse = ReuseSkill.newInstance(rset.getInt("skill_id"), 0);
 					reuse.setItemId(rset.getInt("item_id"));
 					reuse.setEndTime(rset.getLong("end_time"));
@@ -1298,14 +1193,12 @@ public final class DataBaseManager
 				QuestList questList = player.getQuestList();
 
 				// перебираем
-				while(rset.next())
-				{
+				while(rset.next()) {
 					// получаем квест
 					Quest quest = questManager.getQuest(rset.getInt("quest_id"));
 
 					// если такого в таблице квестов нет, сообщаем
-					if(quest == null)
-					{
+					if(quest == null) {
 						log.warning("not found quest for id " + rset.getInt("quest_id"));
 						continue;
 					}
@@ -1317,8 +1210,7 @@ public final class DataBaseManager
 					if(time > 0)
 						// вносим как выполненный
 						questList.addCompleteQuest(questList.newQuestDate(time, quest));
-					else
-					{
+					else {
 						// получаем стадию квеста
 						int state = rset.getInt("state");
 
@@ -1343,8 +1235,7 @@ public final class DataBaseManager
 				rset = statement.executeQuery("SELECT * FROM `character_territories` WHERE `object_id`= " + objectId);
 
 				// перебираем их
-				while(rset.next())
-				{
+				while(rset.next()) {
 					// получаем территори.
 					Territory territory = territoryTable.getTerritory(rset.getInt("territory_id"));
 
@@ -1375,13 +1266,9 @@ public final class DataBaseManager
 
 			// загрузка друзей игрока
 			loadFriends(objectId, player.getFriendList());
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
 
@@ -1390,50 +1277,47 @@ public final class DataBaseManager
 
 	/**
 	 * Полное сохранение игрока.
-	 *
+	 * 
 	 * @param player игрок, которого нужно сохранить.
 	 * @return сохранился ли.
 	 */
-	public final boolean fullStore(Player player)
-	{
+	public final boolean fullStore(Player player) {
 		if(player == null || player.isDeleted())
 			return false;
 
 		Connection con = null;
 		Statement statement = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.createStatement();
 
 			// сохранение игрока
 			{
-				statement.executeUpdate("UPDATE `characters` SET `heading` =  '" + player.getHeading() + "' , `x` = '" + player.getX() + "', `y` = '" + player.getY() + "', `z` = '" + player.getZ() + "', " +
-						 " `online_time` = '" + player.getOnlineTime() + "', `end_ban` = '" + player.getEndBan() + "', `end_chat_ban` = '" + player.getEndChatBan() + "', `exp` = '" + player.getExp() + "', " +
-										"`hp` = " + player.getCurrentHp() + ", `mp` = " + player.getCurrentMp() + ", `heart` = " + player.getStamina() + ", " +
-												"`attack_counter` = '" + player.getAttackCounter() + "', `pvp_count` = '" + player.getPvpCount() +
-												"', `karma` = '" + player.getKarma() + "', `pve_count` = '" + player.getPveCount() + "', `collect_mining` = '" + player.getMiningLevel() + "', `collect_plant` = '" + player.getPlantLevel() + "', `collect_energy` = '" + player.getEnergyLevel() + "', `last_online` = '" + (System.currentTimeMillis() / 1000) + "', `continent_id` = '" + player.getContinentId() + "' WHERE `object_id` = '" + player.getObjectId() + "' LIMIT 1");
+				statement.executeUpdate("UPDATE `characters` SET `heading` =  '" + player.getHeading() + "' , `x` = '" + player.getX() + "', `y` = '" + player.getY() + "', `z` = '" + player.getZ()
+						+ "', " + " `online_time` = '" + player.getOnlineTime() + "', `end_ban` = '" + player.getEndBan() + "', `end_chat_ban` = '" + player.getEndChatBan() + "', `exp` = '"
+						+ player.getExp() + "', " + "`hp` = " + player.getCurrentHp() + ", `mp` = " + player.getCurrentMp() + ", `heart` = " + player.getStamina() + ", " + "`attack_counter` = '"
+						+ player.getAttackCounter() + "', `pvp_count` = '" + player.getPvpCount() + "', `karma` = '" + player.getKarma() + "', `pve_count` = '" + player.getPveCount()
+						+ "', `collect_mining` = '" + player.getMiningLevel() + "', `collect_plant` = '" + player.getPlantLevel() + "', `collect_energy` = '" + player.getEnergyLevel()
+						+ "', `last_online` = '" + (System.currentTimeMillis() / 1000) + "', `continent_id` = '" + player.getContinentId() + "' WHERE `object_id` = '" + player.getObjectId()
+						+ "' LIMIT 1");
 			}
 
-			if(player.isChangedFace())
-			{
-				//TODO
+			if(player.isChangedFace()) {
+				// TODO
 			}
 
 			Table<IntKey, ReuseSkill> reuses = player.getReuseSkills();
 
-			if(!reuses.isEmpty())
-			{
+			if(!reuses.isEmpty()) {
 				StringBuilder message = new StringBuilder("REPLACE INTO `character_skill_reuses` VALUES ");
 
 				int counter = 0;
 
 				long time = System.currentTimeMillis();
 
-				for(ReuseSkill reuse : reuses)
-				{
+				for(ReuseSkill reuse : reuses) {
 					if(reuse.getEndTime() < time)
 						continue;
 
@@ -1457,27 +1341,23 @@ public final class DataBaseManager
 
 			EffectList effectList = player.getEffectList();
 
-			if(effectList.size() > 0)
-			{
+			if(effectList.size() > 0) {
 				effectList.lock();
-				try
-				{
+				try {
 					Array<Effect> effects = effectList.getEffects();
 
 					Effect[] array = effects.array();
 
-					for(int i = 0, length = effects.size(); i < length; i++)
-					{
+					for(int i = 0, length = effects.size(); i < length; i++) {
 						Effect effect = array[i];
 
 						if(effect == null || effect.isAura() || effect.isEnded())
 							continue;
 
-						statement.executeUpdate("REPLACE INTO `character_save_effects` (object_id, class_id, skill_id, effect_order, count, duration) VALUES(" + player.getObjectId() + ", " + effect.getSkillClassId() + ", " + effect.getSkillId() + ", " + effect.getOrder() + ", " + effect.getCount() + ", " + effect.getTime() + ")");
+						statement.executeUpdate("REPLACE INTO `character_save_effects` (object_id, class_id, skill_id, effect_order, count, duration) VALUES(" + player.getObjectId() + ", "
+								+ effect.getSkillClassId() + ", " + effect.getSkillId() + ", " + effect.getOrder() + ", " + effect.getCount() + ", " + effect.getTime() + ")");
 					}
-				}
-				finally
-				{
+				} finally {
 					effectList.unlock();
 				}
 			}
@@ -1486,13 +1366,9 @@ public final class DataBaseManager
 			player.saveVars();
 
 			return storeSettingsAndHotKeys(player);
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 
@@ -1501,18 +1377,16 @@ public final class DataBaseManager
 
 	/**
 	 * Получение кол-ва персонажей на аккаунте.
-	 *
+	 * 
 	 * @param account имя аккаунта.
 	 * @return кол-во кол-во персонажей на нем.
 	 */
-	public final int getAccountSize(String account)
-	{
+	public final int getAccountSize(String account) {
 		Connection con = null;
 		PreparedStatement statement = null;
 		ResultSet rset = null;
 
-		try
-		{
+		try {
 			int number = 0;
 
 			// получаем коннект к БД.
@@ -1531,13 +1405,9 @@ public final class DataBaseManager
 
 			// возвращаем кол-во
 			return number;
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
 
@@ -1547,27 +1417,24 @@ public final class DataBaseManager
 	/**
 	 * @return фабрика подключений к БД.
 	 */
-	public final ConnectFactory getConnectFactory()
-	{
+	public final ConnectFactory getConnectFactory() {
 		return connectFactory;
 	}
 
 	/**
 	 * Внесение спавна босса в БД.
-	 *
+	 * 
 	 * @param template темплейт босса.
 	 * @param spawn время спавна босса.
 	 */
-	public final void insertBossSpawns(NpcTemplate template, long spawn)
-	{
+	public final void insertBossSpawns(NpcTemplate template, long spawn) {
 		if(template == null)
 			return;
 
 		PreparedStatement statement = null;
 		Connection con = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(INSERT_BOSS_SPAWNS);
@@ -1575,30 +1442,24 @@ public final class DataBaseManager
 			statement.setInt(2, template.getTemplateType());
 			statement.setLong(3, spawn);
 			statement.execute();
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 	}
 
 	/**
 	 * Внесение друга в БД.
-	 *
+	 * 
 	 * @param objectId ид игрока.
 	 * @param friendId ид друга.
 	 */
-	public final void insertFriend(int objectId, int friendId)
-	{
+	public final void insertFriend(int objectId, int friendId) {
 		PreparedStatement statement = null;
 		Connection con = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(INSERT_PLAYER_FRIEND);
@@ -1606,29 +1467,23 @@ public final class DataBaseManager
 			statement.setInt(2, friendId);
 			statement.setString(3, Strings.EMPTY);
 			statement.execute();
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 	}
 
 	/**
 	 * Добавление гильдии в БД.
-	 *
+	 * 
 	 * @param guild гильдия.
 	 */
-	public final boolean insertGuild(Guild guild)
-	{
+	public final boolean insertGuild(Guild guild) {
 		Connection con = null;
 		PreparedStatement statement = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(INSERT_GUILD);
@@ -1637,13 +1492,9 @@ public final class DataBaseManager
 			statement.execute();
 
 			return true;
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 
@@ -1652,18 +1503,16 @@ public final class DataBaseManager
 
 	/**
 	 * Добавление игрока переменной.
-	 *
+	 * 
 	 * @param objectId уникальный ид игрока.
 	 * @param name название переменной.
 	 * @param value значение переменной.
 	 */
-	public final void insertPlayerVar(int objectId, String name, String value)
-	{
+	public final void insertPlayerVar(int objectId, String name, String value) {
 		PreparedStatement statement = null;
 		Connection con = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(INSERT_PLAYER_VARIABLE);
@@ -1671,29 +1520,23 @@ public final class DataBaseManager
 			statement.setString(2, name);
 			statement.setString(3, value);
 			statement.execute();
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 	}
 
 	/**
 	 * Внесение в БД записи с внешностью персонажа.
-	 *
+	 * 
 	 * @param appearance внешность игрока.
 	 */
-	public final void insertPlayerAppearance(PlayerAppearance appearance)
-	{
+	public final void insertPlayerAppearance(PlayerAppearance appearance) {
 		PreparedStatement statement = null;
 		Connection con = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(INSERT_PLAYER_APPEARANCE);
@@ -1735,29 +1578,23 @@ public final class DataBaseManager
 			statement.setInt(36, appearance.getBoneStructureJawWidth());
 			statement.setInt(37, appearance.getMothGape());
 			statement.execute();
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 	}
 
 	/**
 	 * Обновление в БД записи с внешностью персонажа.
-	 *
+	 * 
 	 * @param appearance внешность игрока.
 	 */
-	public final boolean updatePlayerAppearance(PlayerAppearance appearance)
-	{
+	public final boolean updatePlayerAppearance(PlayerAppearance appearance) {
 		PreparedStatement statement = null;
 		Connection con = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(UPDATE_PLAYER_APPEARANCE);
@@ -1800,13 +1637,9 @@ public final class DataBaseManager
 			statement.setInt(37, appearance.getObjectId());
 
 			return statement.executeUpdate() > 0;
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 
@@ -1815,18 +1648,16 @@ public final class DataBaseManager
 
 	/**
 	 * Загрузка внешности игрока из БД.
-	 *
+	 * 
 	 * @param objectId уникальный ид игрока.
 	 * @return внешность игрока.
 	 */
-	public final PlayerAppearance loadPlayerAppearance(int objectId)
-	{
+	public final PlayerAppearance loadPlayerAppearance(int objectId) {
 		Connection con = null;
 		PreparedStatement statement = null;
 		ResultSet rset = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(SELECT_PLAYER_APPEARANCE);
@@ -1834,8 +1665,7 @@ public final class DataBaseManager
 
 			rset = statement.executeQuery();
 
-			if(rset.next())
-			{
+			if(rset.next()) {
 				// создаем контейнер внешности
 				PlayerAppearance appearance = PlayerAppearance.getInstance(objectId);
 
@@ -1880,13 +1710,9 @@ public final class DataBaseManager
 			}
 
 			log.warning("not found appearance for " + objectId);
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
 
@@ -1895,16 +1721,14 @@ public final class DataBaseManager
 
 	/**
 	 * Внесение региона в БД.
-	 *
+	 * 
 	 * @param region новый регион.
 	 */
-	public final void insertRegion(Region region)
-	{
+	public final void insertRegion(Region region) {
 		PreparedStatement statement = null;
 		Connection con = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(INSERT_REGION_STATUS);
@@ -1912,30 +1736,24 @@ public final class DataBaseManager
 			statement.setInt(2, 0);
 			statement.setInt(3, 0);
 			statement.execute();
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 	}
 
 	/**
 	 * Внесение зарегестрированной гильдии на осаду региона в БД.
-	 *
+	 * 
 	 * @param region регион.
 	 * @param guild зарегестрированная гильдия.
 	 */
-	public final boolean insertRegionGuildRegister(Region region, Guild guild)
-	{
+	public final boolean insertRegionGuildRegister(Region region, Guild guild) {
 		PreparedStatement statement = null;
 		Connection con = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(INSERT_REGION_REGISTER_GUILD);
@@ -1944,13 +1762,9 @@ public final class DataBaseManager
 			statement.execute();
 
 			return true;
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 
@@ -1959,48 +1773,40 @@ public final class DataBaseManager
 
 	/**
 	 * Добавление серверной переменной.
-	 *
+	 * 
 	 * @param name название переменной.
 	 * @param value значение переменной.
 	 */
-	public final void insertServerVar(String name, String value)
-	{
+	public final void insertServerVar(String name, String value) {
 		PreparedStatement statement = null;
 		Connection con = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(INSERT_SERVER_VARIABLE);
 			statement.setString(1, name);
 			statement.setString(2, value);
 			statement.execute();
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 	}
 
 	/**
 	 * Проверка на занятость указанного ника.
-	 *
+	 * 
 	 * @param name проверяемый ник.
 	 * @return свободен ли.
 	 */
-	public final boolean isFreeName(String name)
-	{
+	public final boolean isFreeName(String name) {
 		Connection con = null;
 		PreparedStatement statement = null;
 		ResultSet rset = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(SELECT_PLAYER_CHECK_NAME);
@@ -2009,13 +1815,9 @@ public final class DataBaseManager
 			rset = statement.executeQuery();
 
 			return !rset.next();
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
 
@@ -2024,18 +1826,16 @@ public final class DataBaseManager
 
 	/**
 	 * Проверка на занятость ид игрока.
-	 *
+	 * 
 	 * @param objectId проверяемый ид.
 	 * @return свободен ли.
 	 */
-	public final boolean isFreePlayerId(int objectId)
-	{
+	public final boolean isFreePlayerId(int objectId) {
 		Connection con = null;
 		PreparedStatement statement = null;
 		ResultSet rset = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(SELECT_PLAYER_CHECK_ID);
@@ -2044,13 +1844,9 @@ public final class DataBaseManager
 			rset = statement.executeQuery();
 
 			return !rset.next();
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
 
@@ -2059,31 +1855,27 @@ public final class DataBaseManager
 
 	/**
 	 * Загрузка спавнов боссов с БД.
-	 *
+	 * 
 	 * @param spawns таблица спавнов.
 	 */
-	public final void loadBossSpawns(Table<IntKey, Table<IntKey, Wrap>> spawns)
-	{
+	public final void loadBossSpawns(Table<IntKey, Table<IntKey, Wrap>> spawns) {
 		PreparedStatement statement = null;
 		Connection con = null;
 		ResultSet rset = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(SELECT_BOSS_SPAWNS);
 			rset = statement.executeQuery();
 
-			while(rset.next())
-			{
+			while(rset.next()) {
 				int id = rset.getInt("npc_id");
 				int type = rset.getInt("npc_type");
 
 				Table<IntKey, Wrap> table = spawns.get(id);
 
-				if(table == null)
-				{
+				if(table == null) {
 					table = Tables.newIntegerTable();
 
 					spawns.put(id, table);
@@ -2091,31 +1883,25 @@ public final class DataBaseManager
 
 				table.put(type, Wraps.newLongWrap(rset.getLong("spawn"), true));
 			}
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
 	}
 
 	/**
 	 * Загрузка друга игрока с БД.
-	 *
+	 * 
 	 * @param objectId уникальный ид дрга.
 	 * @param friendList список друзей игрока.
 	 */
-	public final void loadFriend(int objectId, FriendList friendList)
-	{
+	public final void loadFriend(int objectId, FriendList friendList) {
 		PreparedStatement statement = null;
 		Connection con = null;
 		ResultSet rset = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(SELECT_PLAYER_FRIEND);
@@ -2123,8 +1909,7 @@ public final class DataBaseManager
 
 			rset = statement.executeQuery();
 
-			if(rset.next())
-			{
+			if(rset.next()) {
 				FriendInfo info = friendList.newFriendInfo();
 
 				info.setObjectId(objectId);
@@ -2136,31 +1921,25 @@ public final class DataBaseManager
 
 				friendList.addFriend(info);
 			}
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
 	}
 
 	/**
 	 * Загрузка друзей игрока с БД.
-	 *
+	 * 
 	 * @param objectId уникальный ид игрока.
 	 * @param friendList список друзей игрока.
 	 */
-	public final void loadFriends(int objectId, FriendList friendList)
-	{
+	public final void loadFriends(int objectId, FriendList friendList) {
 		PreparedStatement statement = null;
 		Connection con = null;
 		ResultSet rset = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(SELECT_PLAYER_FRIENDS);
@@ -2172,13 +1951,9 @@ public final class DataBaseManager
 				loadFriend(rset.getInt(1), friendList);
 
 			friendList.prepare();
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
 	}
@@ -2186,21 +1961,17 @@ public final class DataBaseManager
 	/**
 	 * Метод получение из результата списка итемов.
 	 */
-	public final void loadItems(ResultSet rset, Array<ItemInstance> items)
-	{
+	public final void loadItems(ResultSet rset, Array<ItemInstance> items) {
 		// получаем таблицу итемов
 		ItemTable itemTable = ItemTable.getInstance();
 
-		try
-		{
-			while(rset.next())
-			{
+		try {
+			while(rset.next()) {
 				// получаем if,kjy итема
 				ItemTemplate template = itemTable.getItem(rset.getInt("item_id"));
 
 				// если его нет, пропускаем
-				if(template == null)
-				{
+				if(template == null) {
 					log.warning("not found item " + rset.getInt("item_id"));
 					continue;
 				}
@@ -2218,30 +1989,31 @@ public final class DataBaseManager
 				item.setAutor(rset.getString("autor"));
 				item.setOwnerName(rset.getString("owner_name"));
 
+				if(!item.isEnchantable() && item.getEnchantLevel() > 0) {
+					item.setEnchantLevel(0);
+					updateItem(item);
+				}
+
 				// добавляем в список
 				items.add(item);
 			}
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
 		}
 	}
 
 	/**
 	 * Загрузка игрока переменных с БД.
-	 *
+	 * 
 	 * @param objectId уникальный ид игрока.
 	 * @param table контейнер переменных.
 	 */
-	public final void loadPlayerVars(int objectId, Table<String, Wrap> table)
-	{
+	public final void loadPlayerVars(int objectId, Table<String, Wrap> table) {
 		PreparedStatement statement = null;
 		Connection con = null;
 		ResultSet rset = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(SELECT_PLAYER_VARIABLES);
@@ -2250,24 +2022,19 @@ public final class DataBaseManager
 
 			while(rset.next())
 				table.put(rset.getString("var_name"), Wraps.newIntegerWrap(Integer.parseInt(rset.getString("var_value")), true));
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
 	}
 
 	/**
 	 * Загрузка региона с БД.
-	 *
+	 * 
 	 * @param region загружаемый регион.
 	 */
-	public final void loadRegion(Region region)
-	{
+	public final void loadRegion(Region region) {
 		PreparedStatement statement = null;
 		Connection con = null;
 		ResultSet rset = null;
@@ -2275,8 +2042,7 @@ public final class DataBaseManager
 		// получаем менеджера гильдий
 		GuildManager guildManager = GuildManager.getInstance();
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(SELECT_REGION_STATUS);
@@ -2286,8 +2052,7 @@ public final class DataBaseManager
 
 			if(!rset.next())
 				insertRegion(region);
-			else
-			{
+			else {
 				// вносим состояние региона
 				region.setState(RegionState.valueOf(rset.getInt("state")));
 
@@ -2300,24 +2065,19 @@ public final class DataBaseManager
 					region.setOwner(guildManager.getGuild(ownerId));
 			}
 
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
 	}
 
 	/**
 	 * Загрузка зарегестрированных гильдий на регион с БД.
-	 *
+	 * 
 	 * @param region загружаемый регион.
 	 */
-	public final void loadRegionRegister(Region region)
-	{
+	public final void loadRegionRegister(Region region) {
 		PreparedStatement statement = null;
 		Connection con = null;
 		ResultSet rset = null;
@@ -2325,8 +2085,7 @@ public final class DataBaseManager
 		// получаем менеджера гильдий
 		GuildManager guildManager = GuildManager.getInstance();
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(SELECT_REGION_REGISTER);
@@ -2334,37 +2093,30 @@ public final class DataBaseManager
 
 			rset = statement.executeQuery();
 
-			while(rset.next())
-			{
+			while(rset.next()) {
 				Guild guild = guildManager.getGuild(rset.getInt("guild_id"));
-				
+
 				if(guild != null)
 					region.addRegisterGuild(guild);
 			}
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
 	}
 
 	/**
 	 * Загрузка серверных переменных с БД.
-	 *
+	 * 
 	 * @param variables контейнер переменных.
 	 */
-	public final void loadServerVars(Table<String, String> variables)
-	{
+	public final void loadServerVars(Table<String, String> variables) {
 		PreparedStatement statement = null;
 		Connection con = null;
 		ResultSet rset = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(SELECT_SERVER_VARIABLES);
@@ -2372,164 +2124,130 @@ public final class DataBaseManager
 
 			while(rset.next())
 				variables.put(rset.getString("var_name"), rset.getString("var_value"));
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
 	}
 
 	/**
 	 * Удаление друга игрока из БД.
-	 *
+	 * 
 	 * @param objectId ид игрока.
 	 * @param friendId ид друга.
 	 */
-	public final void removeFriend(int objectId, int friendId)
-	{
+	public final void removeFriend(int objectId, int friendId) {
 		PreparedStatement statement = null;
 		Connection con = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(REMOME_PLAYER_FRIEND);
 			statement.setInt(1, objectId);
 			statement.setInt(2, friendId);
 			statement.execute();
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 	}
 
 	/**
 	 * Удаление зарегестрированной гильдии из БД.
-	 *
+	 * 
 	 * @param region регион.
 	 * @param guild отрегистрируемая гильдия.
 	 */
-	public final void removeRegionRegisterGuild(Region region, Guild guild)
-	{
+	public final void removeRegionRegisterGuild(Region region, Guild guild) {
 		Connection con = null;
 		PreparedStatement statement = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(REMOVE_REGION_REGISTER_GUILD);
 			statement.setInt(1, region.getId());
 			statement.setInt(2, guild.getId());
 			statement.execute();
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 	}
 
 	/**
 	 * Удаление гильдии из БД.
-	 *
+	 * 
 	 * @param guild гильдия.
 	 */
-	public final void removeGuild(Guild guild)
-	{
+	public final void removeGuild(Guild guild) {
 		Connection con = null;
 		PreparedStatement statement = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(REMOVE_GUILD);
 			statement.setInt(1, guild.getObjectId());
 			statement.execute();
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 	}
 
 	/**
 	 * Удаление всех членов гильдии из БД.
-	 *
+	 * 
 	 * @param guild гильдия.
 	 */
-	public final void removeGuildMembers(Guild guild)
-	{
+	public final void removeGuildMembers(Guild guild) {
 		Connection con = null;
 		PreparedStatement statement = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(REMOVE_GUILD_MEMBERS);
 			statement.setInt(1, guild.getObjectId());
 			statement.execute();
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 	}
 
 	/**
 	 * Обновление строки в БД гильдии игрока.
-	 *
+	 * 
 	 * @param member обновляемый игрок.
 	 * @return успешно ли обновлен.
 	 */
-	public final boolean removeGuildRank(Guild guild, GuildRank rank)
-	{
+	public final boolean removeGuildRank(Guild guild, GuildRank rank) {
 		if(guild == null || rank == null)
 			return false;
 
 		Connection con = null;
 		PreparedStatement statement = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
-            statement = con.prepareStatement(REMOVE_GUILD_RANK);
+			statement = con.prepareStatement(REMOVE_GUILD_RANK);
 			statement.setInt(1, guild.getId());
 			statement.setInt(2, rank.getIndex());
 			statement.execute();
 
 			return true;
-        }
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 
@@ -2538,23 +2256,21 @@ public final class DataBaseManager
 
 	/**
 	 * Обновление строки в БД гильдии игрока.
-	 *
+	 * 
 	 * @param member обновляемый игрок.
 	 * @return успешно ли обновлен.
 	 */
-	public final boolean removeGuildRankForPlayer(Guild guild, GuildRank def, GuildRank rank)
-	{
+	public final boolean removeGuildRankForPlayer(Guild guild, GuildRank def, GuildRank rank) {
 		if(guild == null || rank == null || def == null)
 			return false;
 
 		Connection con = null;
 		PreparedStatement statement = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
-            statement = con.prepareStatement(REMOVE_GUILD_RANK_FOR_PLAYERS);
+			statement = con.prepareStatement(REMOVE_GUILD_RANK_FOR_PLAYERS);
 			statement.setInt(1, def.getIndex());
 			statement.setInt(2, guild.getId());
 			statement.setInt(3, rank.getIndex());
@@ -2562,13 +2278,9 @@ public final class DataBaseManager
 			statement.execute();
 
 			return true;
-        }
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 
@@ -2577,111 +2289,91 @@ public final class DataBaseManager
 
 	/**
 	 * Удаление игрока переменной.
-	 *
+	 * 
 	 * @param objectId уникальный ид игрока.
 	 * @param name название переменной.
 	 */
-	public final void removePlayerVar(int objectId, String name)
-	{
+	public final void removePlayerVar(int objectId, String name) {
 		PreparedStatement statement = null;
 		Connection con = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(REMOVE_PLAYER_VARIABLE);
 			statement.setInt(1, objectId);
 			statement.setString(2, name);
 			statement.execute();
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 	}
 
 	/**
 	 * удаление квеста.
-	 *
+	 * 
 	 * @param player игрок.
 	 * @param quest квест.
 	 */
-	public final void removeQuest(Player player, Quest quest)
-	{
+	public final void removeQuest(Player player, Quest quest) {
 		if(player == null || quest == null)
 			return;
 
 		PreparedStatement statement = null;
 		Connection con = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(REMOVE_QUEST);
 			statement.setInt(1, player.getObjectId());
 			statement.setInt(2, quest.getId());
 			statement.execute();
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 	}
 
 	/**
 	 * Удаление серверной переменной.
-	 *
+	 * 
 	 * @param name название переменной.
 	 */
-	public final void removeServerVar(String name)
-	{
+	public final void removeServerVar(String name) {
 		PreparedStatement statement = null;
 		Connection con = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(REMOVE_SERVER_VARIABLE);
 			statement.setString(1, name);
 			statement.execute();
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 	}
 
 	/**
 	 * Загружает аккаунт с БД.
-	 *
+	 * 
 	 * @param accountName имя аккаунта.
 	 * @return загруженный аккаунт.
 	 */
-	public final Account restoreAccount(String accountName)
-	{
+	public final Account restoreAccount(String accountName) {
 		Connection con = null;
 		PreparedStatement statement = null;
 		ResultSet rset = null;
 
 		Account account = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(SELECT_ACCOUNT);
@@ -2691,13 +2383,9 @@ public final class DataBaseManager
 
 			if(rset.next())
 				account = Account.valueOf(accountName, rset.getString(1), rset.getString(2), rset.getString(3), rset.getString(4), rset.getString(5), rset.getLong(6), rset.getLong(7), rset.getInt(8));
-		}
-		catch(Exception e)
-		{
+		} catch(Exception e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
 
@@ -2706,18 +2394,16 @@ public final class DataBaseManager
 
 	/**
 	 * Получает ид банка закрепленного за аккаунтом.
-	 *
+	 * 
 	 * @param accountName имя аккаунта.
 	 * @return ид банка.
 	 */
-	public final int restoreAccountBank(String accountName)
-	{
+	public final int restoreAccountBank(String accountName) {
 		PreparedStatement statement = null;
 		ResultSet rset = null;
 		Connection con = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(RESTORE_ACCOUNT_BANK);
@@ -2727,13 +2413,9 @@ public final class DataBaseManager
 
 			if(rset.next())
 				return rset.getInt("bank_id");
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 
@@ -2742,18 +2424,16 @@ public final class DataBaseManager
 
 	/**
 	 * Загружает с БД внешность игрока.
-	 *
+	 * 
 	 * @param objectId уникальных ид игрока.
 	 * @return внешность игрока.
 	 */
-	public final DeprecatedPlayerFace restoreFace(int objectId)
-	{
+	public final DeprecatedPlayerFace restoreFace(int objectId) {
 		Connection con = null;
 		PreparedStatement statement = null;
 		ResultSet rset = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(SELECT_PLAYER_FACE);
@@ -2761,8 +2441,7 @@ public final class DataBaseManager
 
 			rset = statement.executeQuery();
 
-			if(!rset.next())
-			{
+			if(!rset.next()) {
 				log.warning("not found player face for " + objectId);
 				return null;
 			}
@@ -2806,13 +2485,9 @@ public final class DataBaseManager
 				face.tempVals[i] = rset.getInt("temp" + (i + 1));
 
 			return face;
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
 
@@ -2821,17 +2496,15 @@ public final class DataBaseManager
 
 	/**
 	 * Загрузка всех итемов банка гильдии из БД.
-	 *
+	 * 
 	 * @param guild гильдия.
 	 */
-	public final void restoreGuildBankItems(Guild guild)
-	{
+	public final void restoreGuildBankItems(Guild guild) {
 		Connection con = null;
 		PreparedStatement statement = null;
 		ResultSet rset = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(SELECT_GUILD_BANK_ITEMS);
@@ -2856,30 +2529,24 @@ public final class DataBaseManager
 			// вносим итемы в банк
 			for(ItemInstance item : items)
 				bank.setItem(item.getIndex(), item);
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
 	}
 
 	/**
 	 * Загрузка всех членов гильдии из БД.
-	 *
+	 * 
 	 * @param guild гильдия.
 	 */
-	public final void restoreGuildMembers(Guild guild)
-	{
+	public final void restoreGuildMembers(Guild guild) {
 		Connection con = null;
 		PreparedStatement statement = null;
 		ResultSet rset = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(SELECT_GUILD_MEMBERS);
@@ -2889,8 +2556,7 @@ public final class DataBaseManager
 			rset = statement.executeQuery();
 
 			// загружаем мемберов
-			while(rset.next())
-			{
+			while(rset.next()) {
 				GuildMember member = GuildMember.newInstance();
 
 				member.setClassId(rset.getInt(1));
@@ -2907,30 +2573,24 @@ public final class DataBaseManager
 
 				guild.addMember(member);
 			}
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
 	}
 
 	/**
 	 * Загрузка всех рангов гильдии из БД.
-	 *
+	 * 
 	 * @param guild гильдия.
 	 */
-	public final void restoreGuildRanks(Guild guild)
-	{
+	public final void restoreGuildRanks(Guild guild) {
 		Connection con = null;
 		PreparedStatement statement = null;
 		ResultSet rset = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(SELECT_GUILD_RANKS);
@@ -2942,30 +2602,24 @@ public final class DataBaseManager
 			// загружаем ранги
 			while(rset.next())
 				guild.addRank(GuildRank.newInstance(rset.getString("rank_name"), GuildRankLaw.valueOf(rset.getInt("law")), rset.getInt("order")));
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
 	}
 
 	/**
 	 * Загрузка всех гильдий из БД.
-	 *
+	 * 
 	 * @param guilds таблица гильдий.
 	 */
-	public final void restoreGuilds(Table<IntKey, Guild> guilds)
-	{
+	public final void restoreGuilds(Table<IntKey, Guild> guilds) {
 		Connection con = null;
 		PreparedStatement statement = null;
 		ResultSet rset = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(SELECT_GUILDS);
@@ -2975,32 +2629,29 @@ public final class DataBaseManager
 
 			// загружаем гильдии
 			while(rset.next())
-				guilds.put(rset.getInt("id"), new Guild(rset.getString("name"), rset.getString("title"), rset.getString("message"), rset.getInt("id"), rset.getInt("level"), new GuildIcon(rset.getString("icon_name"), rset.getBytes("icon"))));
-		}
-		catch(SQLException e)
-		{
+				guilds.put(
+						rset.getInt("id"),
+						new Guild(rset.getString("name"), rset.getString("title"), rset.getString("message"), rset.getInt("id"), rset.getInt("level"), new GuildIcon(rset.getString("icon_name"), rset
+								.getBytes("icon"))));
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
 	}
 
 	/**
 	 * Загрузка списка персоажей на указанном аккаунте.
-	 *
+	 * 
 	 * @param playerList список персонажей.
 	 * @param accountName имя аккаунта.
 	 */
-	public final void restorePlayerList(Array<PlayerPreview> playerList, String accountName)
-	{
+	public final void restorePlayerList(Array<PlayerPreview> playerList, String accountName) {
 		Connection con = null;
 		PreparedStatement statement = null;
 		ResultSet rset = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(SELECT_PLAYER_LIST);
@@ -3008,8 +2659,7 @@ public final class DataBaseManager
 
 			rset = statement.executeQuery();
 
-			while(rset.next())
-			{
+			while(rset.next()) {
 				// получаем уникальный ид игрока
 				int objectId = rset.getInt("object_id");
 
@@ -3023,31 +2673,25 @@ public final class DataBaseManager
 				// добавляем превью в список
 				playerList.add(playerPreview);
 			}
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
 	}
 
 	/**
 	 * Загрузка списка имен персоажей на указанном аккаунте.
-	 *
+	 * 
 	 * @param playerNames список имен персонажей.
 	 * @param accountName имя аккаунта.
 	 */
-	public final void restorePlayerNames(Array<String> playerNames, String accountName)
-	{
+	public final void restorePlayerNames(Array<String> playerNames, String accountName) {
 		Connection con = null;
 		PreparedStatement statement = null;
 		ResultSet rset = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(SELECT_PLAYER_ACCOUNT);
@@ -3057,31 +2701,25 @@ public final class DataBaseManager
 
 			while(rset.next())
 				playerNames.add(rset.getString(1));
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
 	}
 
 	/**
 	 * Загружает с БД превью игрока.
-	 *
+	 * 
 	 * @param objectId уникальных ид игрока.
 	 * @return превью игрока.
 	 */
-	public final PlayerPreview restorePreview(int objectId)
-	{
+	public final PlayerPreview restorePreview(int objectId) {
 		Connection con = null;
 		PreparedStatement statement = null;
 		ResultSet rset = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(SELECT_PLAYER_PREVIEW);
@@ -3090,8 +2728,7 @@ public final class DataBaseManager
 			rset = statement.executeQuery();
 
 			// если не нашли персонажа
-			if(!rset.next())
-			{
+			if(!rset.next()) {
 				log.warning("not found player for " + objectId);
 				return null;
 			}
@@ -3121,8 +2758,7 @@ public final class DataBaseManager
 			{
 				rset = statement.executeQuery("SELECT * FROM `items` WHERE `owner_id` = " + objectId + " AND `location` = " + ItemLocation.EQUIPMENT.ordinal());
 
-				while(rset.next())
-				{
+				while(rset.next()) {
 					ItemTemplate template = itemTable.getItem(rset.getInt("item_id"));
 
 					if(template == null)
@@ -3145,13 +2781,9 @@ public final class DataBaseManager
 			playerPreview.setAppearance(appearance).setEquipment(equipment);
 
 			return playerPreview;
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
 
@@ -3160,11 +2792,10 @@ public final class DataBaseManager
 
 	/**
 	 * Загрузка переменных квеста.
-	 *
+	 * 
 	 * @param state состояние квеста.
 	 */
-	public final void restoreQuestVar(QuestState state)
-	{
+	public final void restoreQuestVar(QuestState state) {
 		Player player = state.getPlayer();
 
 		if(player == null)
@@ -3174,8 +2805,7 @@ public final class DataBaseManager
 		Connection con = null;
 		ResultSet rset = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(RESTORE_QUEST_VAR);
@@ -3186,33 +2816,27 @@ public final class DataBaseManager
 
 			while(rset.next())
 				state.setVar(rset.getString("name"), Wraps.newIntegerWrap(rset.getInt("value"), true));
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
 	}
 
 	/**
 	 * Загружает с БД откаты скилов игрока.
-	 *
+	 * 
 	 * @param objectId уникальный ид игрока.
 	 * @return reuses таблица откатов скилов.
 	 */
-	public final Table<IntKey, ReuseSkill> restoreReuseSkills(int objectId)
-	{
+	public final Table<IntKey, ReuseSkill> restoreReuseSkills(int objectId) {
 		Table<IntKey, ReuseSkill> reuses = Tables.newConcurrentIntegerTable();
 
 		Connection con = null;
 		PreparedStatement statement = null;
 		ResultSet rset = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement("SELECT * FROM `character_skill_reuses` WHERE `object_id` = ? ");
@@ -3220,20 +2844,15 @@ public final class DataBaseManager
 
 			rset = statement.executeQuery();
 
-			while(rset.next())
-			{
+			while(rset.next()) {
 				ReuseSkill reuse = ReuseSkill.newInstance(rset.getInt("skill_id"), 0);
 				reuse.setItemId(rset.getInt("item_id"));
 				reuse.setEndTime(rset.getLong("end_time"));
 				reuses.put(reuse.getSkillId(), reuse);
 			}
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
 
@@ -3242,17 +2861,15 @@ public final class DataBaseManager
 
 	/**
 	 * Загружает скилы игрока с БД.
-	 *
+	 * 
 	 * @param player игрок, для которого загружаются скилы.
 	 */
-	public final void restoreSkills(Player player)
-	{
+	public final void restoreSkills(Player player) {
 		Connection con = null;
 		PreparedStatement statement = null;
 		ResultSet rset = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement("SELECT * FROM `character_skills` WHERE `object_id`= ? ");
@@ -3262,8 +2879,7 @@ public final class DataBaseManager
 
 			SkillTable skillTable = SkillTable.getInstance();
 
-			while(rset.next())
-			{
+			while(rset.next()) {
 				int id = rset.getInt("skill_id");
 				byte classId = rset.getByte("class_id");
 
@@ -3274,35 +2890,28 @@ public final class DataBaseManager
 
 				player.addSkill(skill, false);
 			}
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
 	}
 
 	/**
 	 * Сохраняет настройки клиента и горячих клавишь игрока.
-	 *
+	 * 
 	 * @param player игрок.
 	 */
-	public final boolean storeSettingsAndHotKeys(Player player)
-	{
+	public final boolean storeSettingsAndHotKeys(Player player) {
 		Connection con = null;
 		PreparedStatement statement = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			byte[] bytes = player.getHotkey();
 
-			if(player.isChangeHotkey() && bytes != null)
-			{
+			if(player.isChangeHotkey() && bytes != null) {
 				statement = con.prepareStatement("REPLACE INTO `character_hotkey` (object_id, data) VALUES (?,?)");
 
 				statement.setInt(1, player.getObjectId());
@@ -3315,8 +2924,7 @@ public final class DataBaseManager
 
 			bytes = player.getSettings();
 
-			if(player.isChangedSettings() && bytes != null)
-			{
+			if(player.isChangedSettings() && bytes != null) {
 				statement = con.prepareStatement("REPLACE INTO `character_settings` (object_id, data) VALUES (?,?)");
 
 				statement.setInt(1, player.getObjectId());
@@ -3328,13 +2936,9 @@ public final class DataBaseManager
 			}
 
 			return true;
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeConnection(con);
 		}
 
@@ -3343,36 +2947,30 @@ public final class DataBaseManager
 
 	/**
 	 * Создание строки в БД пройденной территории.
-	 *
+	 * 
 	 * @param player игрок который побывал в территории.
 	 * @param territory территория, в которой побывал игрок.
 	 * @return успешно ли создан.
 	 */
-	public final boolean storeTerritory(Player player, Territory territory)
-	{
+	public final boolean storeTerritory(Player player, Territory territory) {
 		if(territory == null || player == null)
 			return false;
 
 		Connection con = null;
 		PreparedStatement statement = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
-            statement = con.prepareStatement(ADD_STORE_TERRITORY);
+			statement = con.prepareStatement(ADD_STORE_TERRITORY);
 			statement.setInt(1, player.getObjectId());
 			statement.setInt(2, territory.getId());
 			statement.execute();
 
 			return true;
-        }
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 
@@ -3381,13 +2979,12 @@ public final class DataBaseManager
 
 	/**
 	 * Сохранение значения переменной квеста.
-	 *
+	 * 
 	 * @param state состояние квеста.
 	 * @param name название переменной.
 	 * @param wrap значение переменной.
 	 */
-	public final void storyQuestVar(QuestState state, String name, Wrap wrap)
-	{
+	public final void storyQuestVar(QuestState state, String name, Wrap wrap) {
 		Player player = state.getPlayer();
 
 		if(player == null || wrap == null)
@@ -3396,8 +2993,7 @@ public final class DataBaseManager
 		PreparedStatement statement = null;
 		Connection con = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(STORE_QUEST_VAR);
@@ -3406,30 +3002,24 @@ public final class DataBaseManager
 			statement.setString(3, name);
 			statement.setInt(4, wrap.getInt());
 			statement.execute();
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 	}
 
 	/**
 	 * Обновление аккаунта
-	 *
+	 * 
 	 * @param account
 	 * @param address
 	 */
-	public final void updateAccount(Account account, InetAddress address)
-	{
+	public final void updateAccount(Account account, InetAddress address) {
 		PreparedStatement statement = null;
 		Connection con = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement("UPDATE `accounts` SET `end_block`=?, `last_ip`=? WHERE `login`=?");
@@ -3437,33 +3027,27 @@ public final class DataBaseManager
 			statement.setString(2, address != null ? address.getHostAddress() : "");
 			statement.setString(3, account.getName());
 			statement.execute();
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 	}
 
 	/**
 	 * Обновление спавна босса в БД.
-	 *
+	 * 
 	 * @param template темплейт босса.
 	 * @param spawn время спавна босса.
 	 */
-	public final void updateBossSpawns(NpcTemplate template, long spawn)
-	{
+	public final void updateBossSpawns(NpcTemplate template, long spawn) {
 		if(template == null)
 			return;
 
 		PreparedStatement statement = null;
 		Connection con = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(UPDATE_BOSS_SPAWNS);
@@ -3471,38 +3055,32 @@ public final class DataBaseManager
 			statement.setInt(2, template.getTemplateType());
 			statement.setInt(3, template.getTemplateType());
 			statement.execute();
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 	}
 
 	/**
 	 * Обновление строки в БД итема.
-	 *
+	 * 
 	 * @param item итем.
 	 * @return успешно ли обновлен.
 	 */
-	public final boolean updateDataItem(ItemInstance item)
-	{
+	public final boolean updateDataItem(ItemInstance item) {
 		if(item == null)
 			return false;
 
 		Connection con = null;
 		PreparedStatement statement = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
-            statement = con.prepareStatement(UPDATE_DATA_ITEM);
+			statement = con.prepareStatement(UPDATE_DATA_ITEM);
 			statement.setLong(1, item.getItemCount());
-			statement.setInt(2, item.hasCrystals()? 1 : 0);
+			statement.setInt(2, item.hasCrystals() ? 1 : 0);
 			statement.setString(3, item.getAutor());
 			statement.setInt(4, item.getBonusId());
 			statement.setInt(5, item.getEnchantLevel());
@@ -3511,13 +3089,9 @@ public final class DataBaseManager
 			statement.execute();
 
 			return true;
-        }
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 
@@ -3526,17 +3100,15 @@ public final class DataBaseManager
 
 	/**
 	 * Обновление аккаунта
-	 *
+	 * 
 	 * @param account
 	 * @param address
 	 */
-	public final void updateFullAccount(Account account)
-	{
+	public final void updateFullAccount(Account account) {
 		PreparedStatement statement = null;
 		Connection con = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement("UPDATE `accounts` SET `email` = ?, `access_level` = ?, `end_pay` = ?, `end_block`= ?, `last_ip`= ?, `allow_ips` = ?, `comments` = ? WHERE `login`=?");
@@ -3549,25 +3121,20 @@ public final class DataBaseManager
 			statement.setString(7, account.getComments());
 			statement.setString(8, account.getName());
 			statement.execute();
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 	}
 
 	/**
 	 * Обоновление иконки гильдии.
-	 *
+	 * 
 	 * @param guild гильдия.
 	 * @return успешно ли сообновлена.
 	 */
-	public final boolean updateGuildIcon(Guild guild)
-	{
+	public final boolean updateGuildIcon(Guild guild) {
 		if(guild == null)
 			return false;
 
@@ -3579,24 +3146,19 @@ public final class DataBaseManager
 		Connection con = null;
 		PreparedStatement statement = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
-            statement = con.prepareStatement(UPDATE_GUILD_ICON);
+			statement = con.prepareStatement(UPDATE_GUILD_ICON);
 			statement.setBytes(1, icon.getIcon());
 			statement.setString(2, icon.getName());
 			statement.setInt(3, guild.getId());
 			statement.execute();
 
 			return true;
-        }
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 
@@ -3605,35 +3167,29 @@ public final class DataBaseManager
 
 	/**
 	 * Обновление сообщения для гильдии.
-	 *
+	 * 
 	 * @param guild гильдия.
 	 * @return успешно ли обновлен.
 	 */
-	public final boolean updateGuildMessage(Guild guild)
-	{
+	public final boolean updateGuildMessage(Guild guild) {
 		if(guild == null)
 			return false;
 
 		Connection con = null;
 		PreparedStatement statement = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
-            statement = con.prepareStatement(UPDATE_GUILD_MESSAGE);
+			statement = con.prepareStatement(UPDATE_GUILD_MESSAGE);
 			statement.setString(1, guild.getMessage());
 			statement.setInt(2, guild.getId());
 			statement.execute();
 
 			return true;
-        }
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 
@@ -3642,24 +3198,22 @@ public final class DataBaseManager
 
 	/**
 	 * Обновление ранга для гильдии.
-	 *
+	 * 
 	 * @param guild гильдия.
 	 * @param rank ранг.
 	 * @return успешно ли обновлен.
 	 */
-	public final boolean updateGuildRank(Guild guild, GuildRank rank)
-	{
+	public final boolean updateGuildRank(Guild guild, GuildRank rank) {
 		if(rank == null || guild == null)
 			return false;
 
 		Connection con = null;
 		PreparedStatement statement = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
-            statement = con.prepareStatement(UPDATE_GUILD_RANK);
+			statement = con.prepareStatement(UPDATE_GUILD_RANK);
 			statement.setString(1, rank.getName());
 			statement.setInt(2, rank.getLawId());
 			statement.setInt(3, rank.getIndex());
@@ -3667,13 +3221,9 @@ public final class DataBaseManager
 			statement.execute();
 
 			return true;
-        }
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 
@@ -3682,35 +3232,29 @@ public final class DataBaseManager
 
 	/**
 	 * Обновление титула для гильдии.
-	 *
+	 * 
 	 * @param guild гильдия.
 	 * @return успешно ли обновлен.
 	 */
-	public final boolean updateGuildTitle(Guild guild)
-	{
+	public final boolean updateGuildTitle(Guild guild) {
 		if(guild == null)
 			return false;
 
 		Connection con = null;
 		PreparedStatement statement = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
-            statement = con.prepareStatement(UPDATE_GUILD_TITLE);
+			statement = con.prepareStatement(UPDATE_GUILD_TITLE);
 			statement.setString(1, guild.getTitle());
 			statement.setInt(2, guild.getId());
 			statement.execute();
 
 			return true;
-        }
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 
@@ -3719,33 +3263,27 @@ public final class DataBaseManager
 
 	/**
 	 * Обновление строки в БД инвенторя.
-	 *
+	 * 
 	 * @param owner владелец инвенторя.
 	 * @param inventory инвентарь.
 	 * @return успешно ли обновлен.
 	 */
-	public final boolean updateInventory(Character owner, Inventory inventory)
-	{
+	public final boolean updateInventory(Character owner, Inventory inventory) {
 		Connection con = null;
 		PreparedStatement statement = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
-            statement = con.prepareStatement(UPDATE_INVENTORY);
+			statement = con.prepareStatement(UPDATE_INVENTORY);
 			statement.setLong(1, inventory.getLevel());
 			statement.setInt(2, owner.getObjectId());
 			statement.execute();
 
 			return true;
-        }
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 
@@ -3754,28 +3292,26 @@ public final class DataBaseManager
 
 	/**
 	 * Обновление строки в БД итема.
-	 *
+	 * 
 	 * @param item итем.
 	 * @return успешно ли обновлен.
 	 */
-	public final boolean updateItem(ItemInstance item)
-	{
+	public final boolean updateItem(ItemInstance item) {
 		if(item == null)
 			return false;
 
 		Connection con = null;
 		PreparedStatement statement = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
-            statement = con.prepareStatement(UPDATE_ITEM);
+			statement = con.prepareStatement(UPDATE_ITEM);
 			statement.setLong(1, item.getItemCount());
 			statement.setInt(2, item.getOwnerId());
 			statement.setInt(3, item.getLocationId());
 			statement.setInt(4, item.getIndex());
-			statement.setInt(5, item.hasCrystals()? 1 : 0);
+			statement.setInt(5, item.hasCrystals() ? 1 : 0);
 			statement.setString(6, item.getAutor());
 			statement.setInt(7, item.getBonusId());
 			statement.setInt(8, item.getEnchantLevel());
@@ -3784,13 +3320,9 @@ public final class DataBaseManager
 			statement.execute();
 
 			return true;
-        }
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 
@@ -3799,23 +3331,21 @@ public final class DataBaseManager
 
 	/**
 	 * Обновление строки в БД местоположения итема.
-	 *
+	 * 
 	 * @param item итем.
 	 * @return успешно ли обновлен.
 	 */
-	public final boolean updateLocationItem(ItemInstance item)
-	{
+	public final boolean updateLocationItem(ItemInstance item) {
 		if(item == null)
 			return false;
 
 		Connection con = null;
 		PreparedStatement statement = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
-            statement = con.prepareStatement(UPDATE_LOCATION_ITEM);
+			statement = con.prepareStatement(UPDATE_LOCATION_ITEM);
 			statement.setInt(1, item.getOwnerId());
 			statement.setInt(2, item.getLocationId());
 			statement.setInt(3, item.getIndex());
@@ -3823,13 +3353,9 @@ public final class DataBaseManager
 			statement.execute();
 
 			return true;
-        }
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 
@@ -3838,35 +3364,29 @@ public final class DataBaseManager
 
 	/**
 	 * Обновление строки в БД континента игрока.
-	 *
+	 * 
 	 * @param player обновляемый игрок.
 	 * @return успешно ли обновлен.
 	 */
-	public final boolean updatePlayerContinentId(Player player)
-	{
+	public final boolean updatePlayerContinentId(Player player) {
 		if(player == null)
 			return false;
 
 		Connection con = null;
 		PreparedStatement statement = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
-            statement = con.prepareStatement(UPDATE_PLAYER_CONTINENT_ID);
+			statement = con.prepareStatement(UPDATE_PLAYER_CONTINENT_ID);
 			statement.setInt(1, player.getContinentId());
 			statement.setInt(2, player.getObjectId());
 			statement.execute();
 
 			return true;
-        }
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 
@@ -3875,36 +3395,30 @@ public final class DataBaseManager
 
 	/**
 	 * Обновление строки в БД гильдии игрока.
-	 *
+	 * 
 	 * @param member обновляемый игрок.
 	 * @return успешно ли обновлен.
 	 */
-	public final boolean updatePlayerGuild(Guild guild, GuildMember member)
-	{
+	public final boolean updatePlayerGuild(Guild guild, GuildMember member) {
 		if(member == null)
 			return false;
 
 		Connection con = null;
 		PreparedStatement statement = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
-            statement = con.prepareStatement(UPDATE_PLAYER_GUILD);
-			statement.setInt(1, guild != null? guild.getId() : 0);
+			statement = con.prepareStatement(UPDATE_PLAYER_GUILD);
+			statement.setInt(1, guild != null ? guild.getId() : 0);
 			statement.setInt(2, member.getRankId());
 			statement.setInt(3, member.getObjectId());
 			statement.execute();
 
 			return true;
-        }
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 
@@ -3913,36 +3427,30 @@ public final class DataBaseManager
 
 	/**
 	 * Обновление строки в БД гильдии игрока.
-	 *
+	 * 
 	 * @param player обновляемый игрок.
 	 * @return успешно ли обновлен.
 	 */
-	public final boolean updatePlayerGuild(Player player)
-	{
+	public final boolean updatePlayerGuild(Player player) {
 		if(player == null)
 			return false;
 
 		Connection con = null;
 		PreparedStatement statement = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
-            statement = con.prepareStatement(UPDATE_PLAYER_GUILD);
+			statement = con.prepareStatement(UPDATE_PLAYER_GUILD);
 			statement.setInt(1, player.getGuildId());
 			statement.setInt(2, player.getGuildRankId());
 			statement.setInt(3, player.getObjectId());
 			statement.execute();
 
 			return true;
-        }
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 
@@ -3951,35 +3459,29 @@ public final class DataBaseManager
 
 	/**
 	 * Обновление гилд пометки игрок в БД
-	 *
+	 * 
 	 * @param player обновляемый игрок.
 	 * @return успешно ли обновлен.
 	 */
-	public final boolean updatePlayerGuildNote(Player player)
-	{
+	public final boolean updatePlayerGuildNote(Player player) {
 		if(player == null)
 			return false;
 
 		Connection con = null;
 		PreparedStatement statement = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
-            statement = con.prepareStatement(UPDATE_PLAYER_GUILD_NOTE);
+			statement = con.prepareStatement(UPDATE_PLAYER_GUILD_NOTE);
 			statement.setString(1, player.getGuildNote());
 			statement.setInt(2, player.getObjectId());
 			statement.execute();
 
 			return true;
-        }
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 
@@ -3988,93 +3490,75 @@ public final class DataBaseManager
 
 	/**
 	 * Обновление состояние региона в БД.
-	 *
+	 * 
 	 * @param region обновляемый регион.
 	 */
-	public final void updateRegionState(Region region)
-	{
+	public final void updateRegionState(Region region) {
 		Connection con = null;
 		PreparedStatement statement = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
-            statement = con.prepareStatement(UPDATE_REGION_STATE);
+			statement = con.prepareStatement(UPDATE_REGION_STATE);
 			statement.setInt(1, region.getState().ordinal());
 			statement.setInt(2, region.getId());
 			statement.execute();
-        }
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 	}
 
 	/**
 	 * Обновление владельца региона в БД.
-	 *
+	 * 
 	 * @param region обновляемый регион.
 	 */
-	public final void updateRegionOwner(Region region)
-	{
+	public final void updateRegionOwner(Region region) {
 		Connection con = null;
 		PreparedStatement statement = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
-            statement = con.prepareStatement(UPDATE_REGION_OWNER);
+			statement = con.prepareStatement(UPDATE_REGION_OWNER);
 			statement.setInt(1, region.getOwnerId());
 			statement.setInt(2, region.getId());
 			statement.execute();
-        }
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 	}
 
 	/**
 	 * Обновление строки в БД уровня игрока.
-	 *
+	 * 
 	 * @param player обновляемый игрок.
 	 * @return успешно ли обновлен.
 	 */
-	public final boolean updatePlayerLevel(Player player)
-	{
+	public final boolean updatePlayerLevel(Player player) {
 		if(player == null)
 			return false;
 
 		Connection con = null;
 		PreparedStatement statement = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
-            statement = con.prepareStatement(UPDATE_PLAYER_LEVEL);
+			statement = con.prepareStatement(UPDATE_PLAYER_LEVEL);
 			statement.setInt(1, player.getLevel());
 			statement.setInt(2, player.getObjectId());
 			statement.execute();
 
 			return true;
-        }
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 
@@ -4083,35 +3567,29 @@ public final class DataBaseManager
 
 	/**
 	 * Обновление титула игрок в БД
-	 *
+	 * 
 	 * @param player обновляемый игрок.
 	 * @return успешно ли обновлен.
 	 */
-	public final boolean updatePlayerTitle(Player player)
-	{
+	public final boolean updatePlayerTitle(Player player) {
 		if(player == null)
 			return false;
 
 		Connection con = null;
 		PreparedStatement statement = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
-            statement = con.prepareStatement(UPDATE_PLAYER_TITLE);
+			statement = con.prepareStatement(UPDATE_PLAYER_TITLE);
 			statement.setString(1, player.getTitle());
 			statement.setInt(2, player.getObjectId());
 			statement.execute();
 
 			return true;
-        }
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 
@@ -4120,18 +3598,16 @@ public final class DataBaseManager
 
 	/**
 	 * Обновление игрока переменной.
-	 *
+	 * 
 	 * @param objectId уникальный ид игрока.
 	 * @param name название переменной.
 	 * @param value значение переменной.
 	 */
-	public final void updatePlayerVar(int objectId, String name, String value)
-	{
+	public final void updatePlayerVar(int objectId, String name, String value) {
 		PreparedStatement statement = null;
 		Connection con = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(UPDATE_PLAYER_VARIABLE);
@@ -4139,48 +3615,38 @@ public final class DataBaseManager
 			statement.setInt(2, objectId);
 			statement.setString(3, name);
 			statement.execute();
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 	}
 
 	/**
 	 * Обновление строки в БД зоны игрока.
-	 *
+	 * 
 	 * @param player обновляемый игрок.
 	 * @return успешно ли обновлен.
 	 */
-	public final boolean updatePlayerZoneId(Player player)
-	{
+	public final boolean updatePlayerZoneId(Player player) {
 		if(player == null)
 			return false;
 
 		Connection con = null;
 		PreparedStatement statement = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
-            statement = con.prepareStatement(UPDATE_PLAYER_ZONE_ID);
+			statement = con.prepareStatement(UPDATE_PLAYER_ZONE_ID);
 			statement.setInt(1, player.getZoneId());
 			statement.setInt(2, player.getObjectId());
 			statement.execute();
 
 			return true;
-        }
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 
@@ -4189,11 +3655,10 @@ public final class DataBaseManager
 
 	/**
 	 * Обновление стадии квеста.
-	 *
+	 * 
 	 * @param state состояние квеста.
 	 */
-	public final void updateQuest(QuestState state)
-	{
+	public final void updateQuest(QuestState state) {
 		Player player = state.getPlayer();
 
 		if(player == null)
@@ -4202,8 +3667,7 @@ public final class DataBaseManager
 		PreparedStatement statement = null;
 		Connection con = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(UPDATE_QUEST);
@@ -4212,60 +3676,48 @@ public final class DataBaseManager
 			statement.setInt(3, player.getObjectId());
 			statement.setInt(4, state.getQuestId());
 			statement.execute();
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 	}
 
 	/**
 	 * Обновление серверной переменной.
-	 *
+	 * 
 	 * @param name название переменной.
 	 * @param value значение переменной.
 	 */
-	public final void updateServerVar(String name, String value)
-	{
+	public final void updateServerVar(String name, String value) {
 		PreparedStatement statement = null;
 		Connection con = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(UPDATE_SERVER_VARIABLE);
 			statement.setString(1, value);
 			statement.setString(2, name);
 			statement.execute();
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 	}
 
 	/**
 	 * Обновление положения игрока в БД.
-	 *
+	 * 
 	 * @param location позиция игрока.
 	 * @param name имя игрока.
 	 */
-	public final void updatePlayerLocation(Location location, String name, int zoneId)
-	{
+	public final void updatePlayerLocation(Location location, String name, int zoneId) {
 		PreparedStatement statement = null;
 		Connection con = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(UPDATE_PLAYER_LOCATION);
@@ -4278,30 +3730,24 @@ public final class DataBaseManager
 			statement.setString(7, name);
 
 			statement.execute();
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 	}
 
 	/**
 	 * Обновление класса игрока в БД.
-	 *
+	 * 
 	 * @param objectId ид игрока.
 	 * @param cs класс игрока.
 	 */
-	public final void updatePlayerClass(int objectId, PlayerClass cs)
-	{
+	public final void updatePlayerClass(int objectId, PlayerClass cs) {
 		PreparedStatement statement = null;
 		Connection con = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(UPDATE_PLAYER_CLASS);
@@ -4309,31 +3755,25 @@ public final class DataBaseManager
 			statement.setInt(2, objectId);
 
 			statement.execute();
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 	}
 
 	/**
 	 * Обновление расы игрока в БД.
-	 *
+	 * 
 	 * @param objectId ид игрока.
 	 * @param race раса игрока.
 	 * @param sex пол игрока.
 	 */
-	public final boolean updatePlayerRace(int objectId, Race race, Sex sex)
-	{
+	public final boolean updatePlayerRace(int objectId, Race race, Sex sex) {
 		PreparedStatement statement = null;
 		Connection con = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(UPDATE_PLAYER_RACE);
@@ -4342,13 +3782,9 @@ public final class DataBaseManager
 			statement.setInt(3, objectId);
 
 			return statement.executeUpdate() > 0;
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
 
@@ -4357,18 +3793,16 @@ public final class DataBaseManager
 
 	/**
 	 * Получение ид игрока с указанным именем
-	 *
+	 * 
 	 * @param name имя игрока.
 	 * @return уникальный ид.
 	 */
-	public final int getPlayerObjectId(String name)
-	{
+	public final int getPlayerObjectId(String name) {
 		Connection con = null;
 		PreparedStatement statement = null;
 		ResultSet rset = null;
 
-		try
-		{
+		try {
 			con = connectFactory.getConnection();
 
 			statement = con.prepareStatement(SELECT_PLAYER_OJECT_ID);
@@ -4378,13 +3812,9 @@ public final class DataBaseManager
 
 			if(rset.next())
 				return rset.getInt(1);
-		}
-		catch(SQLException e)
-		{
+		} catch(SQLException e) {
 			log.warning(e);
-		}
-		finally
-		{
+		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
 
