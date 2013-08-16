@@ -123,6 +123,7 @@ public class EnchantItemDialog extends AbstractActionDialog {
 	private static final Table<IntKey, int[]> ALKAHEST_TABLE;
 
 	static {
+
 		ALKAHEST_TABLE = Tables.newIntegerTable();
 
 		ALKAHEST_TABLE.put(15, Arrays.toIntegerArray(0, 6));
@@ -160,6 +161,7 @@ public class EnchantItemDialog extends AbstractActionDialog {
 	@Override
 	public boolean apply() {
 		try {
+
 			Player actor = getActor();
 
 			if(actor == null)
@@ -172,6 +174,7 @@ public class EnchantItemDialog extends AbstractActionDialog {
 
 			inventory.lock();
 			try {
+
 				ItemInstance target = getSource();
 				ItemInstance source = inventory.getItemForObjectId(target.getObjectId());
 
@@ -182,7 +185,7 @@ public class EnchantItemDialog extends AbstractActionDialog {
 
 				ItemInstance consume = inventory.getItemForObjectId(target.getObjectId());
 
-				if(consume == null || consume == source || consume.getExtractable() < source.getExtractable())
+				if(consume == null || consume == source || !consume.isEnchantable() || consume.getExtractable() < source.getExtractable())
 					return false;
 
 				if(!source.getClass().isInstance(consume))
@@ -247,6 +250,7 @@ public class EnchantItemDialog extends AbstractActionDialog {
 	@Override
 	public synchronized boolean init() {
 		if(super.init()) {
+
 			Player actor = getActor();
 
 			actor.sendPacket(DialogPanel.getInstance(actor, PanelType.ENCHANT_ITEM), true);
@@ -434,10 +438,12 @@ public class EnchantItemDialog extends AbstractActionDialog {
 	 * @param itemId ид шаблона предмета.
 	 */
 	public void addItem(int index, int objectId, int itemId) {
+
 		Player actor = getActor();
 
 		switch(index) {
 			case SOURCE_ITEM_INDEX: {
+
 				if(getConsume() != null || getAlkahest() != null) {
 					actor.sendMessage("Нужно очистить используемый предмет и alkshest.");
 					return;
@@ -455,7 +461,7 @@ public class EnchantItemDialog extends AbstractActionDialog {
 					return;
 				}
 
-				if(source.getExtractable() < 1) {
+				if(!source.isEnchantable()) {
 					actor.sayMessage("Этот предмет нельзя зачаровывать.");
 					return;
 				}
@@ -465,6 +471,7 @@ public class EnchantItemDialog extends AbstractActionDialog {
 				break;
 			}
 			case CONSUME_ITEM_INDEX: {
+
 				ItemInstance source = getSource();
 
 				if(source == null) {
@@ -494,6 +501,7 @@ public class EnchantItemDialog extends AbstractActionDialog {
 				break;
 			}
 			case ALKAHEST_ITEM_INDEX: {
+
 				ItemInstance source = getSource();
 
 				if(source == null || getConsume() == null) {
@@ -539,6 +547,7 @@ public class EnchantItemDialog extends AbstractActionDialog {
 	 * @return предмет в инвенторе.
 	 */
 	public ItemInstance findItem(int objectId, int itemId) {
+
 		Player actor = getActor();
 
 		if(actor == null)
@@ -559,6 +568,7 @@ public class EnchantItemDialog extends AbstractActionDialog {
 	 * @return уровень заточки.
 	 */
 	public int getEnchantLevel(int index) {
+
 		if(index == SOURCE_ITEM_INDEX) {
 			ItemInstance source = getSource();
 
