@@ -23,8 +23,8 @@ import tera.gameserver.network.serverpackets.SkillListInfo;
  * 
  * @author Ronn
  */
-public class UserCommand extends AbstractCommand
-{
+public class UserCommand extends AbstractCommand {
+
 	private static final SimpleDateFormat timeFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm");
 
 	private static final String CHANGE_APPEARANCE_VAR = "CHANGE_APPEARANCE_VAR";
@@ -37,26 +37,21 @@ public class UserCommand extends AbstractCommand
 
 	private static String help;
 
-	public UserCommand(int access, String[] commands)
-	{
+	public UserCommand(int access, String[] commands) {
 		super(access, commands);
 
 		help = Files.read(Config.SERVER_DIR + "/data/help.txt");
 	}
 
 	@Override
-	public void execution(String command, Player player, String values)
-	{
-		switch(command)
-		{
-			case "event_reg":
-			{
+	public void execution(String command, Player player, String values) {
+		switch(command) {
+			case "event_reg": {
 				EventManager eventManager = EventManager.getInstance();
 				eventManager.registerPlayer(values, player);
 				break;
 			}
-			case "restore_characters":
-			{
+			case "restore_characters": {
 				PlayerManager playerManager = PlayerManager.getInstance();
 				playerManager.restoreCharacters(player);
 
@@ -65,28 +60,23 @@ public class UserCommand extends AbstractCommand
 			case "help":
 				player.sendMessage(help);
 				break;
-			case "time":
-			{
-				synchronized(date)
-				{
+			case "time": {
+				synchronized(date) {
 					date.setTime(System.currentTimeMillis());
 					player.sendMessage(timeFormat.format(date));
 				}
 
 				break;
 			}
-			case "end_pay":
-			{
+			case "end_pay": {
 				Account account = player.getAccount();
 
 				long time = account.getEndPay();
 
 				if(System.currentTimeMillis() > time)
 					player.sendMessage("У вас не проплаченный аккаунт.");
-				else
-				{
-					synchronized(date)
-					{
+				else {
+					synchronized(date) {
 						date.setTime(time);
 						player.sendMessage("Дата завершения проплаты: " + timeFormat.format(date));
 					}
@@ -94,14 +84,12 @@ public class UserCommand extends AbstractCommand
 
 				break;
 			}
-			case "restore_skills":
-			{
+			case "restore_skills": {
 				Table<IntKey, Skill> current = player.getSkills();
 
 				DataBaseManager dbManager = DataBaseManager.getInstance();
 
-				for(Skill skill : current)
-				{
+				for(Skill skill : current) {
 					if(skill.getClassId() == -15)
 						continue;
 
@@ -118,16 +106,13 @@ public class UserCommand extends AbstractCommand
 				player.sendPacket(SkillListInfo.getInstance(player), true);
 				break;
 			}
-			case "kill_me":
-			{
-				if(player.isBattleStanced())
-				{
+			case "kill_me": {
+				if(player.isBattleStanced()) {
 					player.sendMessage("Нельзя использовать в бою.");
 					return;
 				}
 
-				synchronized(player)
-				{
+				synchronized(player) {
 					player.setCurrentHp(0);
 					player.doDie(player);
 				}
@@ -137,16 +122,14 @@ public class UserCommand extends AbstractCommand
 			case "version":
 				player.sendMessage("Текущая версия сервера: " + Config.SERVER_VERSION);
 				break;
-			case "online":
-			{
+			case "online": {
 				OnlineManager onlineManager = OnlineManager.getInstance();
 
 				player.sendMessage("Текущий онлаин: " + onlineManager.getCurrentOnline());
 
 				break;
 			}
-			case "player_info":
-			{
+			case "player_info": {
 				if(player.getName().equals(values))
 					return;
 
@@ -155,8 +138,7 @@ public class UserCommand extends AbstractCommand
 				if(target == null)
 					target = World.getPlayer(values);
 
-				if(target == null)
-				{
+				if(target == null) {
 					player.sendMessage(MessageType.THAT_CHARACTER_ISNT_ONLINE);
 					return;
 				}

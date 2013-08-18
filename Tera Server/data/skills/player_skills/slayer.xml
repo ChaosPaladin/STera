@@ -1326,6 +1326,28 @@
 			</effect>
 		</for>
     </skill>
+	
+	<skill id="67259664" class="2" name="Startling Kick VIII" levels="1">
+        <set name="power" value="1148"/>
+        <set name="operateType" value="ACTIVE"/>
+		<set name="skillName" value="STARTLING_KICK"/>
+        <set name="skillType" value="STRIKE"/>
+        <set name="targetType" value="TARGET_ONE_AREA" />
+        <set name="radius" value="35"/>
+		<set name="range" value="35"/>
+        <set name="mpConsume" value="120"/>
+        <set name="hitTime" value="2700"/>
+		<set name="moveDistance" value="-180" />
+		<set name="moveTime" value="1000" />
+		<set name="reuseDelay" value="20000"/>
+		<set name="correctableTarget" value="true" />
+		<set name="implemented" value="true" />
+		<for>
+			<effect id="300400" time="2" count="1" type="STUN" chance="80" stackType="stun" debuff="true" >
+				<mul stat="runSpd" order="0x50" val="0" />
+			</effect>
+		</for>
+    </skill>
 
     <skill id="67278964" class="2" name="Headlong Rush I" levels="1">
         <set name="operateType" value="ACTIVE"/>
@@ -1504,6 +1526,21 @@
 		</cond>
     </skill>
 	
+	<skill id="67209764" class="2" name="Retaliate IX" levels="1">
+        <set name="power" value="931"/>
+        <set name="operateType" value="ACTIVE"/>
+        <set name="skillType" value="OWERTURNED_STRIKE"/>
+        <set name="targetType" value="TARGET_AURA"/>
+        <set name="radius" value="80"/>
+        <set name="delay" value="1000"/>
+		<set name="reuseDelay" value="15000"/>
+        <set name="hitTime" value="2000"/>
+        <set name="implemented" value="true" />
+		<cond>
+			<player owerturned="true" msg="Вы не опрокинуты."/>
+		</cond>
+    </skill>
+	
 	<skill id="67198964" class="2" name="Leaping Strike I" levels="1">
         <set name="power" value="39"/>
         <set name="operateType" value="ACTIVE"/>
@@ -1631,6 +1668,31 @@
 	
 	<skill id="67199464" class="2" name="Leaping Strike VI" levels="1">
         <set name="power" value="256"/>
+        <set name="operateType" value="ACTIVE"/>
+		<set name="skillName" value="LEAPING_STRIKE"/>
+        <set name="skillType" value="STRIKE"/>
+        <set name="targetType" value="TARGET_AREA" />
+        <set name="radius" value="40"/>
+		<set name="range" value="40"/>
+        <set name="mpConsume" value="200"/>
+        <set name="hitTime" value="3500"/>
+        <set name="reuseDelay" value="8000"/>
+		<set name="moveDistance" value="230" />
+		<set name="moveTime" value="1000" />
+        <set name="delay" value="1000"/>
+		<set name="implemented" value="true" />
+        <cond>
+			<using weapon="GREATSWORD" msg="Используется только с мечем." />
+		</cond>
+		<cast>
+			<mul stat="atk" order="0x50" val="5" >
+				<target owerturned="true" />
+			</mul>
+		</cast>
+    </skill>
+	
+	<skill id="67199564" class="2" name="Leaping Strike VII" levels="1">
+        <set name="power" value="374"/>
         <set name="operateType" value="ACTIVE"/>
 		<set name="skillName" value="LEAPING_STRIKE"/>
         <set name="skillType" value="STRIKE"/>
@@ -2260,6 +2322,26 @@
 				<add stat="powerFactor" order="0x40" val="26" />
 			</effect>
 		</for>
+    </skill>
+	
+	<skill id="67338964" class="2" name="Measured Slice" levels="1">
+        <set name="power" value="2284"/>
+        <set name="operateType" value="ACTIVE"/>
+		<set name="skillName" value="LEAPING_STRIKE"/>
+        <set name="skillType" value="STRIKE"/>
+        <set name="targetType" value="TARGET_AURA" />
+        <set name="radius" value="80"/>
+        <set name="mpConsume" value="150"/>
+        <set name="hitTime" value="5800"/>
+        <set name="reuseDelay" value="12000"/>
+		<set name="moveDelay" value="2200" />
+		<set name="moveDistance" value="190" />
+		<set name="moveTime" value="700" />
+        <set name="delay" value="2800"/>
+		<set name="implemented" value="true" />
+        <cond>
+			<using weapon="GREATSWORD" msg="Используется только с мечем." />
+		</cond>
     </skill>
 	
 	<!-- <skill id="67168964" class="2" name="Backstab" levels="1">

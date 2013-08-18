@@ -1080,6 +1080,22 @@
 		</cond>
     </skill>
 	
+	<skill id="67249764" class="5" name="Retaliate IX" levels="1">
+        <set name="power" value="931"/>
+        <set name="operateType" value="ACTIVE"/>
+        <set name="skillType" value="OWERTURNED_STRIKE"/>
+        <set name="targetType" value="TARGET_AURA"/>
+        <set name="radius" value="80"/>
+        <set name="delay" value="1000"/>
+		<set name="reuseDelay" value="15000"/>
+        <set name="hitTime" value="2000"/>
+		<set name="owerturnMod" value="0" />
+        <set name="implemented" value="true" />
+		<cond>
+			<player owerturned="true" msg="Вы не опрокинуты."/>
+		</cond>
+    </skill>
+	
 	<skill id="67128964" class="5" name="Arrow Volley I" levels="11">
 		<table name="#skillType">LOCK_ON LOCK_ON_STRIKE</table>
 		<table name="#operateType">LOCK_ON ACTIVE</table>
@@ -2145,6 +2161,54 @@
 		</for>
     </skill>
 	
+	<skill id="67139664" class="5" name="Radiant Arrow VIII" levels="12">
+        <table name="#operateType">CHARGE ACTIVE</table>
+        <table name="#skillType">CHARGE CHARHE_SINGLE_SHOT</table>
+		<table name="#delay">1000 100</table>
+		<table name="#hitTime">10000 2700</table>
+		<table name="#interval">1000 500</table>
+		<table name="#moveDistance">0 -100</table>
+		<table name="#castCount">3 1</table>
+		<table name="#mpConsume">60 60 60 120 0</table>
+		<table name="#blockingMove">false true</table>
+		<set name="power" value="2864"/>
+		<set name="startPower" value="0.5"/>
+		<set name="chargeMod" value="0.2"/>
+        <set name="operateType" value="#operateType"/>
+        <set name="skillType" value="#skillType"/>
+        <set name="targetType" value="TARGET_ONE"/>
+		<set name="rangeType" value="RANGE_SKILL" />
+        <set name="radius" value="5"/>
+		<set name="range" value="470"/>
+        <set name="hitTime" value="#hitTime"/>
+		<set name="delay" value="#delay"/>
+		<set name="reuseId" value="67139664"/>
+		<set name="castCount" value="#castCount"/>
+		<set name="offsetId" value="11"/>
+		<set name="maxTargets" value="1"/>
+		<set name="interval" value="#interval"/>
+        <set name="reuseDelay" value="10000"/>
+		<set name="mpConsume" value="#mpConsume" />
+		<set name="speed" value="2000" />
+		<set name="speedOffset" value="-1300" />
+		<set name="implemented" value="true" />
+		<set name="blockingMove" value="#blockingMove" />
+		<set name="owerturnMod" value="0.1" />
+		<set name="moveDistance" value="#moveDistance" />	
+		<set name="moveDelay" value="100" />	
+		<set name="moveTime" value="500" />	
+		<set name="correctableTarget" value="true" />
+		<cond>
+			<using weapon="BOW" msg="Используется только с луком."/>
+		</cond>
+		<cast>
+			<mul stat="runSpd" order="0x50" val="0.5" />	
+		</cast>
+		<for>
+			<effect id="600200" time="10" onCaster="true" count="1" type="BUFF" stackType="final_salvo_active" />
+		</for>
+    </skill>
+	
 	<skill id="67188964" class="5" name="Rapid Fire I" levels="7">
 		<table name="#power">10 7 7 7 7 7 28</table>
 		<set name="targetType" value="TARGET_ONE" />
@@ -2443,6 +2507,30 @@
 	
 	<skill id="67329464" class="5" name="Final Salvo VI" levels="5">
 		<table name="#power">88 51 51 51 336</table>
+		<set name="targetType" value="TARGET_ONE" />
+		<set name="range" value="440"/>
+		<set name="power" value="#power" />
+		<set name="skillType" value="SINGLE_SHOT" />
+		<set name="operateType" value="ACTIVE" />		
+		<set name="rangeType" value="RANGE_SKILL" />
+		<set name="speed" value="1200" />
+		<set name="speedOffset" value="-600" />
+		<set name="hitTime" value="900" />
+		<set name="delay" value="100" />
+		<set name="owerturnMod" value="0.01" />
+		<set name="reuseDelay" value="10000"/>
+		<set name="forceCast" value="true" />
+		<set name="implemented" value="true" />
+		<cond>
+			<and>
+				<using weapon="BOW" msg="Используется только с луком."/>
+				<has effectId="600200" msg="Отсутствует эффект Final Salvo Active." />
+			</and>
+		</cond>
+    </skill>
+	
+	<skill id="67329564" class="5" name="Final Salvo VII" levels="5">
+		<table name="#power">128 128 128 128 491</table>
 		<set name="targetType" value="TARGET_ONE" />
 		<set name="range" value="440"/>
 		<set name="power" value="#power" />
@@ -2842,10 +2930,36 @@
 		<set name="owerturnMod" value="0.01" />
     </skill>
 	
-	<skill id="67278964" class="5" name="Web Arrow" levels="1">
+	<skill id="67278964" class="5" name="Web Arrow I" levels="1">
 		<set name="targetType" value="TARGET_ONE" />
 		<set name="range" value="450"/>
 		<set name="power" value="102" />
+		<set name="mpConsume" value="25" />
+		<set name="reuseDelay" value="5000" />
+		<set name="skillType" value="SINGLE_SHOT" />
+		<set name="operateType" value="ACTIVE" />		
+		<set name="rangeType" value="RANGE_SKILL" />
+		<set name="speed" value="1200" />
+		<set name="speedOffset" value="-600" />
+		<set name="hitTime" value="1000" />
+		<set name="delay" value="200" />
+		<set name="owerturnMod" value="0.01" />
+		<set name="correctableTarget" value="true" />
+		<set name="implemented" value="true" />
+		<cond>
+			<using weapon="BOW" msg="Используется только с луком."/>
+		</cond>
+		<for> 
+			<effect id="600700" time="5" count="1" type="DEBUFF" stackType="speed_down" chance="80" debuff="true" >
+				<mul stat="runSpd" order="0x30" val="0.8" />
+			</effect>
+		</for>
+	</skill>   
+	
+	<skill id="67279064" class="5" name="Web Arrow II" levels="1">
+		<set name="targetType" value="TARGET_ONE" />
+		<set name="range" value="450"/>
+		<set name="power" value="318" />
 		<set name="mpConsume" value="25" />
 		<set name="reuseDelay" value="5000" />
 		<set name="skillType" value="SINGLE_SHOT" />
@@ -2960,4 +3074,104 @@
 			</effect>
 		</for>
 	</skill>   
+	
+	<skill id="67338964" class="5" name="Concussion Trap" levels="1">
+		<set name="range" value="380"/>
+		<set name="radius" value="60"/>
+		<set name="skillType" value="SPAWN_TRAP" />
+		<set name="operateType" value="ACTIVE" />		
+		<set name="speed" value="1200" />
+		<set name="speedOffset" value="-600" />
+		<set name="hitTime" value="2500" />
+		<set name="reuseDelay" value="25000" />
+		<set name="delay" value="2500" />
+		<set name="rangeType" value="RANGE_SKILL" />
+		<set name="mpConsume" value="250" />
+		<set name="lifeTime" value="10"/>
+		<set name="offsetId" value="20"/>
+		<set name="correctableTarget" value="true" />
+		<set name="implemented" value="true" />
+		<cond>
+			<using weapon="BOW" msg="Используется только с луком."/>
+		</cond>
+    </skill>
+	
+	<skill id="67338984" class="5" name="Concussion Trap Attack" levels="1">
+        <set name="power" value="273"/>
+        <set name="operateType" value="ACTIVE"/>
+        <set name="skillType" value="STRIKE"/>
+        <set name="targetType" value="TRAP_AURA"/>
+        <set name="radius" value="60"/>
+		<set name="owerturnMod" value="0.01" />
+		<for> 
+			<effect id="601200" time="3" count="1" type="STUN" chance="80" stackType="stun" debuff="true" >
+				<mul stat="runSpd" order="0x50" val="0" />
+			</effect>
+		</for>
+    </skill>
+	
+	<skill id="67348964" class="5" name="Ensnaring Trap" levels="1">
+		<set name="range" value="380"/>
+		<set name="radius" value="60"/>
+		<set name="skillType" value="SPAWN_TRAP" />
+		<set name="operateType" value="ACTIVE" />		
+		<set name="speed" value="1200" />
+		<set name="speedOffset" value="-600" />
+		<set name="hitTime" value="2500" />
+		<set name="reuseDelay" value="25000" />
+		<set name="delay" value="2500" />
+		<set name="rangeType" value="RANGE_SKILL" />
+		<set name="mpConsume" value="250" />
+		<set name="lifeTime" value="10"/>
+		<set name="offsetId" value="20"/>
+		<set name="correctableTarget" value="true" />
+		<set name="implemented" value="true" />
+		<cond>
+			<using weapon="BOW" msg="Используется только с луком."/>
+		</cond>
+    </skill>
+	
+	<skill id="67348984" class="5" name="Ensnaring Trap" levels="1">
+        <set name="power" value="273"/>
+        <set name="operateType" value="ACTIVE"/>
+        <set name="skillType" value="STRIKE"/>
+        <set name="targetType" value="TRAP_AURA"/>
+        <set name="radius" value="60"/>
+		<set name="owerturnMod" value="0.01" />
+		<for> 
+			<effect id="601300" time="8" count="1" type="DEBUFF" chance="80" stackType="speed_down" debuff="true" >
+				<mul stat="runSpd" order="0x30" val="0.65" />
+			</effect>
+		</for>
+    </skill>
+	
+	<skill id="67358964" class="5" name="Explosion Trap" levels="1">
+		<set name="range" value="380"/>
+		<set name="radius" value="60"/>
+		<set name="skillType" value="SPAWN_TRAP" />
+		<set name="operateType" value="ACTIVE" />		
+		<set name="speed" value="1200" />
+		<set name="speedOffset" value="-600" />
+		<set name="hitTime" value="2500" />
+		<set name="reuseDelay" value="25000" />
+		<set name="delay" value="2500" />
+		<set name="rangeType" value="RANGE_SKILL" />
+		<set name="mpConsume" value="250" />
+		<set name="lifeTime" value="10"/>
+		<set name="offsetId" value="20"/>
+		<set name="correctableTarget" value="true" />
+		<set name="implemented" value="true" />
+		<cond>
+			<using weapon="BOW" msg="Используется только с луком."/>
+		</cond>
+    </skill>
+	
+	<skill id="67358984" class="5" name="Explosion Trap" levels="1">
+        <set name="power" value="2200"/>
+        <set name="operateType" value="ACTIVE"/>
+        <set name="skillType" value="STRIKE"/>
+        <set name="targetType" value="TRAP_AURA"/>
+        <set name="radius" value="60"/>
+		<set name="owerturnMod" value="0.01" />
+    </skill>
 </list>

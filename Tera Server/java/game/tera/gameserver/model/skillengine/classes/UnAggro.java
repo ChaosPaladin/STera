@@ -10,31 +10,28 @@ import tera.util.LocalObjects;
 /**
  * @author Ronn
  */
-public class UnAggro extends Strike
-{
-	public UnAggro(SkillTemplate template)
-	{
+public class UnAggro extends Strike {
+
+	public UnAggro(SkillTemplate template) {
 		super(template);
 	}
 
 	@Override
-	public AttackInfo applySkill(Character attacker, Character target)
-	{
-		// получаем локальные объекты
+	public AttackInfo applySkill(Character attacker, Character target) {
+
 		LocalObjects local = LocalObjects.get();
 
-		// получаем инфо об атаке
 		AttackInfo info = local.getNextAttackInfo();
 
-		// получаем список сагренных НПС
-		Array<Npc> list = attacker.getLocalHateList();
+		Array<Npc> hateList = local.getNextNpcList();
+		hateList = attacker.getLocalHateList(hateList);
 
-		// получаем массив НПС
-		Npc[] array = list.array();
+		Npc[] array = hateList.array();
 
-		// перебираем НПС и удаляем у них хейт на персонажа
-		for(int i = 0, length = list.size(); i < length; i++)
+		for(int i = 0, length = hateList.size(); i < length; i++)
 			array[i].removeAggro(attacker);
+
+		addEffects(attacker, target);
 
 		return info;
 	}

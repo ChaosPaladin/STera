@@ -19,7 +19,6 @@ import rlib.util.table.IntKey;
 import rlib.util.table.Table;
 import rlib.util.table.Tables;
 import rlib.util.wraps.Wrap;
-
 import tera.Config;
 import tera.gameserver.manager.DataBaseManager;
 import tera.gameserver.manager.ObjectEventManager;
@@ -71,28 +70,26 @@ import tera.util.Location;
 
 /**
  * Модель персонажа.
- *
+ * 
  * @author Ronn
  */
-public abstract class Character extends TObject implements Synchronized
-{
+public abstract class Character extends TObject implements Synchronized {
+
 	/** логер */
 	protected static final Logger log = Loggers.getLogger(Character.class);
 
-	protected static final FuncValue<ReuseSkill> FUNC_REUSE_SKILL_FOLD = new FuncValue<ReuseSkill>()
-	{
+	protected static final FuncValue<ReuseSkill> FUNC_REUSE_SKILL_FOLD = new FuncValue<ReuseSkill>() {
+
 		@Override
-		public void apply(ReuseSkill value)
-		{
+		public void apply(ReuseSkill value) {
 			value.fold();
 		}
 	};
 
-	protected static final FuncValue<Wrap> FUNC_SKILL_VAR_FOLD = new FuncValue<Wrap>()
-	{
+	protected static final FuncValue<Wrap> FUNC_SKILL_VAR_FOLD = new FuncValue<Wrap>() {
+
 		@Override
-		public void apply(Wrap value)
-		{
+		public void apply(Wrap value) {
 			value.fold();
 		}
 	};
@@ -214,8 +211,7 @@ public abstract class Character extends TObject implements Synchronized
 	 * @param objectId уникальный ид персонажа.
 	 * @param template темплейт персонажа.
 	 */
-	public Character(int objectId, CharTemplate template)
-	{
+	public Character(int objectId, CharTemplate template) {
 		super(objectId);
 
 		// темлпейт персонажа
@@ -224,7 +220,7 @@ public abstract class Character extends TObject implements Synchronized
 		this.currentHp = 1;
 		this.currentMp = 1;
 
-		//Направление персонажа
+		// Направление персонажа
 		this.heading = 0;
 		// имя персонажа по умолчанию
 		this.name = Strings.EMPTY;
@@ -238,7 +234,7 @@ public abstract class Character extends TObject implements Synchronized
 		this.regenHp = newRegenHp();
 		this.regenMp = newRegenMp();
 
-		//создаем массив калкуляторов
+		// создаем массив калкуляторов
 		this.calcs = new Calculator[StatType.SIZE];
 
 		// создаем обработчика перемещения персонажа
@@ -289,8 +285,7 @@ public abstract class Character extends TObject implements Synchronized
 	/**
 	 * Обработка отмены использования скила.
 	 */
-	public void abortCast(boolean force)
-	{
+	public void abortCast(boolean force) {
 		if(Config.DEVELOPER_MAIN_DEBUG)
 			sendMessage("abort cast skill");
 
@@ -305,8 +300,7 @@ public abstract class Character extends TObject implements Synchronized
 		castingSkill = null;
 
 		// отменяем активированный скил
-		if(activateSkill != null)
-		{
+		if(activateSkill != null) {
 			activateSkill.endSkill(this, x, y, z, force);
 			activateSkill = null;
 		}
@@ -315,58 +309,54 @@ public abstract class Character extends TObject implements Synchronized
 	/**
 	 * Отмена сбора.
 	 */
-	public void abortCollect()
-	{
+	public void abortCollect() {
 		log.warning(this, new Exception("unsupperted method."));
 	}
 
 	/**
 	 * Увеличение счетчика атак скилом.
 	 */
-	public void addAttackCounter(){}
+	public void addAttackCounter() {
+	}
 
 	/**
 	 * @param func добавляемая шансовая функция.
 	 */
-	public void addChanceFunc(ChanceFunc func)
-	{
+	public void addChanceFunc(ChanceFunc func) {
 		chanceFuncs.add(func);
 	}
 
 	/**
 	 * @param listener слушатель урона.
 	 */
-	public void addDamageListener(DamageListener listener)
-	{
+	public void addDamageListener(DamageListener listener) {
 		damageListeners.add(listener);
 	}
 
 	/**
 	 * Увеличение счетчика отбитых атак.
 	 */
-	public void addDefenseCounter(){}
+	public void addDefenseCounter() {
+	}
 
 	/**
 	 * @param listener слушатель смерти.
 	 */
-	public void addDieListener(DieListener listener)
-	{
+	public void addDieListener(DieListener listener) {
 		dieListeners.add(listener);
 	}
 
 	/**
 	 * Добавление нового эффекта персонажу.
-	 *
+	 * 
 	 * @param effect новый эффект.
 	 */
-	public final void addEffect(Effect effect)
-	{
+	public final void addEffect(Effect effect) {
 		// если эффект не добавлен
 		if(!effectList.addEffect(effect))
 			// складываем в пул
 			effect.fold();
-		else
-		{
+		else {
 			// получаем менеджер событий
 			ObjectEventManager manager = ObjectEventManager.getInstance();
 
@@ -377,87 +367,75 @@ public abstract class Character extends TObject implements Synchronized
 
 	/**
 	 * Метод, добавляющий опыт игроку.
-	 *
+	 * 
 	 * @param added кол-во добавленного опыта.
 	 * @param object объект, с которого был получен опыт.
 	 * @param creator кто выдал экспу.
 	 */
-	public void addExp(int added, TObject object, String creator){}
+	public void addExp(int added, TObject object, String creator) {
+	}
 
 	/**
 	 * Добавление сагринного нпс.
-	 *
+	 * 
 	 * @param hated сагренный нпс.
 	 */
-	public void addHated(Npc hated)
-	{
+	public void addHated(Npc hated) {
 		if(!hateList.contains(hated))
 			hateList.add(hated);
 	}
 
 	/**
 	 * Добавление таргета для скила.
-	 *
+	 * 
 	 * @param target цель.
 	 * @param skill скил.
 	 */
-	public boolean addLockOnTarget(Character target, Skill skill)
-	{
+	public boolean addLockOnTarget(Character target, Skill skill) {
 		return false;
 	}
 
 	@Override
-	public void addMe(Player player)
-	{
+	public void addMe(Player player) {
 		// обновляем перемещние для игрока
 		moveNextTask.update(player);
 
-		//TODO в этом месте дедлок, из-за того, что scheduleEffect вызывается из синхронизированного эффект листа
+		// TODO в этом месте дедлок, из-за того, что scheduleEffect вызывается
+		// из синхронизированного эффект листа
 		// отображение висящих эффектов, если они есть
-		/*if(effectList.size() > 0)
-		{
-			effectList.lock();
-			try
-			{
-				// список всех эффектов
-				Array<Effect> effects = effectList.getEffects();
-
-				// массив для быстрого перебора
-				Effect[] array = effects.array();
-
-				for(int i = 0, length = effects.size(); i < length; i++)
-				{
-					// висящий эффект
-					Effect effect = array[i];
-					// отправляем игроку анимацию эффекта, который висит на этом игроке
-					PacketManager.showEffect(player, effect);
-				}
-			}
-			finally
-			{
-				effectList.unlock();
-			}
-		}*/
+		/*
+		 * if(effectList.size() > 0) { effectList.lock(); try { // список всех
+		 * эффектов Array<Effect> effects = effectList.getEffects();
+		 * 
+		 * // массив для быстрого перебора Effect[] array = effects.array();
+		 * 
+		 * for(int i = 0, length = effects.size(); i < length; i++) { // висящий
+		 * эффект Effect effect = array[i]; // отправляем игроку анимацию
+		 * эффекта, который висит на этом игроке
+		 * PacketManager.showEffect(player, effect); } } finally {
+		 * effectList.unlock(); } }
+		 */
 	}
 
 	/**
 	 * Увеличение счетчика убитых нпс.
 	 */
-	public void addPvECount(){}
+	public void addPvECount() {
+	}
 
 	/**
 	 * Увеличение счетчика убитых игроков.
 	 */
-	public void addPvPCount(){}
+	public void addPvPCount() {
+	}
 
 	/**
 	 * Обработка добавления нового скила.
-	 *
+	 * 
 	 * @param skill новый скил.
 	 * @param sendPacket отправлять ли пакет с новым списком скилов.
 	 */
-	public boolean addSkill(Skill skill, boolean sendPacket)
-	{
+	public boolean addSkill(Skill skill, boolean sendPacket) {
 		// если скила нет, выходим
 		if(skill == null)
 			return false;
@@ -481,12 +459,11 @@ public abstract class Character extends TObject implements Synchronized
 
 	/**
 	 * Обработка добавления нового скила.
-	 *
+	 * 
 	 * @param template новый скил.
 	 * @param sendPacket отправлять ли пакет с новым списком скилов.
 	 */
-	public boolean addSkill(SkillTemplate template, boolean sendPacket)
-	{
+	public boolean addSkill(SkillTemplate template, boolean sendPacket) {
 		// если темплейта нет, выходим
 		if(template == null)
 			return false;
@@ -513,12 +490,11 @@ public abstract class Character extends TObject implements Synchronized
 
 	/**
 	 * Обработка добавления нового скила.
-	 *
+	 * 
 	 * @param skills новые скилы.
 	 * @param sendPacket отправлять ли пакет с новым списком скилов.
 	 */
-	public boolean addSkills(Skill[] skills, boolean sendPacket)
-	{
+	public boolean addSkills(Skill[] skills, boolean sendPacket) {
 		// если массив пуст, выходим
 		if(skills == null || skills.length == 0)
 			return false;
@@ -532,12 +508,11 @@ public abstract class Character extends TObject implements Synchronized
 
 	/**
 	 * Обработка добавления нового скила.
-	 *
+	 * 
 	 * @param templates новые скилы.
 	 * @param sendPacket отправлять ли пакет с новым списком скилов.
 	 */
-	public boolean addSkills(SkillTemplate[] templates, boolean sendPacket)
-	{
+	public boolean addSkills(SkillTemplate[] templates, boolean sendPacket) {
 		// если массив пуст, выходим
 		if(templates == null || templates.length == 0)
 			return false;
@@ -546,8 +521,7 @@ public abstract class Character extends TObject implements Synchronized
 		Table<IntKey, Skill> current = getSkills();
 
 		// перебираем темплейты
-		for(int i = 0, length = templates.length; i < length; i++)
-		{
+		for(int i = 0, length = templates.length; i < length; i++) {
 			// получаем темплейт скила
 			SkillTemplate template = templates[i];
 
@@ -577,11 +551,10 @@ public abstract class Character extends TObject implements Synchronized
 
 	/**
 	 * Добавлении функции персонажу.
-	 *
+	 * 
 	 * @param func новая функция.
 	 */
-	public final void addStatFunc(StatFunc func)
-	{
+	public final void addStatFunc(StatFunc func) {
 		// если функции нет, то выходим
 		if(func == null)
 			return;
@@ -590,40 +563,33 @@ public abstract class Character extends TObject implements Synchronized
 		int ordinal = func.getStat().ordinal();
 
 		writeStatLock.lock();
-		try
-		{
+		try {
 			// получаем калькулятор для этой функции
 			Calculator calc = calcs[ordinal];
 
-			//если калькулятора для этого стата нету, создаем новый
-			if(calc == null)
-			{
+			// если калькулятора для этого стата нету, создаем новый
+			if(calc == null) {
 				calc = new Calculator();
 				calcs[ordinal] = calc;
 			}
 
-			//добавляем функцию в калькулятор
+			// добавляем функцию в калькулятор
 			calc.addFunc(func);
-		}
-		finally
-		{
+		} finally {
 			writeStatLock.unlock();
 		}
 	}
 
 	/**
 	 * Добавление массива функций.
-	 *
+	 * 
 	 * @param funcs новые функции.
 	 */
-	public final void addStatFuncs(StatFunc[] funcs)
-	{
+	public final void addStatFuncs(StatFunc[] funcs) {
 		writeStatLock.lock();
-		try
-		{
+		try {
 			// перебираем стат функции
-			for(int i = 0, length = funcs.length; i < length; i++)
-			{
+			for(int i = 0, length = funcs.length; i < length; i++) {
 				// получаем функцию
 				StatFunc func = funcs[i];
 
@@ -638,8 +604,7 @@ public abstract class Character extends TObject implements Synchronized
 				Calculator calc = calcs[ordinal];
 
 				// если калькулятора для этого стата нету, создаем новый
-				if(calc == null)
-				{
+				if(calc == null) {
 					calc = new Calculator();
 					calcs[ordinal] = calc;
 				}
@@ -647,41 +612,37 @@ public abstract class Character extends TObject implements Synchronized
 				// добавляем функцию в калькулятор
 				calc.addFunc(func);
 			}
-		}
-		finally
-		{
+		} finally {
 			writeStatLock.unlock();
 		}
 	}
 
 	/**
 	 * Добавление в видимость нового объекта.
-	 *
+	 * 
 	 * @param object новый объект.
 	 */
-	public void addVisibleObject(TObject object){}
+	public void addVisibleObject(TObject object) {
+	}
 
 	/**
 	 * Рассчет приминения шансовых функций.
-	 *
+	 * 
 	 * @param type тип события.
 	 * @param target цель.
 	 * @param skill используемый скил.
 	 */
-	public void applyChanceFunc(ChanceType type, Character target, Skill skill)
-	{
+	public void applyChanceFunc(ChanceType type, Character target, Skill skill) {
 		// если шансовых функций нету, выходим
 		if(chanceFuncs.isEmpty())
 			return;
 
 		chanceFuncs.readLock();
-		try
-		{
+		try {
 			// получаем массив функций
 			ChanceFunc[] array = chanceFuncs.array();
 
-			for(int i = 0, length = chanceFuncs.size(); i < length; i++)
-			{
+			for(int i = 0, length = chanceFuncs.size(); i < length; i++) {
 				// получаем функцию
 				ChanceFunc func = array[i];
 
@@ -714,16 +675,14 @@ public abstract class Character extends TObject implements Synchronized
 				// применяем функцию
 				func.apply(this, target, skill);
 			}
-		}
-		finally
-		{
+		} finally {
 			chanceFuncs.readUnlock();
 		}
 	}
 
 	/**
 	 * Отправка пакета о перемезении персонажа.
-	 *
+	 * 
 	 * @param x стартовая координата.
 	 * @param y стартовая координата.
 	 * @param z стартовая координата.
@@ -734,29 +693,25 @@ public abstract class Character extends TObject implements Synchronized
 	 * @param targetZ целевая координата.
 	 * @param sendSelfPacket отправлять ли и себе пакет.
 	 */
-	public void broadcastMove(float x, float y, float z, int heading, MoveType type, float targetX, float targetY, float targetZ, boolean sendSelfPacket)
-	{
+	public void broadcastMove(float x, float y, float z, int heading, MoveType type, float targetX, float targetY, float targetZ, boolean sendSelfPacket) {
 		broadcastPacket(getMovePacket(x, y, z, heading, type, targetX, targetY, targetZ));
 	}
 
-
 	/**
 	 * Отправляем пакет персонажу и окружающим.
-	 *
+	 * 
 	 * @param packet отправляемый пакет.
 	 */
-	public void broadcastPacket(ServerPacket packet)
-	{
+	public void broadcastPacket(ServerPacket packet) {
 		broadcastPacketToOthers(packet);
 	}
 
 	/**
 	 * Отправить пакет только окружающим.
-	 *
+	 * 
 	 * @param packets отправляемый пакет.
 	 */
-	public final void broadcastPacketToOthers(ServerPacket packet)
-	{
+	public final void broadcastPacketToOthers(ServerPacket packet) {
 		// получаем текущий регион
 		WorldRegion region = getCurrentRegion();
 
@@ -770,10 +725,10 @@ public abstract class Character extends TObject implements Synchronized
 		// увеличиваем счетчик отправок
 		packet.increaseSends();
 
-		//TODO
+		// TODO
 		// рассчитываем кол-во отправок
-		//for(int i = 0, length = regions.length; i < length; i++)
-		//	regions[i].calcSendCount(this, packet);
+		// for(int i = 0, length = regions.length; i < length; i++)
+		// regions[i].calcSendCount(this, packet);
 
 		// отправялем пакет игрокам
 		for(int i = 0, length = regions.length; i < length; i++)
@@ -785,44 +740,40 @@ public abstract class Character extends TObject implements Synchronized
 
 	/**
 	 * Расчет разворота в указанные координаты.
-	 *
+	 * 
 	 * @param targetX целевая координата.
 	 * @param targetY целевая координата.
 	 * @return нужный разворот.
 	 */
-	public final int calcHeading(float targetX, float targetY)
-	{
+	public final int calcHeading(float targetX, float targetY) {
 		return (int) (Math.atan2(y - targetY, x - targetX) * HEADINGS_IN_PI) + 32768;
 	}
 
 	/**
 	 * Расчет разворота в указанные координаты.
-	 *
+	 * 
 	 * @param loc целевая точка.
 	 * @return нужный разворот.
 	 */
-	public final int calcHeading(Location loc)
-	{
-		return loc == null? 0 : calcHeading(loc.getX(), loc.getY());
+	public final int calcHeading(Location loc) {
+		return loc == null ? 0 : calcHeading(loc.getX(), loc.getY());
 	}
 
 	/**
 	 * Рассчет итогового значения указаного стата для этого персонажа.
-	 *
+	 * 
 	 * @param stat стат, который нужно рассчитать.
 	 * @param init базовое значение.
 	 * @param target цель.
 	 * @param skill скилл, учавствующий в процессе расчета.
 	 * @return итоговое значение стата.
 	 */
-	public final float calcStat(StatType stat, int init, Character target, Skill skill)
-	{
+	public final float calcStat(StatType stat, int init, Character target, Skill skill) {
 		if(stat == null)
 			return init;
 
 		readStatLock.lock();
-		try
-		{
+		try {
 			// получаем калькулятор для этого стата
 			Calculator calc = calcs[stat.ordinal()];
 
@@ -832,16 +783,14 @@ public abstract class Character extends TObject implements Synchronized
 
 			// вычисляем
 			return calc.calc(this, target, skill, init);
-		}
-		finally
-		{
+		} finally {
 			readStatLock.unlock();
 		}
 	}
 
 	/**
 	 * Рассчет итогового значения указаного стата для этого персонажа.
-	 *
+	 * 
 	 * @param stat стат, который нужно рассчитать.
 	 * @param init базовое значение.
 	 * @param order - максимальный учитываемый ордер
@@ -849,12 +798,10 @@ public abstract class Character extends TObject implements Synchronized
 	 * @param skill скилл, учавствующий в процессе расчета.
 	 * @return итоговое значение стата.
 	 */
-	public final float calcStat(StatType stat, int init, int order, Character target, Skill skill)
-	{
+	public final float calcStat(StatType stat, int init, int order, Character target, Skill skill) {
 		// вычисляем
 		readStatLock.lock();
-		try
-		{
+		try {
 			// получаем калькулятор для этого стата
 			Calculator calc = calcs[stat.ordinal()];
 
@@ -864,9 +811,7 @@ public abstract class Character extends TObject implements Synchronized
 
 			// вычисляем
 			return calc.calcToOrder(this, target, skill, init, order);
-		}
-		finally
-		{
+		} finally {
 			readStatLock.unlock();
 		}
 	}
@@ -874,20 +819,16 @@ public abstract class Character extends TObject implements Synchronized
 	/**
 	 * Отмена опрокинутого состояния.
 	 */
-	public void cancelOwerturn()
-	{
+	public void cancelOwerturn() {
 		// флаг, нужно ли отправлять пакет
 		boolean send = false;
 
 		// если игрок опрокинут
-		if(isOwerturned())
-		{
+		if(isOwerturned()) {
 			// синхронизируемся
-			synchronized(this)
-			{
+			synchronized(this) {
 				// если он точно опрокинут
-				if(isOwerturned())
-				{
+				if(isOwerturned()) {
 					// убераем флаг
 					setOwerturned(false);
 					// ставим пометку для отправки пакета
@@ -904,13 +845,12 @@ public abstract class Character extends TObject implements Synchronized
 
 	/**
 	 * Обработка нанесения урона.
-	 *
+	 * 
 	 * @param skill атакующий скилл.
 	 * @param info информация об атаке.
 	 * @param attacker атакующий персонаж.
 	 */
-	public void causingDamage(Skill skill, AttackInfo info, Character attacker)
-	{
+	public void causingDamage(Skill skill, AttackInfo info, Character attacker) {
 		if(Config.DEVELOPER_MAIN_DEBUG)
 			sayMessage("id = " + getTemplateId() + ", class = " + getClass().getSimpleName());
 
@@ -922,15 +862,13 @@ public abstract class Character extends TObject implements Synchronized
 		ObjectEventManager eventManager = ObjectEventManager.getInstance();
 
 		// добавляем атакеру счетчик атаки для сердец
-		if(!attacker.isAttacking())
-		{
+		if(!attacker.isAttacking()) {
 			attacker.setAttacking(true);
 			attacker.addAttackCounter();
 		}
 
 		// если атакуемый в защитной стойке и удар был блокирован
-		if(isDefenseStance() && info.isBlocked())
-		{
+		if(isDefenseStance() && info.isBlocked()) {
 			// отображаем факт блокировки
 			PacketManager.showShieldBlocked(this);
 
@@ -942,8 +880,7 @@ public abstract class Character extends TObject implements Synchronized
 		int abs = (int) attacker.calcStat(StatType.ATTACK_ABSORPTION_MP, 0, this, skill);
 
 		// если есть востанновленное мп
-		if(abs > 0)
-		{
+		if(abs > 0) {
 			// добавляем мп
 			attacker.setCurrentMp(attacker.getCurrentMp() + abs);
 
@@ -961,14 +898,11 @@ public abstract class Character extends TObject implements Synchronized
 		boolean mpChanged = false;
 
 		charLock.lock();
-		try
-		{
+		try {
 			// если не заблокирован
-			if(!info.isBlocked())
-			{
+			if(!info.isBlocked()) {
 				// если есть урон
-				if(damage > 0)
-				{
+				if(damage > 0) {
 					// применяем урон
 					setCurrentHp(getCurrentHp() - damage);
 
@@ -981,8 +915,7 @@ public abstract class Character extends TObject implements Synchronized
 			abs = (int) calcStat(StatType.DEFENSE_ABSORPTION_MP, 0, attacker, skill);
 
 			// если такое есть
-			if(abs > 0)
-			{
+			if(abs > 0) {
 				// восстанавливаем
 				setCurrentMp(getCurrentMp() + abs);
 
@@ -992,9 +925,7 @@ public abstract class Character extends TObject implements Synchronized
 
 			if(info.isBlocked() || damage < 1)
 				type = Damage.BLOCK;
-		}
-		finally
-		{
+		} finally {
 			charLock.unlock();
 		}
 
@@ -1028,82 +959,62 @@ public abstract class Character extends TObject implements Synchronized
 
 	/**
 	 * Обработка нанесения урона.
-	 *
+	 * 
 	 * @param skill атакующий скилл.
 	 * @param info информация об атаке.
 	 * @param attacker атакующий персонаж.
 	 */
-	public void causingManaDamage(Skill skill, AttackInfo info, Character attacker)
-	{
-		/*if(Config.DEVELOPER_MAIN_DEBUG)
-			sayMessage("id = " + getNpcId() + ", class = " + getClass().getSimpleName());
-
-		//если мертвый или без урона, то ничего не делаем
-		if(isDead() || info.isNoDamage())
-			return;
-
-		//запускаем боевую стойку
-		attacker.startBattleStance(this);
-		startBattleStance(attacker);
-
-		//добавляем атакеру счетчик атаки для сердец
-		if(!attacker.isAttacking())
-		{
-			attacker.setAttacking(true);
-			attacker.addAttackCounter();
-		}
-
-		if(isDefenseStance() && info.isBlocked())
-		{
-			addDefenseCounter();
-			//broadcastPacket(new CharShieldBlock(this));
-		}
-
-		charLock.lock();
-		try
-		{
-			int type = 0;
-			int damage = Math.min(info.getDamage(), currentMp);
-
-			if(info.isBlocked())
-				type = Damage.BLOCK;
-			else if(damage > 0)
-			{
-				type = Damage.DAMAGE;
-
-				setCurrentMp(getCurrentMp() - damage);
-				attacker.setCurrentMp(attacker.getCurrentMp() + damage);
-
-				ObjectEventManager.notifyMpChanged(this);
-				ObjectEventManager.notifyMpChanged(attacker);
-			}
-
-			//broadcastPacket(new Damage(attacker, this, info, skill, type));
-
-			ObjectEventManager.notifyAttacked(this, attacker, skill, damage, info.isCrit());
-			ObjectEventManager.notifyAttack(attacker, this, skill, damage, info.isCrit());
-
-			updateDefense();
-		}
-		finally
-		{
-			charLock.unlock();
-		}
-
-		if(isDead())
-			doDie(attacker);*/
+	public void causingManaDamage(Skill skill, AttackInfo info, Character attacker) {
+		/*
+		 * if(Config.DEVELOPER_MAIN_DEBUG) sayMessage("id = " + getNpcId() +
+		 * ", class = " + getClass().getSimpleName());
+		 * 
+		 * //если мертвый или без урона, то ничего не делаем if(isDead() ||
+		 * info.isNoDamage()) return;
+		 * 
+		 * //запускаем боевую стойку attacker.startBattleStance(this);
+		 * startBattleStance(attacker);
+		 * 
+		 * //добавляем атакеру счетчик атаки для сердец
+		 * if(!attacker.isAttacking()) { attacker.setAttacking(true);
+		 * attacker.addAttackCounter(); }
+		 * 
+		 * if(isDefenseStance() && info.isBlocked()) { addDefenseCounter();
+		 * //broadcastPacket(new CharShieldBlock(this)); }
+		 * 
+		 * charLock.lock(); try { int type = 0; int damage =
+		 * Math.min(info.getDamage(), currentMp);
+		 * 
+		 * if(info.isBlocked()) type = Damage.BLOCK; else if(damage > 0) { type
+		 * = Damage.DAMAGE;
+		 * 
+		 * setCurrentMp(getCurrentMp() - damage);
+		 * attacker.setCurrentMp(attacker.getCurrentMp() + damage);
+		 * 
+		 * ObjectEventManager.notifyMpChanged(this);
+		 * ObjectEventManager.notifyMpChanged(attacker); }
+		 * 
+		 * //broadcastPacket(new Damage(attacker, this, info, skill, type));
+		 * 
+		 * ObjectEventManager.notifyAttacked(this, attacker, skill, damage,
+		 * info.isCrit()); ObjectEventManager.notifyAttack(attacker, this,
+		 * skill, damage, info.isCrit());
+		 * 
+		 * updateDefense(); } finally { charLock.unlock(); }
+		 * 
+		 * if(isDead()) doDie(attacker);
+		 */
 	}
 
 	/**
 	 * Определяет, есть ли впереди персонажи, мешающие проходу вперед.
-	 *
+	 * 
 	 * @param barriers список персонажей.
 	 * @param distance проверяемая дистанция.
 	 * @param radians проверяемое направление.
 	 * @return есть ли барьеры.
 	 */
-	public final boolean checkBarriers(Array<Character> barriers, int distance, float radians)
-	{
+	public final boolean checkBarriers(Array<Character> barriers, int distance, float radians) {
 		// если преград нету, выходим
 		if(barriers.isEmpty())
 			return true;
@@ -1118,17 +1029,16 @@ public abstract class Character extends TObject implements Synchronized
 		boolean isNpc = isNpc();
 
 		// перебераем преграды
-		for(int i = 0, length = barriers.size(); i < length; i++)
-		{
+		for(int i = 0, length = barriers.size(); i < length; i++) {
 			// получаем персонажа
 			Character target = array[i];
 
 			// если он не находитмся на пути, пропускаем
-			if(target == null || target.isDead() || (isNpc && !checkTarget(target)) || Geometry.getDistanceToLine(x, y, newX, newY, target.getX(), target.getY()) - (target.getGeomRadius() + getGeomRadius()) > 10)
+			if(target == null || target.isDead() || (isNpc && !checkTarget(target))
+					|| Geometry.getDistanceToLine(x, y, newX, newY, target.getX(), target.getY()) - (target.getGeomRadius() + getGeomRadius()) > 10)
 				continue;
 
-			if(Config.DEVELOPER_DEBUG_TARGET_TYPE)
-			{
+			if(Config.DEVELOPER_DEBUG_TARGET_TYPE) {
 				Location[] locs = Coords.circularCoords(Location.class, target.getX(), target.getY(), target.getZ(), (int) target.getGeomRadius(), 10);
 
 				// получаем таблицу итемов
@@ -1136,8 +1046,7 @@ public abstract class Character extends TObject implements Synchronized
 
 				ItemTemplate template = itemTable.getItem(125);
 
-				for(int g = 0; g < 10; g++)
-				{
+				for(int g = 0; g < 10; g++) {
 					ItemInstance item = template.newInstance();
 
 					item.setItemCount(1);
@@ -1154,8 +1063,7 @@ public abstract class Character extends TObject implements Synchronized
 
 				template = itemTable.getItem(127);
 
-				for(int g = 0; g < 10; g++)
-				{
+				for(int g = 0; g < 10; g++) {
 					ItemInstance item = template.newInstance();
 
 					item.setItemCount(1);
@@ -1177,26 +1085,23 @@ public abstract class Character extends TObject implements Synchronized
 
 	/**
 	 * Проверяет на возможность атаки цель.
-	 *
+	 * 
 	 * @param target проверяемая цель.
 	 * @return можно ли атаковать.
 	 */
-	public boolean checkTarget(Character target)
-	{
+	public boolean checkTarget(Character target) {
 		return true;
 	}
 
 	@Override
-	public void decayMe(int type)
-	{
+	public void decayMe(int type) {
 		super.decayMe(type);
 
 		spawned = false;
 	}
 
 	@Override
-	public void deleteMe()
-	{
+	public void deleteMe() {
 		if(isDeleted())
 			return;
 
@@ -1204,14 +1109,12 @@ public abstract class Character extends TObject implements Synchronized
 		Array<Npc> hateList = getHateList();
 
 		// если в хэйти листе есть нпс
-		if(!hateList.isEmpty())
-		{
+		if(!hateList.isEmpty()) {
 			// получаем массив нпс
 			Npc[] array = hateList.array();
 
 			// перебираем их
-			for(int i = 0, length = hateList.size(); i < length; i++)
-			{
+			for(int i = 0, length = hateList.size(); i < length; i++) {
 				// получаем нпс
 				Npc npc = array[i];
 
@@ -1238,8 +1141,7 @@ public abstract class Character extends TObject implements Synchronized
 		Table<IntKey, ReuseSkill> reuseSkills = getReuseSkills();
 
 		// если есть откаты скилов
-		if(!reuseSkills.isEmpty())
-		{
+		if(!reuseSkills.isEmpty()) {
 			// складируем все откаты в пул
 			reuseSkills.apply(FUNC_REUSE_SKILL_FOLD);
 
@@ -1251,8 +1153,7 @@ public abstract class Character extends TObject implements Synchronized
 		Table<IntKey, Wrap> skillVariables = getSkillVariables();
 
 		// если есть переменные для скилов
-		if(skillVariables != null)
-		{
+		if(skillVariables != null) {
 			// складируем переменные
 			skillVariables.apply(FUNC_SKILL_VAR_FOLD);
 
@@ -1271,12 +1172,11 @@ public abstract class Character extends TObject implements Synchronized
 
 	/**
 	 * Запуск отката для итема.
-	 *
+	 * 
 	 * @param skill скил итема.
 	 * @param item использованный итем.
 	 */
-	public boolean disableItem(Skill skill, ItemInstance item)
-	{
+	public boolean disableItem(Skill skill, ItemInstance item) {
 		// получаем время отката скила
 		int reuseDelay = skill.getReuseDelay(this);
 
@@ -1299,11 +1199,10 @@ public abstract class Character extends TObject implements Synchronized
 
 	/**
 	 * Запуск отката скила.
-	 *
+	 * 
 	 * @param skill использованный скилл.
 	 */
-	public boolean disableSkill(Skill skill)
-	{
+	public boolean disableSkill(Skill skill) {
 		// получаем время отката скила
 		int reuseDelay = skill.getReuseDelay(this);
 
@@ -1331,11 +1230,9 @@ public abstract class Character extends TObject implements Synchronized
 		int[] reuseIds = skill.getReuseIds();
 
 		// если такие есть
-		if(reuseIds != null)
-		{
+		if(reuseIds != null) {
 			// перебираем
-			for(int i = 0, length = reuseIds.length; i < length; i++)
-			{
+			for(int i = 0, length = reuseIds.length; i < length; i++) {
 				// получаем ид отката
 				int id = reuseIds[i];
 
@@ -1373,7 +1270,7 @@ public abstract class Character extends TObject implements Synchronized
 
 	/**
 	 * Метод обработки каста скила.
-	 *
+	 * 
 	 * @param startX стартовая координата.
 	 * @param startY стартовая координата.
 	 * @param startZ стартовая координата.
@@ -1384,22 +1281,20 @@ public abstract class Character extends TObject implements Synchronized
 	 * @param targetY точка у куда бьем.
 	 * @param targetZ точка z куда бьем.
 	 */
-	public void doCast(float startX, float startY, float startZ, Skill skill, int state, int heading, float targetX, float targetY, float targetZ)
-	{
+	public void doCast(float startX, float startY, float startZ, Skill skill, int state, int heading, float targetX, float targetY, float targetZ) {
 		doCast(startX, startY, startZ, updateResultSkill(skill), state, heading, targetX, targetY, targetZ, null);
 	}
 
 	/**
 	 * Обновление итогового кастуемого скила.
-	 *
+	 * 
 	 * @param skill обновляемый скил.
 	 * @return итоговый скил.
 	 */
-	protected Skill updateResultSkill(Skill skill)
-	{
-		// если скил имеет быстрый режим, и последний каст был недавно и был скастован нуэный скил
-		if(skill.isHasFast() && System.currentTimeMillis() - lastCast < 1500 && skill.hasPrevSkillName(lastSkillName))
-		{
+	protected Skill updateResultSkill(Skill skill) {
+		// если скил имеет быстрый режим, и последний каст был недавно и был
+		// скастован нуэный скил
+		if(skill.isHasFast() && System.currentTimeMillis() - lastCast < 1500 && skill.hasPrevSkillName(lastSkillName)) {
 			// получаем ускоренный вариант
 			Skill fast = getSkill(skill.getId() + 1);
 
@@ -1413,7 +1308,7 @@ public abstract class Character extends TObject implements Synchronized
 
 	/**
 	 * Метод обработки каста скила.
-	 *
+	 * 
 	 * @param startX стартовая координата.
 	 * @param startY стартовая координата.
 	 * @param startZ стартовая координата.
@@ -1425,8 +1320,7 @@ public abstract class Character extends TObject implements Synchronized
 	 * @param targetZ точка z куда бьем.
 	 * @param item кастующий скил итем.
 	 */
-	public void doCast(float startX, float startY, float startZ, Skill skill, int state, int heading, final float targetX, final float targetY, final float targetZ, ItemInstance item)
-	{
+	public void doCast(float startX, float startY, float startZ, Skill skill, int state, int heading, final float targetX, final float targetY, final float targetZ, ItemInstance item) {
 		// если пассивный, то не кастим его
 		if(skill.isPassive())
 			return;
@@ -1440,11 +1334,9 @@ public abstract class Character extends TObject implements Synchronized
 		// получаем менеджера событий
 		ObjectEventManager eventManager = ObjectEventManager.getInstance();
 
-		switch(operateType)
-		{
+		switch(operateType) {
 			case LOCK_ON:
-			case ACTIVE:
-			{
+			case ACTIVE: {
 				// проверка условий выполнения
 				if(!skill.checkCondition(this, targetX, targetY, targetZ))
 					return;
@@ -1453,15 +1345,13 @@ public abstract class Character extends TObject implements Synchronized
 				Skill castingSkill = getCastingSkill();
 
 				// если скил такой есть
-				if(castingSkill != null)
-				{
+				if(castingSkill != null) {
 					// если это скил выделения целей
 					if(castingSkill.getOperateType() == OperateType.LOCK_ON)
 						// завершаем его
 						abortCast(false);
 					// если новый скил имеет принудительный каст
-					else if(skill.isForceCast())
-					{
+					else if(skill.isForceCast()) {
 						// обрываем текущий
 						abortCast(true);
 
@@ -1469,17 +1359,18 @@ public abstract class Character extends TObject implements Synchronized
 						skill = updateResultSkill(skill);
 					}
 					// иначе новый нельзя использовать
-					else return;
+					else
+						return;
 				}
 
 				// получаем активационный скил
 				Skill activateSkill = getActivateSkill();
 
-				if(activateSkill != null)
-				{
+				if(activateSkill != null) {
 					if(skill.isForceCast())
 						abortCast(false);
-					else return;
+					else
+						return;
 				}
 
 				// если с этим скилам нельзя двигаться
@@ -1488,8 +1379,7 @@ public abstract class Character extends TObject implements Synchronized
 					stopMove();
 
 				// если это лок он скил
-				if(operateType == OperateType.LOCK_ON)
-				{
+				if(operateType == OperateType.LOCK_ON) {
 					// получаем текущий список целей
 					Array<Character> targets = getLockOnTargets();
 
@@ -1524,8 +1414,7 @@ public abstract class Character extends TObject implements Synchronized
 					skillUseTask.nextUse(skill, targetX, targetY, targetZ);
 
 				// есть ли мп потребление у скила
-				if(skill.getMpConsume() > 0)
-				{
+				if(skill.getMpConsume() > 0) {
 					// рассчитываем оставшиеся мп
 					int resultMp = getCurrentMp() - skill.getMpConsume();
 
@@ -1537,8 +1426,7 @@ public abstract class Character extends TObject implements Synchronized
 				}
 
 				// есть ли хп потребление у скила
-				if(skill.getHpConsume() > 0)
-				{
+				if(skill.getHpConsume() > 0) {
 					// рассчитываем оставшиеся хп
 					int resultHp = getCurrentHp() - skill.getHpConsume();
 
@@ -1550,8 +1438,7 @@ public abstract class Character extends TObject implements Synchronized
 				}
 
 				// если потребляется итемы
-				if(skill.getItemIdConsume() != 0)
-				{
+				if(skill.getItemIdConsume() != 0) {
 					// удаляем из инвенторя
 					getInventory().removeItem(skill.getItemIdConsume(), skill.getItemCountConsume());
 
@@ -1567,22 +1454,19 @@ public abstract class Character extends TObject implements Synchronized
 
 				int chargetLevel = getChargeLevel();
 
-				if(chargetLevel > 0)
-				{
+				if(chargetLevel > 0) {
 					setChargeLevel(0);
 					setChargeSkill(null);
 				}
 
 				break;
 			}
-			case ACTIVATE:
-			{
+			case ACTIVATE: {
 				// получаем активируемый скил
 				Skill activateSkill = getActivateSkill();
 
 				// если активируемого скила есть и состояние 0
-				if(activateSkill != null && state == 0 && skill.isCanceable())
-				{
+				if(activateSkill != null && state == 0 && skill.isCanceable()) {
 					// отменяем задание юза
 					skillUseTask.cancel(false);
 
@@ -1590,8 +1474,7 @@ public abstract class Character extends TObject implements Synchronized
 					if(skillCastTask.isRunning())
 						// отменяем каст
 						skillCastTask.cancel(false);
-					else
-					{
+					else {
 						// запускаем завершение каста
 						activateSkill.endSkill(this, x, y, z, true);
 
@@ -1603,8 +1486,7 @@ public abstract class Character extends TObject implements Synchronized
 					setActivateSkill(null);
 				}
 				// если активируемого скила нет и состояние 1
-				else if(activateSkill == null && state == 1)
-				{
+				else if(activateSkill == null && state == 1) {
 					// проверка условий выполнения
 					if(!skill.checkCondition(this, targetX, targetY, targetZ))
 						return;
@@ -1632,12 +1514,11 @@ public abstract class Character extends TObject implements Synchronized
 					// ставим на откат скил
 					disableSkill(skill);
 
-					//запускаем обработку скила
+					// запускаем обработку скила
 					skill.startSkill(this, targetX, targetY, targetZ);
 
 					// если есть время каста
-					if(skill.getHitTime() != 0)
-					{
+					if(skill.getHitTime() != 0) {
 						// запускаем задание использования
 						skillUseTask.nextUse(skill, targetX, targetY, targetZ);
 
@@ -1646,8 +1527,7 @@ public abstract class Character extends TObject implements Synchronized
 					}
 
 					// есть ли мп потребление у скила
-					if(skill.getMpConsume() > 0)
-					{
+					if(skill.getMpConsume() > 0) {
 						// рассчитываем оставшиеся мп
 						int resultMp = getCurrentMp() - skill.getMpConsume();
 
@@ -1659,8 +1539,7 @@ public abstract class Character extends TObject implements Synchronized
 					}
 
 					// есть ли хп потребление у скила
-					if(skill.getHpConsume() > 0)
-					{
+					if(skill.getHpConsume() > 0) {
 						// рассчитываем оставшиеся хп
 						int resultHp = getCurrentHp() - skill.getHpConsume();
 
@@ -1672,8 +1551,7 @@ public abstract class Character extends TObject implements Synchronized
 					}
 
 					// если потребляется итемы
-					if(skill.getItemIdConsume() != 0)
-					{
+					if(skill.getItemIdConsume() != 0) {
 						// удаляем из инвенторя
 						getInventory().removeItem(skill.getItemIdConsume(), skill.getItemCountConsume());
 
@@ -1687,17 +1565,15 @@ public abstract class Character extends TObject implements Synchronized
 
 				int chargetLevel = getChargeLevel();
 
-				if(chargetLevel > 0)
-				{
+				if(chargetLevel > 0) {
 					setChargeLevel(0);
 					setChargeSkill(null);
 				}
 
 				break;
 			}
-			case CAST_ITEM:
-			{
-				//проверка условий выполнения
+			case CAST_ITEM: {
+				// проверка условий выполнения
 				if(!skill.checkCondition(this, targetX, targetY, targetZ))
 					return;
 
@@ -1709,7 +1585,7 @@ public abstract class Character extends TObject implements Synchronized
 
 				setHeading(heading);
 
-				//запускаем обработку скила
+				// запускаем обработку скила
 				if(!skill.isAltCast())
 					skill.startSkill(this, targetX, targetY, targetZ);
 
@@ -1720,33 +1596,30 @@ public abstract class Character extends TObject implements Synchronized
 				else
 					skillUseTask.nextUse(skill, targetX, targetY, targetZ);
 
-				//есть ли мп потребление у скила
-				if(skill.getMpConsume() > 0)
-				{
-					//потребляем мп
+				// есть ли мп потребление у скила
+				if(skill.getMpConsume() > 0) {
+					// потребляем мп
 					int resultMp = getCurrentMp() - skill.getMpConsume();
 
 					setCurrentMp(resultMp);
 
-					//обновляем мп игроку
+					// обновляем мп игроку
 					eventManager.notifyMpChanged(this);
 				}
 
-				//есть ли хп потребление у скила
-				if(skill.getHpConsume() > 0)
-				{
-					//потребляем хп
+				// есть ли хп потребление у скила
+				if(skill.getHpConsume() > 0) {
+					// потребляем хп
 					int resultHp = getCurrentHp() - skill.getHpConsume();
 
 					setCurrentHp(resultHp);
 
-					//обновляем хп игроку
+					// обновляем хп игроку
 					eventManager.notifyHpChanged(this);
 				}
 
 				// если потребляется итемы
-				if(skill.getItemIdConsume() != 0)
-				{
+				if(skill.getItemIdConsume() != 0) {
 					// удаляем из инвенторя
 					getInventory().removeItem(skill.getItemIdConsume(), skill.getItemCountConsume());
 
@@ -1765,21 +1638,18 @@ public abstract class Character extends TObject implements Synchronized
 
 				break;
 			}
-			case CHARGE:
-			{
+			case CHARGE: {
 				// получаем кастуемый скил
 				Skill castingSkill = getCastingSkill();
 
 				// если идет активация скила
-				if(state == 1)
-				{
+				if(state == 1) {
 					// проверка условий выполнения
 					if(!skill.checkCondition(this, targetX, targetY, targetZ))
 						return;
 
 					// если tcnm rfcnetvsq crbk
-					if(castingSkill != null)
-					{
+					if(castingSkill != null) {
 						// и если это ЛОК ОН скил
 						if(castingSkill.getOperateType() == OperateType.LOCK_ON)
 							// обрываем его
@@ -1789,7 +1659,8 @@ public abstract class Character extends TObject implements Synchronized
 							// обрываем кастуемый
 							abortCast(true);
 						// иначе выходим
-						else return;
+						else
+							return;
 					}
 
 					// останавливаем движение
@@ -1816,7 +1687,6 @@ public abstract class Character extends TObject implements Synchronized
 						// запускаем обрабтку юза
 						skillUseTask.nextUse(skill, targetX, targetY, targetZ);
 
-
 					// потребляем необходимые ресурсы
 					skillConsume(skill);
 
@@ -1839,17 +1709,15 @@ public abstract class Character extends TObject implements Synchronized
 
 	/**
 	 * Обрабатываем потребление скила.
-	 *
+	 * 
 	 * @param skill обрабатываемый скил.
 	 */
-	protected void skillConsume(Skill skill)
-	{
+	protected void skillConsume(Skill skill) {
 		// получаем менеджера событий
 		ObjectEventManager eventManager = ObjectEventManager.getInstance();
 
 		// есть ли мп потребление у скила
-		if(skill.getMpConsume() > 0)
-		{
+		if(skill.getMpConsume() > 0) {
 			// потребляем мп
 			int resultMp = getCurrentMp() - skill.getMpConsume();
 
@@ -1860,8 +1728,7 @@ public abstract class Character extends TObject implements Synchronized
 		}
 
 		// есть ли хп потребление у скила
-		if(skill.getHpConsume() > 0)
-		{
+		if(skill.getHpConsume() > 0) {
 			// потребляем хп
 			int resultHp = getCurrentHp() - skill.getHpConsume();
 
@@ -1872,8 +1739,7 @@ public abstract class Character extends TObject implements Synchronized
 		}
 
 		// если потребляется итемы
-		if(skill.getItemIdConsume() != 0)
-		{
+		if(skill.getItemIdConsume() != 0) {
 			// удаляем из инвенторя
 			getInventory().removeItem(skill.getItemIdConsume(), skill.getItemCountConsume());
 
@@ -1890,33 +1756,30 @@ public abstract class Character extends TObject implements Synchronized
 
 	/**
 	 * Обработка каста скила от итема.
-	 *
+	 * 
 	 * @param skill скил используемого итема.
 	 * @heading направление каста скила.
 	 * @param item используемый итем.
 	 */
-	public void doCast(Skill skill, int heading, ItemInstance item)
-	{
+	public void doCast(Skill skill, int heading, ItemInstance item) {
 		doCast(x, y, z, skill, 0, heading, x, y, z, item);
 	}
 
 	/**
 	 * Старт сбора ресурса.
-	 *
+	 * 
 	 * @param resourse собираемый ресурс.
 	 */
-	public void doCollect(ResourseInstance resourse)
-	{
+	public void doCollect(ResourseInstance resourse) {
 		log.warning(this, new Exception("unsupperted method."));
 	}
 
 	/**
 	 * Обработка смерти.
-	 *
+	 * 
 	 * @param killer убийца персонажа.
 	 */
-	public void doDie(Character killer)
-	{
+	public void doDie(Character killer) {
 		// обраваем каст скила
 		abortCast(true);
 		// останавливаем движение
@@ -1932,11 +1795,9 @@ public abstract class Character extends TObject implements Synchronized
 		eventManager.notifyDead(this, killer);
 
 		// если есть подписчики на убийства
-		if(!dieListeners.isEmpty())
-		{
+		if(!dieListeners.isEmpty()) {
 			dieListeners.readLock();
-			try
-			{
+			try {
 				// получаем их массив
 				DieListener[] array = dieListeners.array();
 
@@ -1944,9 +1805,7 @@ public abstract class Character extends TObject implements Synchronized
 				for(int i = 0, length = dieListeners.size(); i < length; i++)
 					// уведомляем их
 					array[i].onDie(killer, this);
-			}
-			finally
-			{
+			} finally {
 				dieListeners.readUnlock();
 			}
 		}
@@ -1954,18 +1813,16 @@ public abstract class Character extends TObject implements Synchronized
 
 	/**
 	 * Обработка падения персонажа.
-	 *
+	 * 
 	 * @param startZ высота, с которой упали.
 	 * @param endZ высота, на которую упали.
 	 */
-	public int doFall(float startZ, float endZ)
-	{
+	public int doFall(float startZ, float endZ) {
 		// расчитываем урон
 		int damage = (int) Math.abs(startZ - endZ) * 7;
 
 		// если он есть
-		if(damage > 0)
-		{
+		if(damage > 0) {
 			// применяем
 			setCurrentHp(Math.max(2, currentHp - damage));
 
@@ -1983,8 +1840,7 @@ public abstract class Character extends TObject implements Synchronized
 	/**
 	 * Обработка опрокидывания.
 	 */
-	public void doOwerturn(Character attacker)
-	{
+	public void doOwerturn(Character attacker) {
 		// отменяем эффекты, которые спадают при опрокидывании
 		effectList.exitNoOwerturnEffects();
 
@@ -2011,8 +1867,7 @@ public abstract class Character extends TObject implements Synchronized
 	/**
 	 * Обработка тика регена.
 	 */
-	public void doRegen()
-	{
+	public void doRegen() {
 		// если мертвый, не регеним
 		if(isDead())
 			return;
@@ -2030,59 +1885,50 @@ public abstract class Character extends TObject implements Synchronized
 
 	/**
 	 * Обработка хила c эффекта.
-	 *
+	 * 
 	 * @param heal сколько отхилили.
 	 * @param healer хилящий персонаж.
 	 */
-	public void effectHealHp(int heal, Character healer)
-	{
+	public void effectHealHp(int heal, Character healer) {
 		// если персонаж мертв или хила нету, выходим
 		if(isDead() || heal < 1)
 			return;
 
 		charLock.lock();
-		try
-		{
+		try {
 			// устанавливаем новое хп
 			setCurrentHp(getCurrentHp() + heal);
-		}
-		finally
-		{
+		} finally {
 			charLock.unlock();
 		}
 	}
 
 	/**
 	 * Обработка хила c эффекта.
-	 *
+	 * 
 	 * @param heal сколько отхилили.
 	 * @param healer хилящий персонаж.
 	 */
-	public void effectHealMp(int heal, Character healer)
-	{
+	public void effectHealMp(int heal, Character healer) {
 		// если персонаж мертв или хила мп нету, выходим
 		if(isDead() || heal < 1)
 			return;
 
 		charLock.lock();
-		try
-		{
+		try {
 			// устанавливаем новое мп
 			setCurrentMp(getCurrentMp() + heal);
-		}
-		finally
-		{
+		} finally {
 			charLock.unlock();
 		}
 	}
 
 	/**
 	 * Остановка отката скила.
-	 *
+	 * 
 	 * @param skill откатываемый скил.
 	 */
-	public boolean enableSkill(Skill skill)
-	{
+	public boolean enableSkill(Skill skill) {
 		if(skill == null)
 			return false;
 
@@ -2106,22 +1952,19 @@ public abstract class Character extends TObject implements Synchronized
 	/**
 	 * @return текущий активированный тогл скил.
 	 */
-	public final Skill getActivateSkill()
-	{
+	public final Skill getActivateSkill() {
 		return activateSkill;
 	}
 
 	@Override
-	public AI getAI()
-	{
+	public AI getAI() {
 		return ai;
 	}
 
 	/**
 	 * @return атак спид.
 	 */
-	public final int getAtkSpd()
-	{
+	public final int getAtkSpd() {
 		if(Config.DEVELOPER_FORCE_ATTACK_SPEED > 0)
 			return Config.DEVELOPER_FORCE_ATTACK_SPEED;
 
@@ -2131,407 +1974,372 @@ public abstract class Character extends TObject implements Synchronized
 	/**
 	 * @return сила атаки.
 	 */
-	public int getAttack(Character attacked, Skill skill)
-	{
+	public int getAttack(Character attacked, Skill skill) {
 		return (int) calcStat(StatType.ATTACK, 0, attacked, skill);
 	}
 
 	/**
 	 * @return набор авто эмоций.
 	 */
-	protected EmotionType[] getAutoEmotions()
-	{
+	protected EmotionType[] getAutoEmotions() {
 		return Arrays.toGenericArray();
 	}
 
 	/**
 	 * @return защита от опрокидывания.
 	 */
-	public int getBalance(Character attacker, Skill skill)
-	{
+	public int getBalance(Character attacker, Skill skill) {
 		return (int) calcStat(StatType.BALANCE, 0, attacker, skill);
 	}
 
 	/**
 	 * @return базовый модификатор защиты от опрокидывания.
 	 */
-	public final int getBalanceFactor()
-	{
+	public final int getBalanceFactor() {
 		return (int) calcStat(StatType.BALANCE_FACTOR, template.getBalanceFactor(), this, null);
 	}
 
 	/**
 	 * @return банк персонажа.
 	 */
-	public Bank getBank()
-	{
+	public Bank getBank() {
 		return null;
 	}
 
 	/**
 	 * @return базовое максимальное хп.
 	 */
-	public final int getBaseMaxHp()
-	{
+	public final int getBaseMaxHp() {
 		return (int) calcStat(StatType.MAX_HP, template.getMaxHp(), 0x20, null, null);
 	}
 
 	/**
 	 * @return базовое максимальное мп.
 	 */
-	public final int getBaseMaxMp()
-	{
+	public final int getBaseMaxMp() {
 		return (int) calcStat(StatType.MAX_MP, template.getMaxMp(), 0x40, null, null);
 	}
 
 	/**
 	 * @return список калькуляторов.
 	 */
-	public final Calculator[] getCalcs()
-	{
+	public final Calculator[] getCalcs() {
 		return calcs;
 	}
 
 	/**
 	 * @return ид каста ида.
 	 */
-	public final int getCastId()
-	{
+	public final int getCastId() {
 		return castId;
 	}
 
 	/**
 	 * @return текущий кастуемый скил.
 	 */
-	public final Skill getCastingSkill()
-	{
+	public final Skill getCastingSkill() {
 		return castingSkill;
 	}
 
 	@Override
-	public final Character getCharacter()
-	{
+	public final Character getCharacter() {
 		return this;
 	}
 
 	/**
 	 * @return уровень заряда.
 	 */
-	public final int getChargeLevel()
-	{
+	public final int getChargeLevel() {
 		return chargeLevel;
 	}
 
 	/**
 	 * @return ид класса персонажа.
 	 */
-	public int getClassId()
-	{
+	public int getClassId() {
 		return -1;
 	}
 
 	/**
 	 * @return шанс нанесения крит удара.
 	 */
-	public final float getCritDamage(Character attacker, Skill skill)
-	{
+	public final float getCritDamage(Character attacker, Skill skill) {
 		return calcStat(StatType.CRITICAL_DAMAGE, 2, attacker, skill);
 	}
 
 	/**
 	 * @return шанс нанесения крит удара.
 	 */
-	public final float getCritRate(Character attacker, Skill skill)
-	{
+	public final float getCritRate(Character attacker, Skill skill) {
 		return calcStat(StatType.CRITICAL_RATE, template.getCritRate(), attacker, skill);
 	}
 
 	/**
 	 * @return защита от шанса нанесения крит удара.
 	 */
-	public final float getCritRateRcpt(Character attacker, Skill skill)
-	{
+	public final float getCritRateRcpt(Character attacker, Skill skill) {
 		return calcStat(StatType.CRIT_CHANCE_RECEPTIVE, template.getCritRcpt(), attacker, skill);
 	}
 
 	/**
 	 * @return текущий уровень хп.
 	 */
-	public final int getCurrentHp()
-	{
+	public final int getCurrentHp() {
 		return currentHp;
 	}
 
 	/**
 	 * @return текущий % уровень хп.
 	 */
-	public final int getCurrentHpPercent()
-	{
+	public final int getCurrentHpPercent() {
 		return Math.max(Math.min(currentHp * 100 / getMaxHp(), 100), 0);
 	}
 
 	/**
 	 * @return текущий уровень мп.
 	 */
-	public final int getCurrentMp()
-	{
+	public final int getCurrentMp() {
 		return currentMp;
 	}
 
 	/**
 	 * @return текущий % уровень мп.
 	 */
-	public final int getCurrentMpPercent()
-	{
+	public final int getCurrentMpPercent() {
 		return Math.max(Math.min(currentMp * 100 / getMaxMp(), 100), 0);
 	}
 
 	/**
 	 * @return защита.
 	 */
-	public int getDefense(Character attacker, Skill skill)
-	{
+	public int getDefense(Character attacker, Skill skill) {
 		return (int) calcStat(StatType.DEFENSE, 0, attacker, skill);
 	}
 
 	/**
 	 * @return модификатор защиты.
 	 */
-	public final int getDefenseFactor()
-	{
+	public final int getDefenseFactor() {
 		return (int) calcStat(StatType.DEFENSE_FACTOR, template.getDefenseFactor(), this, null);
 	}
 
 	/**
 	 * @return текущий дкэль.
 	 */
-	public Duel getDuel()
-	{
+	public Duel getDuel() {
 		return null;
 	}
 
 	/**
 	 * @return список эффектов.
 	 */
-	public final EffectList getEffectList()
-	{
+	public final EffectList getEffectList() {
 		return effectList;
 	}
 
 	/**
 	 * @return цель.
 	 */
-	public final TObject getEnemy()
-	{
+	public final TObject getEnemy() {
 		return enemy;
 	}
 
 	/**
 	 * @return уровень сбора кристалов.
 	 */
-	public int getEnergyLevel()
-	{
+	public int getEnergyLevel() {
 		return 0;
 	}
 
 	/**
 	 * @return экиперовка.
 	 */
-	public Equipment getEquipment()
-	{
+	public Equipment getEquipment() {
 		return null;
 	}
 
 	/**
 	 * @return геометрия модели.
 	 */
-	public final Geom getGeom()
-	{
+	public final Geom getGeom() {
 		return geom;
 	}
 
 	/**
 	 * Дистанция между моделями.
-	 *
+	 * 
 	 * @param target целевая модель.
 	 * @return дистанция.
 	 */
-	public float getGeomDistance(Character target)
-	{
+	public float getGeomDistance(Character target) {
 		return target.getGeomDistance(x, y) - geom.getRadius();
 	}
 
 	@Override
-	public float getGeomDistance(float x, float y)
-	{
+	public float getGeomDistance(float x, float y) {
 		return getDistance(x, y) - geom.getRadius();
 	}
 
 	/**
 	 * @return высота модели персонажа.
 	 */
-	public float getGeomHeight()
-	{
+	public float getGeomHeight() {
 		return geom.getHeight();
 	}
 
 	/**
 	 * @return ширина модели персонажа.
 	 */
-	public float getGeomRadius()
-	{
+	public float getGeomRadius() {
 		return geom.getRadius();
 	}
 
 	/**
 	 * @return клан игрока.
 	 */
-	public Guild getGuild()
-	{
+	public Guild getGuild() {
 		return null;
 	}
 
 	/**
 	 * @return список сагренных НПС на персонажа.
 	 */
-	public final Array<Npc> getHateList()
-	{
+	public final Array<Npc> getHateList() {
 		return hateList;
 	}
 
 	/**
 	 * @return сила опрокидывания.
 	 */
-	public int getImpact(Character attacked, Skill skill)
-	{
+	public int getImpact(Character attacked, Skill skill) {
 		return (int) calcStat(StatType.IMPACT, 0, attacked, skill);
 	}
 
 	/**
 	 * @return базовый модификатор силы опрокидывания.
 	 */
-	public final int getImpactFactor()
-	{
+	public final int getImpactFactor() {
 		return (int) calcStat(StatType.IMPACT_FACTOR, template.getImpactFactor(), this, null);
 	}
 
 	/**
 	 * @return инвентарь.
 	 */
-	public Inventory getInventory()
-	{
+	public Inventory getInventory() {
 		return null;
 	}
 
 	/**
 	 * @return карма игрока.
 	 */
-	public int getKarma()
-	{
+	public int getKarma() {
 		return 0;
 	}
 
 	/**
 	 * @return время последнего каста скила.
 	 */
-	public long getLastCast()
-	{
+	public long getLastCast() {
 		return lastCast;
 	}
 
 	/**
 	 * @return имя последнего скастанувшегося скила.
 	 */
-	public SkillName getLastSkillName()
-	{
+	public SkillName getLastSkillName() {
 		return lastSkillName;
 	}
 
 	/**
 	 * @return уровень персонажа.
 	 */
-	public int getLevel()
-	{
+	public int getLevel() {
 		return 0;
 	}
 
 	/**
 	 * @return локальная копия списока сагренных НПС на персонажа.
 	 */
-	public final Array<Npc> getLocalHateList()
-	{
-		// получаем локальные объекты
+	public final Array<Npc> getLocalHateList() {
+
 		LocalObjects local = LocalObjects.get();
 
-		// получаем локальный список хейтеров
 		Array<Npc> npcs = local.getNextNpcList();
+		Array<Npc> hateList = getHateList();
 
 		hateList.readLock();
-		try
-		{
-			// переносим хейтеров в локальный список
+		try {
 			npcs.addAll(hateList);
-		}
-		finally
-		{
+		} finally {
 			hateList.readUnlock();
 		}
 
-		// возвращаем локальный список
 		return npcs;
+	}
+
+	/**
+	 * @return локальная копия списока сагренных НПС на персонажа.
+	 */
+	public final Array<Npc> getLocalHateList(Array<Npc> container) {
+
+		Array<Npc> hateList = getHateList();
+
+		hateList.readLock();
+		try {
+			container.addAll(hateList);
+		} finally {
+			hateList.readUnlock();
+		}
+
+		return container;
 	}
 
 	/**
 	 * @return активный лок он скил.
 	 */
-	public Skill getLockOnSkill()
-	{
+	public Skill getLockOnSkill() {
 		return lockOnSkill;
 	}
 
 	/**
 	 * @return набор лок он таргетов.
 	 */
-	public Array<Character> getLockOnTargets()
-	{
+	public Array<Character> getLockOnTargets() {
 		return null;
 	}
 
 	/**
 	 * @return текущий максимальный хп.
 	 */
-	public final int getMaxHp()
-	{
+	public final int getMaxHp() {
 		return (int) calcStat(StatType.MAX_HP, template.getMaxHp(), null, null);
 	}
 
 	/**
 	 * @returnтекущий максимальный мп.
 	 */
-	public final int getMaxMp()
-	{
+	public final int getMaxMp() {
 		return (int) calcStat(StatType.MAX_MP, template.getMaxMp(), null, null);
 	}
 
 	/**
 	 * @return уровень сбора камней.
 	 */
-	public int getMiningLevel()
-	{
+	public int getMiningLevel() {
 		return 0;
 	}
 
 	/**
 	 * @return ид модели.
 	 */
-	public int getModelId()
-	{
+	public int getModelId() {
 		return template.getModelId();
 	}
 
 	/**
-	 * Получение пакета перемещения персонажа с указанной точки в указанную точку.
-	 *
+	 * Получение пакета перемещения персонажа с указанной точки в указанную
+	 * точку.
+	 * 
 	 * @param x стартовая точка.
 	 * @param y стартовая точка.
 	 * @param z стартовая точка.
@@ -2542,124 +2350,111 @@ public abstract class Character extends TObject implements Synchronized
 	 * @param targetZ конечная точка.
 	 * @return новый пакет.
 	 */
-	public ServerPacket getMovePacket(float x, float y, float z, int heading, MoveType type, float targetX, float targetY, float targetZ)
-	{
+	public ServerPacket getMovePacket(float x, float y, float z, int heading, MoveType type, float targetX, float targetY, float targetZ) {
 		return CharMove.getInstance(this, type, x, y, z, heading, targetX, targetY, targetZ);
 	}
 
 	/**
 	 * Получение пакета перемещения персонажа с текущей точки в указанную точку.
-	 *
+	 * 
 	 * @param type тип перемещения.
 	 * @param targetX конечная точка.
 	 * @param targetY конечная точка.
 	 * @param targetZ конечная точка.
 	 * @return новый пакет.
 	 */
-	public ServerPacket getMovePacket(MoveType type, float targetX, float targetY, float targetZ)
-	{
+	public ServerPacket getMovePacket(MoveType type, float targetX, float targetY, float targetZ) {
 		return getMovePacket(x, y, z, heading, type, targetX, targetY, targetZ);
 	}
 
 	/**
 	 * @return частота обновления позиций.
 	 */
-	public final int getMoveTickInterval()
-	{
+	public final int getMoveTickInterval() {
 		return 100;
 	}
 
 	@Override
-	public String getName()
-	{
+	public String getName() {
 		return name;
 	}
 
 	/**
 	 * Слезть с маунта.
 	 */
-	public void getOffMount(){}
+	public void getOffMount() {
+	}
 
 	/**
 	 * @return ид опрокидывания.
 	 */
-	public int getOwerturnId()
-	{
+	public int getOwerturnId() {
 		return 0;
 	}
 
 	/**
 	 * @return время, на которое опрокидывается персонаж.
 	 */
-	public int getOwerturnTime()
-	{
+	public int getOwerturnTime() {
 		return 3000;
 	}
 
 	/**
 	 * @return owner владелец самона.
 	 */
-	public Character getOwner()
-	{
+	public Character getOwner() {
 		return null;
 	}
 
 	/**
 	 * @return группа игрока, в которой он состоит.
 	 */
-	public Party getParty()
-	{
+	public Party getParty() {
 		return null;
 	}
 
 	/**
 	 * @return уровень сбора растений.
 	 */
-	public int getPlantLevel()
-	{
+	public int getPlantLevel() {
 		return 0;
 	}
 
 	/**
 	 * @return модификатор атаки.
 	 */
-	public int getPowerFactor()
-	{
+	public int getPowerFactor() {
 		return (int) calcStat(StatType.POWER_FACTOR, template.getPowerFactor(), this, null);
 	}
 
 	/**
 	 * @return список квестов.
 	 */
-	public QuestList getQuestList()
-	{
+	public QuestList getQuestList() {
 		return null;
 	}
 
 	/**
 	 * @return кол-во регенирируемого хп.
 	 */
-	public final int getRegenHp()
-	{
+	public final int getRegenHp() {
 		return (int) calcStat(StatType.REGEN_HP, template.getRegHp(), this, null);
 	}
 
 	/**
 	 * @return кол-во регенирируемого мп.
 	 */
-	public final int getRegenMp()
-	{
+	public final int getRegenMp() {
 		return (int) calcStat(StatType.REGEN_MP, template.getRegMp(), this, null);
 	}
 
 	/**
 	 * Получение отката скила по скилл ид.
-	 *
+	 * 
 	 * @param id сеилл ид.
 	 * @return откат скила.
 	 */
-	public final ReuseSkill getReuseSkill(int id)
-	{
+	public final ReuseSkill getReuseSkill(int id) {
 		if(reuseSkills.isEmpty())
 			return null;
 
@@ -2669,27 +2464,24 @@ public abstract class Character extends TObject implements Synchronized
 	/**
 	 * @return таблицв откатов скилов.
 	 */
-	public final Table<IntKey, ReuseSkill> getReuseSkills()
-	{
+	public final Table<IntKey, ReuseSkill> getReuseSkills() {
 		return reuseSkills;
 	}
 
 	/**
 	 * @return скорость перемещения.
 	 */
-	public final int getRunSpeed()
-	{
+	public final int getRunSpeed() {
 		return Math.min((int) calcStat(StatType.RUN_SPEED, template.getRunSpd(), this, null), 500);
 	}
 
 	/**
 	 * Получение скила персонажа по скилл ид.
-	 *
+	 * 
 	 * @param skillId ид скила.
 	 * @return скилл персонажа.
 	 */
-	public final Skill getSkill(int skillId)
-	{
+	public final Skill getSkill(int skillId) {
 		if(skills.isEmpty())
 			return null;
 
@@ -2699,21 +2491,17 @@ public abstract class Character extends TObject implements Synchronized
 	/**
 	 * @return таблица скилов персонажа.
 	 */
-	public final Table<IntKey, Skill> getSkills()
-	{
+	public final Table<IntKey, Skill> getSkills() {
 		return skills;
 	}
 
 	/**
 	 * @return переменные для скилов.
 	 */
-	public Table<IntKey, Wrap> getSkillVariables()
-	{
+	public Table<IntKey, Wrap> getSkillVariables() {
 		// если таблицы нету
-		if(skillVariables == null)
-		{
-			synchronized(this)
-			{
+		if(skillVariables == null) {
+			synchronized(this) {
 				// и если ее опять нету
 				if(skillVariables == null)
 					// создаем
@@ -2727,131 +2515,115 @@ public abstract class Character extends TObject implements Synchronized
 	/**
 	 * @return вызванный суммон.
 	 */
-	public Summon getSummon()
-	{
+	public Summon getSummon() {
 		return summon;
 	}
 
 	/**
 	 * @return текущая цель.
 	 */
-	public Character getTarget()
-	{
+	public Character getTarget() {
 		return target;
 	}
 
 	/**
 	 * @return темплейт персонажа.
 	 */
-	public CharTemplate getTemplate()
-	{
+	public CharTemplate getTemplate() {
 		return template;
 	}
 
 	@Override
-	public int getTemplateId()
-	{
+	public int getTemplateId() {
 		return template.getTemplateId();
 	}
 
 	@Override
-	public int getTemplateType()
-	{
+	public int getTemplateType() {
 		return template.getTemplateType();
 	}
 
 	/**
 	 * @return title титул персонажа.
 	 */
-	public String getTitle()
-	{
+	public String getTitle() {
 		return title;
 	}
 
 	@Override
-	public final boolean hasAI()
-	{
+	public final boolean hasAI() {
 		return ai != null;
 	}
 
 	/**
 	 * @return есть ли на персонаже эффекты.
 	 */
-	public boolean hasEffects()
-	{
+	public boolean hasEffects() {
 		return effectList.size() > 0;
 	}
 
 	/**
 	 * @return состоит ли персонаж в гильдии.
 	 */
-	public boolean hasGuild()
-	{
+	public boolean hasGuild() {
 		return false;
 	}
 
 	/**
 	 * @return состоит ли игрок в пати.
 	 */
-	public boolean hasParty()
-	{
+	public boolean hasParty() {
 		return false;
 	}
 
 	/**
 	 * @return имеются ли активные квесты.
 	 */
-	public boolean hasQuests()
-	{
+	public boolean hasQuests() {
 		return false;
 	}
 
 	/**
 	 * @return заблокированы ли все действия.
 	 */
-	public final boolean isAllBlocking()
-	{
+	public final boolean isAllBlocking() {
 		return stuned || owerturned || flyingPegas;
 	}
 
 	/**
 	 * @return заблокирована ли атака.
 	 */
-	public final boolean isAttackBlocking()
-	{
+	public final boolean isAttackBlocking() {
 		return stuned || skillBlocking;
 	}
 
 	/**
 	 * @return была ли уже нанесена атака во время каста.
 	 */
-	public boolean isAttacking()
-	{
+	public boolean isAttacking() {
 		return false;
 	}
 
 	/**
 	 * @return находится ли в боевой стойке.
 	 */
-	public final boolean isBattleStanced()
-	{
+	public final boolean isBattleStanced() {
 		return battleStanced;
 	}
 
 	/**
 	 * Определяет, находится ли за списной у цели.
-	 *
+	 * 
 	 * @param target целевой.
 	 * @return находится ли за спиной.
 	 */
-	public final boolean isBehindTarget(TObject target)
-	{
+	public final boolean isBehindTarget(TObject target) {
 		if(target == null)
 			return false;
 
-		if(target.isCharacter())
-		{
-			int head = getHeadingTo(target, true);// head != -1 && (head <= 22337 || head >= 43197);
+		if(target.isCharacter()) {
+			int head = getHeadingTo(target, true);// head != -1 && (head <=
+													// 22337 || head >= 43197);
 			return head != -1 && (head <= 10430 || head >= 55105);
 		}
 
@@ -2860,15 +2632,14 @@ public abstract class Character extends TObject implements Synchronized
 
 	/**
 	 * Расчет блокировки удара по персонажу.
-	 *
+	 * 
 	 * @param attacker атакующий персонаж.
 	 * @param impactX координата удара.
 	 * @param impactY координата удара.
 	 * @param skill атакуемый скил.
 	 * @return заблокирован ли.
 	 */
-	public final boolean isBlocked(Character attacker, float impactX, float impactY, Skill skill)
-	{
+	public final boolean isBlocked(Character attacker, float impactX, float impactY, Skill skill) {
 		if(!isDefenseStance() || skill.isShieldIgnore())
 			return false;
 
@@ -2878,46 +2649,40 @@ public abstract class Character extends TObject implements Synchronized
 	/**
 	 * @return кастуется ли сейчас скил.
 	 */
-	public final boolean isCastingNow()
-	{
+	public final boolean isCastingNow() {
 		return castingSkill != null;
 	}
 
 	@Override
-	public final boolean isCharacter()
-	{
+	public final boolean isCharacter() {
 		return true;
 	}
 
 	/**
 	 * @return собирает ли сейчас
 	 */
-	public boolean isCollecting()
-	{
+	public boolean isCollecting() {
 		return false;
 	}
 
 	/**
 	 * @return мертв ли персонаж.
 	 */
-	public final boolean isDead()
-	{
+	public final boolean isDead() {
 		return currentHp < 1;
 	}
 
 	/**
 	 * @return в оборонительной ли стойке персонаж.
 	 */
-	public final boolean isDefenseStance()
-	{
+	public final boolean isDefenseStance() {
 		return defenseStance;
 	}
 
 	/**
 	 * @return уклоняем ли сейчас персонаж для скилов.
 	 */
-	public final boolean isEvasioned()
-	{
+	public final boolean isEvasioned() {
 		Skill skill = getCastingSkill();
 
 		if(skill == null)
@@ -2929,32 +2694,28 @@ public abstract class Character extends TObject implements Synchronized
 	/**
 	 * @return летит ли на пегасе.
 	 */
-	public final boolean isFlyingPegas()
-	{
+	public final boolean isFlyingPegas() {
 		return flyingPegas;
 	}
 
 	/**
 	 * @return ГМ ли персонаж.
 	 */
-	public boolean isGM()
-	{
+	public boolean isGM() {
 		return false;
 	}
 
 	/**
 	 * Поражает ли цель.
-	 *
+	 * 
 	 * @param startX координата.
 	 * @param startY координата.
 	 * @param startZ координата.
 	 * @param radius радиус поражения.
 	 * @return задевает ли персонажа.
 	 */
-	public boolean isHit(float startX, float startY, float startZ, float height, float radius)
-	{
-		if(Config.DEVELOPER_DEBUG_TARGET_TYPE)
-		{
+	public boolean isHit(float startX, float startY, float startZ, float height, float radius) {
+		if(Config.DEVELOPER_DEBUG_TARGET_TYPE) {
 			Location[] locs = Coords.circularCoords(Location.class, x, y, z, (int) geom.getRadius(), 10);
 
 			// получаем таблицу итемов
@@ -2962,8 +2723,7 @@ public abstract class Character extends TObject implements Synchronized
 
 			ItemTemplate template = itemTable.getItem(125);
 
-			for(int i = 0; i < 10; i++)
-			{
+			for(int i = 0; i < 10; i++) {
 				ItemInstance item = template.newInstance();
 
 				item.setItemCount(1);
@@ -2981,10 +2741,8 @@ public abstract class Character extends TObject implements Synchronized
 	}
 
 	@Override
-	public boolean isHit(float startX, float startY, float startZ, float endX, float endY, float endZ, float radius, boolean checkHeight)
-	{
-		if(Config.DEVELOPER_DEBUG_TARGET_TYPE)
-		{
+	public boolean isHit(float startX, float startY, float startZ, float endX, float endY, float endZ, float radius, boolean checkHeight) {
+		if(Config.DEVELOPER_DEBUG_TARGET_TYPE) {
 			Location[] locs = Coords.circularCoords(Location.class, x, y, z, (int) geom.getRadius(), 10);
 
 			// получаем таблицу итемов
@@ -2992,8 +2750,7 @@ public abstract class Character extends TObject implements Synchronized
 
 			ItemTemplate template = itemTable.getItem(125);
 
-			for(int i = 0; i < 10; i++)
-			{
+			for(int i = 0; i < 10; i++) {
 				ItemInstance item = template.newInstance();
 
 				item.setItemCount(1);
@@ -3013,18 +2770,16 @@ public abstract class Character extends TObject implements Synchronized
 	/**
 	 * @return находится ли персонаж в зоне костра.
 	 */
-	public boolean isInBattleTerritory()
-	{
+	public boolean isInBattleTerritory() {
 		return false;
 	}
 
 	/**
 	 * Находится ли цель за спиной.
-	 *
+	 * 
 	 * @param target цель.
 	 */
-	public final boolean isInBehind(Character target)
-	{
+	public final boolean isInBehind(Character target) {
 		if(target == null)
 			return false;
 
@@ -3036,21 +2791,19 @@ public abstract class Character extends TObject implements Synchronized
 	/**
 	 * @return находится ли персонаж в зоне костра.
 	 */
-	public boolean isInBonfireTerritory()
-	{
+	public boolean isInBonfireTerritory() {
 		return false;
 	}
 
 	/**
 	 * Находится ли цель в указанном диапозоне градусов перед персонажем.
-	 *
+	 * 
 	 * @param target цель.
 	 * @param degree точка градусов.
 	 * @param width ширина градусов.
 	 * @return находится ли в деапозоне.
 	 */
-	public final boolean isInDegree(Character target, int degree, int width)
-	{
+	public final boolean isInDegree(Character target, int degree, int width) {
 		int angle = (int) Angles.headingToDegree(getHeadingTo(target, false));
 
 		int min = degree - width;
@@ -3077,15 +2830,14 @@ public abstract class Character extends TObject implements Synchronized
 
 	/**
 	 * Находится ли цель в указанном диапозоне градусов перед персонажем.
-	 *
+	 * 
 	 * @param targetX целевая координата.
 	 * @param targetY целевая координата.
 	 * @param degree точка градусов.
 	 * @param width ширина градусов.
 	 * @return находится ли в деапозоне.
 	 */
-	public final boolean isInDegree(float targetX, float targetY, int degree, int width)
-	{
+	public final boolean isInDegree(float targetX, float targetY, int degree, int width) {
 		int angle = (int) Angles.headingToDegree(getHeadingTo(targetX, targetY));
 
 		int min = degree - width;
@@ -3112,11 +2864,10 @@ public abstract class Character extends TObject implements Synchronized
 
 	/**
 	 * Находится ли цель перед лицом
-	 *
+	 * 
 	 * @param target цель.
 	 */
-	public final boolean isInFront(Character target)
-	{
+	public final boolean isInFront(Character target) {
 		if(target == null)
 			return false;
 
@@ -3128,24 +2879,21 @@ public abstract class Character extends TObject implements Synchronized
 	/**
 	 * @return находится ли персонаж в мирной зоне.
 	 */
-	public boolean isInPeaceTerritory()
-	{
+	public boolean isInPeaceTerritory() {
 		return false;
 	}
 
 	@Override
-	public boolean isInRange(float x, float y, float z, float range)
-	{
+	public boolean isInRange(float x, float y, float z, float range) {
 		return getDistance(x, y, z) - geom.getRadius() <= range;
 	}
 
 	/**
 	 * Находится ли цель с боку
-	 *
+	 * 
 	 * @param target цель.
 	 */
-	public final boolean isInSide(Character target)
-	{
+	public final boolean isInSide(Character target) {
 		if(target == null)
 			return false;
 
@@ -3157,25 +2905,22 @@ public abstract class Character extends TObject implements Synchronized
 	/**
 	 * @return не уязвим липерсонаж.
 	 */
-	public boolean isInvul()
-	{
+	public boolean isInvul() {
 		return invul;
 	}
 
 	/**
 	 * @return блок движения.
 	 */
-	public final boolean isMoveBlocked()
-	{
+	public final boolean isMoveBlocked() {
 		return stuned || rooted;
 	}
 
 	/**
 	 * @return заблокиравано ли перемещение персонажа.
 	 */
-	public final boolean isMovementDisabled()
-	{
-		if(isDead() || defenseStance || rooted || owerturned ||skillMoved || stuned || getRunSpeed() < 1)
+	public final boolean isMovementDisabled() {
+		if(isDead() || defenseStance || rooted || owerturned || skillMoved || stuned || getRunSpeed() < 1)
 			return true;
 
 		Skill castingSkill = getCastingSkill();
@@ -3189,64 +2934,56 @@ public abstract class Character extends TObject implements Synchronized
 	/**
 	 * @return находится ли в движении персонаж.
 	 */
-	public final boolean isMoving()
-	{
+	public final boolean isMoving() {
 		return moving;
 	}
 
 	/**
 	 * @return находится ли перс на маунте.
 	 */
-	public boolean isOnMount()
-	{
+	public boolean isOnMount() {
 		return false;
 	}
 
 	/**
 	 * @return опрокинут ли персонаж.
 	 */
-	public final boolean isOwerturned()
-	{
+	public final boolean isOwerturned() {
 		return owerturned;
 	}
 
 	/**
 	 * @return не восприимчив к опрокидыванию ли.
 	 */
-	public boolean isOwerturnImmunity()
-	{
+	public boolean isOwerturnImmunity() {
 		return false;
 	}
 
 	/**
 	 * @return не восприимчив ли к удочке.
 	 */
-	public boolean isLeashImmunity()
-	{
+	public boolean isLeashImmunity() {
 		return false;
 	}
 
 	/**
 	 * @return пвп режим игрока.
 	 */
-	public boolean isPvPMode()
-	{
+	public boolean isPvPMode() {
 		return false;
 	}
 
 	/**
 	 * Определяет, находится ли персонаж сбоку от цели.
-	 *
+	 * 
 	 * @param target цель.
 	 * @return находится ли сбоку.
 	 */
-	public final boolean isSideTarget(TObject target)
-	{
+	public final boolean isSideTarget(TObject target) {
 		if(target == null)
 			return false;
 
-		if(target.isCharacter())
-		{
+		if(target.isCharacter()) {
 			int head = getHeadingTo(target, true);
 			return head != -1 && (head <= 22337 || head >= 43197);
 		}
@@ -3257,19 +2994,17 @@ public abstract class Character extends TObject implements Synchronized
 	/**
 	 * @return заблокировано ли использование скилов.
 	 */
-	public boolean isSkillBlocking()
-	{
+	public boolean isSkillBlocking() {
 		return skillBlocking;
 	}
 
 	/**
 	 * Находится ли скил в откате.
-	 *
+	 * 
 	 * @param skill проверяемый скил.
 	 * @return находится ли в откате.
 	 */
-	public boolean isSkillDisabled(Skill skill)
-	{
+	public boolean isSkillDisabled(Skill skill) {
 		ReuseSkill reuse = reuseSkills.get(skill.getReuseId());
 
 		if(reuse == null)
@@ -3281,52 +3016,46 @@ public abstract class Character extends TObject implements Synchronized
 	/**
 	 * @return находится ли персонаж в перемещении скилом.
 	 */
-	public final boolean isSkillMoved()
-	{
+	public final boolean isSkillMoved() {
 		return skillMoved;
 	}
 
 	/**
 	 * @return не восприимчив к усыплениюли.
 	 */
-	public boolean isSleepImmunity()
-	{
+	public boolean isSleepImmunity() {
 		return false;
 	}
 
 	/**
 	 * @return отспавнен ли.
 	 */
-	public boolean isSpawned()
-	{
+	public boolean isSpawned() {
 		return spawned;
 	}
 
 	/**
 	 * @return оглушен ли персонаж.
 	 */
-	public final boolean isStuned()
-	{
+	public final boolean isStuned() {
 		return stuned;
 	}
 
 	/**
 	 * @return невосприимчив к оглушению ли.
 	 */
-	public boolean isStunImmunity()
-	{
+	public boolean isStunImmunity() {
 		return false;
 	}
 
 	@Override
-	public void lock()
-	{
+	public void lock() {
 		Locks.lock(effectList, charLock);
 	}
 
 	/**
 	 * Указание откуда и куда двигаться.
-	 *
+	 * 
 	 * @param startX стартовая координата.
 	 * @param startY стартовая координата.
 	 * @param startZ стартовая координата.
@@ -3338,8 +3067,7 @@ public abstract class Character extends TObject implements Synchronized
 	 * @param broadCastMove отправлять ли пакет окружающим.
 	 * @param sendSelfPacket отправлять ли пакет персонажу.
 	 */
-	public void moveToLocation(float startX, float startY, float startZ, int heading, MoveType type, float targetX, float targetY, float targetZ, boolean broadCastMove, boolean sendSelfPacket)
-	{
+	public void moveToLocation(float startX, float startY, float startZ, int heading, MoveType type, float targetX, float targetY, float targetZ, boolean broadCastMove, boolean sendSelfPacket) {
 		// если это падение, обрабатываем дмг
 		if(type == MoveType.JUMP_FALL || type == MoveType.RUN_FALL)
 			// обрабатываем урон с падения
@@ -3364,89 +3092,78 @@ public abstract class Character extends TObject implements Synchronized
 
 	/**
 	 * Создание новой геометрии персонажа.
-	 *
+	 * 
 	 * @return новая геометрия.
 	 */
-	protected Geom newGeomCharacter()
-	{
+	protected Geom newGeomCharacter() {
 		throw new IllegalArgumentException("unsupported method.");
 	}
 
 	/**
 	 * Создание нового обработчика регена ХП.
-	 *
+	 * 
 	 * @return новый обработчик.
 	 */
-	protected Regen newRegenHp()
-	{
+	protected Regen newRegenHp() {
 		throw new IllegalArgumentException("unsupported method.");
 	}
 
 	/**
 	 * Создание нового обработчика регена МП.
-	 *
+	 * 
 	 * @return новый обработчик.
 	 */
-	protected Regen newRegenMp()
-	{
+	protected Regen newRegenMp() {
 		throw new IllegalArgumentException("unsupported method.");
 	}
 
 	/**
 	 * @return ид следующего каста скила.
 	 */
-	public int nextCastId()
-	{
+	public int nextCastId() {
 		return 0;
 	}
 
 	/**
 	 * Применяет заготовленный скил.
-	 *
+	 * 
 	 * @param skill применяемый скил.
 	 */
-	public final void nextUse(Skill skill)
-	{
+	public final void nextUse(Skill skill) {
 		skillUseTask.nextUse(skill);
 	}
 
 	/**
 	 * Пропуск урона по слушателям.
-	 *
+	 * 
 	 * @param attacker атакующий.
 	 * @param skill скил.
 	 * @param info информация об атаке.
 	 */
-	public void onDamage(Character attacker, Skill skill, AttackInfo info)
-	{
+	public void onDamage(Character attacker, Skill skill, AttackInfo info) {
 		if(damageListeners.isEmpty())
 			return;
 
 		damageListeners.readLock();
-		try
-		{
+		try {
 			DamageListener[] array = damageListeners.array();
 
 			for(int i = 0, length = damageListeners.size(); i < length; i++)
 				array[i].onDamage(attacker, this, info, skill);
-		}
-		finally
-		{
+		} finally {
 			damageListeners.readUnlock();
 		}
 	}
 
 	/**
 	 * Обработка блоком щитом.
-	 *
+	 * 
 	 * @param attacker атакующий.
 	 * @param skill скил.
 	 * @param info информация об атаке.
 	 */
-	public void onShield(Character attacker, Skill skill, AttackInfo info)
-	{
-		if(isBlocked(attacker, skill.getImpactX(), skill.getImpactY(), skill))
-		{
+	public void onShield(Character attacker, Skill skill, AttackInfo info) {
+		if(isBlocked(attacker, skill.getImpactX(), skill.getImpactY(), skill)) {
 			int limit = (int) calcStat(StatType.MAX_DAMAGE_DEFENSE, 0, attacker, skill);
 
 			int mpConsume = 0;
@@ -3456,8 +3173,7 @@ public abstract class Character extends TObject implements Synchronized
 			if(defense != null)
 				mpConsume = defense.blockMpConsume(info.getDamage());
 
-			if(mpConsume > 0)
-			{
+			if(mpConsume > 0) {
 				setCurrentMp(getCurrentMp() - mpConsume);
 
 				// получаем менеджера событий
@@ -3475,44 +3191,39 @@ public abstract class Character extends TObject implements Synchronized
 	/**
 	 * @param func удаляемая шансовая функция.
 	 */
-	public void removeChanceFunc(ChanceFunc func)
-	{
+	public void removeChanceFunc(ChanceFunc func) {
 		chanceFuncs.fastRemove(func);
 	}
 
 	/**
 	 * @param listener слушатель урона.
 	 */
-	public void removeDamageListener(DamageListener listener)
-	{
+	public void removeDamageListener(DamageListener listener) {
 		damageListeners.fastRemove(listener);
 	}
 
 	/**
 	 * @param listener слушатель смерти.
 	 */
-	public void removeDieListener(DieListener listener)
-	{
+	public void removeDieListener(DieListener listener) {
 		dieListeners.fastRemove(listener);
 	}
 
 	/**
 	 * Удаление эффекта у персонажа.
-	 *
+	 * 
 	 * @param effect удаляемый эффект.
 	 */
-	public final void removeEffect(Effect effect)
-	{
+	public final void removeEffect(Effect effect) {
 		effectList.removeEffect(effect);
 	}
 
 	/**
 	 * Удаляет из агр листа персонажа для указаного нпс.
-	 *
+	 * 
 	 * @param hated персонаж, имеющий хейт на этого персонажа.
 	 */
-	public final void removeHate(Npc npc)
-	{
+	public final void removeHate(Npc npc) {
 		if(npc == null || hateList.isEmpty())
 			return;
 
@@ -3522,18 +3233,16 @@ public abstract class Character extends TObject implements Synchronized
 
 	/**
 	 * Удаление скила.
-	 *
+	 * 
 	 * @param skillId удаляемый скил.
 	 * @param sendPacket отправлять ли пакет.
 	 */
-	public void removeSkill(int skillId, boolean sendPacket)
-	{
+	public void removeSkill(int skillId, boolean sendPacket) {
 		Table<IntKey, Skill> current = getSkills();
 
 		Skill old = current.remove(skillId);
 
-		if(old != null)
-		{
+		if(old != null) {
 			old.getTemplate().removePassiveFuncs(this);
 			old.fold();
 		}
@@ -3541,18 +3250,16 @@ public abstract class Character extends TObject implements Synchronized
 
 	/**
 	 * Удаление скила.
-	 *
+	 * 
 	 * @param skill удаляемый скил.
 	 * @param sendPacket отправлять ли пакет.
 	 */
-	public void removeSkill(Skill skill, boolean sendPacket)
-	{
+	public void removeSkill(Skill skill, boolean sendPacket) {
 		Table<IntKey, Skill> current = getSkills();
 
 		Skill old = current.remove(skill.getId());
 
-		if(old != null)
-		{
+		if(old != null) {
 			old.getTemplate().removePassiveFuncs(this);
 			old.fold();
 		}
@@ -3560,18 +3267,16 @@ public abstract class Character extends TObject implements Synchronized
 
 	/**
 	 * Удаление скила.
-	 *
+	 * 
 	 * @param template удаляемый скил.
 	 * @param sendPacket отправлять ли пакет.
 	 */
-	public void removeSkill(SkillTemplate template, boolean sendPacket)
-	{
+	public void removeSkill(SkillTemplate template, boolean sendPacket) {
 		Table<IntKey, Skill> current = getSkills();
 
 		Skill old = current.remove(template.getId());
 
-		if(old != null)
-		{
+		if(old != null) {
 			old.getTemplate().removePassiveFuncs(this);
 			old.fold();
 		}
@@ -3579,18 +3284,16 @@ public abstract class Character extends TObject implements Synchronized
 
 	/**
 	 * Удаление скилов.
-	 *
+	 * 
 	 * @param templates список скилов.
 	 * @param sendPacket отправлять ли пакет.
 	 */
-	public void removeSkills(SkillTemplate[] templates, boolean sendPacket)
-	{
+	public void removeSkills(SkillTemplate[] templates, boolean sendPacket) {
 		Table<IntKey, Skill> current = getSkills();
 
 		DataBaseManager dbManager = DataBaseManager.getInstance();
 
-		for(int i = 0, length = templates.length; i < length; i++)
-		{
+		for(int i = 0, length = templates.length; i < length; i++) {
 			Skill skill = current.remove(templates[i].getId());
 
 			if(skill == null)
@@ -3605,97 +3308,87 @@ public abstract class Character extends TObject implements Synchronized
 
 	/**
 	 * Удаление функции.
-	 *
+	 * 
 	 * @param func удаляемая функция.
 	 */
-	public final void removeStatFunc(StatFunc func)
-	{
-		//если функции нету, выходим
+	public final void removeStatFunc(StatFunc func) {
+		// если функции нету, выходим
 		if(func == null)
 			return;
 
-		//получаем индекс в массиве калькулятора
+		// получаем индекс в массиве калькулятора
 		int ordinal = func.getStat().ordinal();
 
 		writeStatLock.lock();
-		try
-		{
-			//если калькулятора нету, выходим
+		try {
+			// если калькулятора нету, выходим
 			if(calcs[ordinal] == null)
 				return;
 
-			//удаляем функцию с калькулятора
+			// удаляем функцию с калькулятора
 			calcs[ordinal].removeFunc(func);
-		}
-		finally
-		{
+		} finally {
 			writeStatLock.unlock();
 		}
 	}
 
 	/**
 	 * Удаление списка функций.
-	 *
+	 * 
 	 * @param funcs список функций.
 	 */
-	public final void removeStatFuncs(StatFunc[] funcs)
-	{
+	public final void removeStatFuncs(StatFunc[] funcs) {
 		charLock.lock();
-		try
-		{
-			for(int i = 0, length = funcs.length; i < length; i++)
-			{
+		try {
+			for(int i = 0, length = funcs.length; i < length; i++) {
 				StatFunc func = funcs[i];
 
-				//если функции нету, пропускаем
+				// если функции нету, пропускаем
 				if(func == null)
 					continue;
 
-				//получаем индекс в массиве калькулятора
+				// получаем индекс в массиве калькулятора
 				int ordinal = func.getStat().ordinal();
 				// калькулятор статов
 				Calculator calc = calcs[ordinal];
 
-				//если калькулятора нету, пропускаем
+				// если калькулятора нету, пропускаем
 				if(calc == null)
 					continue;
 
-				//удаляем функцию с калькулятора
+				// удаляем функцию с калькулятора
 				calc.removeFunc(func);
 			}
-		}
-		finally
-		{
+		} finally {
 			charLock.unlock();
 		}
 	}
 
 	/**
 	 * Удаление с видимости старого объекта.
-	 *
+	 * 
 	 * @param object удаляемый объект.
 	 * @param type тип удаления.
 	 */
-	public void removeVisibleObject(TObject object, int type){}
+	public void removeVisibleObject(TObject object, int type) {
+	}
 
 	/**
 	 * Отправка сообщения в чат окружающим.
-	 *
+	 * 
 	 * @param message отправляемое сообщение.
 	 */
-	public void sayMessage(String message)
-	{
+	public void sayMessage(String message) {
 		sayMessage(getName(), message);
 	}
 
 	/**
 	 * Отправка сообщения в чат окружающим.
-	 *
+	 * 
 	 * @param name имя, от кого отправить.
 	 * @param message содержание сообщения.
 	 */
-	public final void sayMessage(String name, String message)
-	{
+	public final void sayMessage(String name, String message) {
 		// получаем локальные объекты
 		LocalObjects local = LocalObjects.get();
 
@@ -3726,84 +3419,81 @@ public abstract class Character extends TObject implements Synchronized
 
 	/**
 	 * Отправка системного сообщения персонажу.
-	 *
+	 * 
 	 * @param type тип сообщения.
 	 */
-	public void sendMessage(MessageType type){}
+	public void sendMessage(MessageType type) {
+	}
 
 	/**
 	 * Отправка в систем чат сообщения.
-	 *
+	 * 
 	 * @param message содержание сообщения.
 	 */
-	public void sendMessage(String message){}
+	public void sendMessage(String message) {
+	}
 
 	/**
 	 * Отправить пакет персонажу.
-	 *
+	 * 
 	 * @param packet отправляемый пакет.
 	 * @param increaseSends увеличивать ли счетчик.
 	 */
-	public void sendPacket(ServerPacket packet, boolean increaseSends){}
+	public void sendPacket(ServerPacket packet, boolean increaseSends) {
+	}
 
 	/**
 	 * @param activateSkill активный тогл скил.
 	 */
-	public final void setActivateSkill(Skill activateSkill)
-	{
+	public final void setActivateSkill(Skill activateSkill) {
 		this.activateSkill = activateSkill;
 	}
 
 	/**
 	 * @param ai АИ персонажа.
 	 */
-	public void setAi(AI ai)
-	{
+	public void setAi(AI ai) {
 		this.ai = ai;
 	}
 
 	/**
 	 * @param attacking была ли уже успешная атака за каст скила.
 	 */
-	public void setAttacking(boolean attacking){}
+	public void setAttacking(boolean attacking) {
+	}
 
 	/**
 	 * @param battleStanced находится ли персонаж в боевой стойке.
 	 */
-	public final void setBattleStanced(boolean battleStanced)
-	{
+	public final void setBattleStanced(boolean battleStanced) {
 		this.battleStanced = battleStanced;
 	}
 
 	/**
 	 * @param castId ид каста скила.
 	 */
-	public final void setCastId(int castId)
-	{
+	public final void setCastId(int castId) {
 		this.castId = castId;
 	}
 
 	/**
 	 * @param castingSkill текущий кастуемый кил.
 	 */
-	public final void setCastingSkill(Skill castingSkill)
-	{
+	public final void setCastingSkill(Skill castingSkill) {
 		this.castingSkill = castingSkill;
 	}
 
 	/**
 	 * @param chargeLevel уровень заряда.
 	 */
-	public final void setChargeLevel(int chargeLevel)
-	{
+	public final void setChargeLevel(int chargeLevel) {
 		this.chargeLevel = chargeLevel;
 	}
 
 	/**
 	 * @param currentHp текущий уровень хп.
 	 */
-	public void setCurrentHp(int currentHp)
-	{
+	public void setCurrentHp(int currentHp) {
 		if(currentHp > getMaxHp())
 			currentHp = getMaxHp();
 
@@ -3816,8 +3506,7 @@ public abstract class Character extends TObject implements Synchronized
 	/**
 	 * @param currentMp текущий уровень мп.
 	 */
-	public void setCurrentMp(int currentMp)
-	{
+	public void setCurrentMp(int currentMp) {
 		if(currentMp > getMaxMp())
 			currentMp = getMaxMp();
 
@@ -3830,87 +3519,81 @@ public abstract class Character extends TObject implements Synchronized
 	/**
 	 * @param defenseStance находился ли в боевой стойке.
 	 */
-	public final void setDefenseStance(boolean defenseStance)
-	{
+	public final void setDefenseStance(boolean defenseStance) {
 		this.defenseStance = defenseStance;
 	}
 
 	/**
 	 * @param enemy цель.
 	 */
-	public final void setEnemy(TObject enemy)
-	{
+	public final void setEnemy(TObject enemy) {
 		this.enemy = enemy;
 	}
 
 	/**
 	 * @param equipment экиперовка.
 	 */
-	public void setEquipment(Equipment equipment){}
+	public void setEquipment(Equipment equipment) {
+	}
 
 	/**
 	 * @param flyingPegas летит ли на пегасе.
 	 */
-	public final void setFlyingPegas(boolean flyingPegas)
-	{
+	public final void setFlyingPegas(boolean flyingPegas) {
 		this.flyingPegas = flyingPegas;
 	}
 
 	/**
 	 * @param inventory инвентарь.
 	 */
-	public void setInventory(Inventory inventory){}
+	public void setInventory(Inventory inventory) {
+	}
 
 	/**
 	 * @param invul неуязвим ли персонаж.
 	 */
-	public final void setInvul(boolean invul)
-	{
+	public final void setInvul(boolean invul) {
 		this.invul = invul;
 	}
 
 	/**
 	 * @param karma карма.
 	 */
-	public void setKarma(int karma){}
+	public void setKarma(int karma) {
+	}
 
 	/**
 	 * @param lastCast время последнего каста скила.
 	 */
-	public void setLastCast(long lastCast)
-	{
+	public void setLastCast(long lastCast) {
 		this.lastCast = lastCast;
 	}
 
 	/**
 	 * @param lastSkillName имя последнего скастанувшегося скила.
 	 */
-	public void setLastSkillName(SkillName lastSkillName)
-	{
+	public void setLastSkillName(SkillName lastSkillName) {
 		this.lastSkillName = lastSkillName;
 	}
 
 	/**
 	 * @param lockOnSkill активный лок он скил.
 	 */
-	public void setLockOnSkill(Skill lockOnSkill)
-	{
+	public void setLockOnSkill(Skill lockOnSkill) {
 		this.lockOnSkill = lockOnSkill;
 	}
 
 	/**
 	 * @param moving находится ли в движении персонаж.
 	 */
-	public void setMoving(boolean moving)
-	{
+	public void setMoving(boolean moving) {
 		this.moving = moving;
 	}
 
 	/**
 	 * @param name имя персонажа.
 	 */
-	public final void setName(String name)
-	{
+	public final void setName(String name) {
 		if(name == null)
 			return;
 
@@ -3920,29 +3603,27 @@ public abstract class Character extends TObject implements Synchronized
 	/**
 	 * @param owerturned опрокинут ли персонаж.
 	 */
-	public final void setOwerturned(boolean owerturned)
-	{
+	public final void setOwerturned(boolean owerturned) {
 		this.owerturned = owerturned;
 	}
 
 	/**
 	 * @param owner владелец самона.
 	 */
-	public void setOwner(Character owner)
-	{
+	public void setOwner(Character owner) {
 		log.warning(getClass(), "unsupported invoke \"setOwner\".");
 	}
 
 	/**
 	 * @param pvpMode пвп режим игрока.
 	 */
-	public void setPvPMode(boolean pvpMode){}
+	public void setPvPMode(boolean pvpMode) {
+	}
 
 	/**
 	 * @param rooted заблокировано ли движение персонажа.
 	 */
-	public final void setRooted(boolean rooted)
-	{
+	public final void setRooted(boolean rooted) {
 		if(rooted)
 			stopMove();
 
@@ -3952,28 +3633,22 @@ public abstract class Character extends TObject implements Synchronized
 	/**
 	 * @param skillBlocking заблокировано ли использование скилов.
 	 */
-	public void setSkillBlocking(boolean skillBlocking)
-	{
+	public void setSkillBlocking(boolean skillBlocking) {
 		this.skillBlocking = skillBlocking;
 	}
 
 	/**
 	 * @param skillMoved перемещается ли средствами скила.
 	 */
-	public final void setSkillMoved(boolean skillMoved)
-	{
+	public final void setSkillMoved(boolean skillMoved) {
 		this.skillMoved = skillMoved;
 	}
-
-
 
 	/**
 	 * @param sks список скилов.
 	 */
-	public final void setSkills(Skill[] sks)
-	{
-		for(int i = 0, length = sks.length; i < length; i++)
-		{
+	public final void setSkills(Skill[] sks) {
+		for(int i = 0, length = sks.length; i < length; i++) {
 			Skill skill = sks[i];
 
 			if(!skills.containsKey(skill.getId()))
@@ -3984,10 +3659,8 @@ public abstract class Character extends TObject implements Synchronized
 	/**
 	 * @param stuned оглушен ли персонаж.
 	 */
-	public final void setStuned(boolean stuned)
-	{
-		if(stuned)
-		{
+	public final void setStuned(boolean stuned) {
+		if(stuned) {
 			abortCast(true);
 			stopMove();
 		}
@@ -3998,40 +3671,34 @@ public abstract class Character extends TObject implements Synchronized
 	/**
 	 * @param target текущая цель.
 	 */
-	public void setTarget(Character target)
-	{
+	public void setTarget(Character target) {
 		this.target = target;
 	}
 
 	/**
 	 * @param title титул персонажа.
 	 */
-	public final void setTitle(String title)
-	{
+	public final void setTitle(String title) {
 		this.title = title;
 	}
 
 	/**
 	 * Обработка хила от скила.
-	 *
+	 * 
 	 * @param damageId ид хила.
 	 * @param heal сила хила.
 	 * @param healer хилящий персонаж.
 	 */
-	public void skillHealHp(int damageId, int heal, Character healer)
-	{
+	public void skillHealHp(int damageId, int heal, Character healer) {
 		// если мертв или хила нет, выходим
 		if(isDead() || heal < 1)
 			return;
 
 		charLock.lock();
-		try
-		{
+		try {
 			// применяем
 			setCurrentHp(getCurrentHp() + heal);
-		}
-		finally
-		{
+		} finally {
 			charLock.unlock();
 		}
 
@@ -4047,25 +3714,21 @@ public abstract class Character extends TObject implements Synchronized
 
 	/**
 	 * Обработка хила от скила.
-	 *
+	 * 
 	 * @param damageId ид хила.
 	 * @param heal сила хила.
 	 * @param healer хилящий персонаж.
 	 */
-	public void skillHealMp(int damageId, int heal, Character healer)
-	{
+	public void skillHealMp(int damageId, int heal, Character healer) {
 		// если перс мертв или хила нет, выходмим
 		if(isDead() || heal < 1)
 			return;
 
 		charLock.lock();
-		try
-		{
+		try {
 			// применяем хил
 			setCurrentMp(getCurrentMp() + heal);
-		}
-		finally
-		{
+		} finally {
 			charLock.unlock();
 		}
 
@@ -4080,8 +3743,7 @@ public abstract class Character extends TObject implements Synchronized
 	}
 
 	@Override
-	public void spawnMe()
-	{
+	public void spawnMe() {
 		super.spawnMe();
 
 		// запускаем обработку движения
@@ -4092,40 +3754,37 @@ public abstract class Character extends TObject implements Synchronized
 
 	/**
 	 * Запуск боевой стойки.
-	 *
+	 * 
 	 * @param enemy запустивший боевую стойку персонаж.
 	 */
-	public boolean startBattleStance(Character enemy)
-	{
+	public boolean startBattleStance(Character enemy) {
 		return true;
 	}
 
 	/**
 	 * Запуск эмоций.
 	 */
-	public void startEmotions()
-	{
+	public void startEmotions() {
 		emotionTask.start();
 	}
 
 	/**
 	 * Остановка боевой стойки.
 	 */
-	public void stopBattleStance(){}
+	public void stopBattleStance() {
+	}
 
 	/**
 	 * Стоп эмоции.
 	 */
-	public void stopEmotions()
-	{
+	public void stopEmotions() {
 		emotionTask.stop();
 	}
 
 	/**
 	 * Останавливает движение.
 	 */
-	public final void stopMove()
-	{
+	public final void stopMove() {
 		// определяем, был ли в движении ерсонаж
 		boolean moving = (isMoving() || isCastingNow()) && !owerturned;
 
@@ -4141,35 +3800,32 @@ public abstract class Character extends TObject implements Synchronized
 	/**
 	 * Остановка движения средствами скила.
 	 */
-	public void stopSkillMove()
-	{
+	public void stopSkillMove() {
 		skillMoveTask.cancel(true);
 	}
 
 	/**
 	 * Телепорт объекта в указаные координаты.
-	 *
+	 * 
 	 * @param continentId ид континента.
 	 * @param x координата.
 	 * @param y координата.
 	 * @param z координата.
 	 */
-	public void teleToLocation(int continentId, float x, float y, float z)
-	{
+	public void teleToLocation(int continentId, float x, float y, float z) {
 		teleToLocation(continentId, x, y, z, heading);
 	}
 
 	/**
 	 * Телепорт объекта в указаные координаты.
-	 *
+	 * 
 	 * @param continentId ид континента.
 	 * @param x координата.
 	 * @param y координата.
 	 * @param z координата.
 	 * @param heading разворот.
 	 */
-	public void teleToLocation(int continentId, float x, float y, float z, int heading)
-	{
+	public void teleToLocation(int continentId, float x, float y, float z, int heading) {
 		if(isOnMount())
 			getOffMount();
 
@@ -4181,124 +3837,121 @@ public abstract class Character extends TObject implements Synchronized
 
 	/**
 	 * Телепорт объекта в указанную локу.
-	 *
+	 * 
 	 * @param location точка.
 	 */
-	public void teleToLocation(Location location)
-	{
-		teleToLocation(location.getContinentId(), location.getX(), location.getY(), location.getZ(), location.getHeading() != 0? location.getHeading() : heading);
+	public void teleToLocation(Location location) {
+		teleToLocation(location.getContinentId(), location.getX(), location.getY(), location.getZ(), location.getHeading() != 0 ? location.getHeading() : heading);
 	}
 
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		return super.toString();
 	}
 
 	@Override
-	public void unlock()
-	{
+	public void unlock() {
 		Locks.unlock(effectList, charLock);
 	}
 
 	/**
 	 * Обновление координат.
 	 */
-	public void updateCoords(){}
+	public void updateCoords() {
+	}
 
 	/**
 	 * Проверяет, может ли щит продолжать удерживаться.
 	 */
-	public void updateDefense()
-	{
+	public void updateDefense() {
+
 		if(!isDefenseStance() || activateSkill == null || activateSkill.getSkillType() != SkillType.DEFENSE)
 			return;
 
-		if(getCurrentMp() < 1)
+		if(getCurrentMp() < 1) {
 			abortCast(true);
+		}
 	}
 
 	/**
 	 * Обновление баф иконок.
 	 */
-	public void updateEffects(){}
+	public void updateEffects() {
+	}
 
 	/**
 	 * Обновление состояния хп.
 	 */
-	public void updateHp(){}
+	public void updateHp() {
+	}
 
 	/**
 	 * Обновление информации о персонаже.
 	 */
-	public void updateInfo()
-	{
+	public void updateInfo() {
 		moveNextTask.update();
 	}
 
 	/**
 	 * Обновлеие состояния хп.
 	 */
-	public void updateMp(){}
+	public void updateMp() {
+	}
 
 	/**
 	 * Обновление отображения отката скила.
-	 *
+	 * 
 	 * @param skill обновляемый скил.
 	 * @param reuseDelay время отката.
 	 */
-	public void updateReuse(Skill skill, int reuseDelay){}
+	public void updateReuse(Skill skill, int reuseDelay) {
+	}
 
 	/**
 	 * Обновление состояния цсталости.
 	 */
-	public void updateStamina(){}
+	public void updateStamina() {
+	}
 
 	/**
 	 * @return находится ли в корнях.
 	 */
-	public boolean isRooted()
-	{
+	public boolean isRooted() {
 		return rooted;
 	}
 
 	/**
 	 * @param summon вызванный суммон.
 	 */
-	public void setSummon(Summon summon)
-	{
+	public void setSummon(Summon summon) {
 		this.summon = summon;
 	}
 
 	/**
 	 * @return текущий заряжаемый скил.
 	 */
-	public Skill getChargeSkill()
-	{
+	public Skill getChargeSkill() {
 		return chargeSkill;
 	}
 
 	/**
 	 * @param chargeSkill текущий заряжаемый скил.
 	 */
-	public void setChargeSkill(Skill chargeSkill)
-	{
+	public void setChargeSkill(Skill chargeSkill) {
 		this.chargeSkill = chargeSkill;
 	}
 
 	/**
 	 * @return явлеятся ли персонаж дальним классом.
 	 */
-	public boolean isRangeClass()
-	{
+	public boolean isRangeClass() {
 		return false;
 	}
 
 	/**
 	 * @return отправляеть пакет завершения каста при коллизии.
 	 */
-	public boolean isBroadcastEndSkillForCollision()
-	{
+	public boolean isBroadcastEndSkillForCollision() {
 		return false;
 	}
 
@@ -4306,13 +3959,21 @@ public abstract class Character extends TObject implements Synchronized
 	 * @param skill проверяемый скил.
 	 * @return содержит ли персонаж эффекты от скила.
 	 */
-	public boolean containsEffect(Skill skill)
-	{
+	public boolean containsEffect(Skill skill) {
+
 		EffectList effectList = getEffectList();
 
-		if(effectList == null)
+		if(effectList == null) {
 			return false;
+		}
 
 		return effectList.contains(skill);
+	}
+
+	/**
+	 * @return является ли персонаж убийцей игроков.
+	 */
+	public boolean isPK() {
+		return false;
 	}
 }

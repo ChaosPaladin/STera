@@ -11,8 +11,7 @@ import rlib.logging.Loggers;
  * @author Ronn
  * @created 04.03.2012
  */
-public enum CommandType
-{
+public enum CommandType {
 	RESOURSE_COMMANDS(ResourseCommand.class, 100, "around_resourse", "spawn_resourse", "set_export_file", "add_resourse", "export_resourse"),
 	/** команды для работы с конфигом */
 	CONFIG_COMMANDS(ConfigCommand.class, 100, "config_reload", "config_set"),
@@ -56,17 +55,13 @@ public enum CommandType
 	 * @param access уровень доступа к обработчику.
 	 * @param commands список обрабатываемых команд.
 	 */
-	private CommandType(Class<? extends Command> type, int access, String... commands)
-	{
+	private CommandType(Class<? extends Command> type, int access, String... commands) {
 		this.commands = commands;
 		this.access = access;
 
-		try
-		{
+		try {
 			constructor = type.getConstructor(int.class, String[].class);
-		}
-		catch(NoSuchMethodException | SecurityException e)
-		{
+		} catch(NoSuchMethodException | SecurityException e) {
 			Loggers.warning(this, e);
 		}
 	}
@@ -74,38 +69,31 @@ public enum CommandType
 	/**
 	 * @return минимальный уровень доступа к обработчику.
 	 */
-	public int getAccess()
-	{
+	public int getAccess() {
 		return access;
 	}
 
 	/**
 	 * @return конструктор обработчика.
 	 */
-	public Constructor<? extends Command> getConstructor()
-	{
+	public Constructor<? extends Command> getConstructor() {
 		return constructor;
 	}
 
 	/**
 	 * @return кол-во обрабатываемых комманд.
 	 */
-	public int getCount()
-	{
+	public int getCount() {
 		return commands.length;
 	}
 
 	/**
 	 * @return новый экземпляр обработчика.
 	 */
-	public Command newInstance()
-	{
-		try
-		{
+	public Command newInstance() {
+		try {
 			return constructor.newInstance(access, commands);
-		}
-		catch(InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
-		{
+		} catch(InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			Loggers.warning(this, e);
 		}
 

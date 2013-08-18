@@ -1023,7 +1023,24 @@
         <set name="operateType" value="ACTIVE"/>
         <set name="skillType" value="PREPARE_MANAHEAL"/>
 		<set name="power" value="467"/>
-		<set name="hpConsume" value="1685"/>
+		<set name="hpConsume" value="2329"/>
+        <set name="targetType" value="TARGET_SELF"/>
+		<set name="rangeType" value="OTHER_SKILL" />
+		<set name="startState" value="1"/>
+		<set name="endState" value="1"/>
+        <set name="hitTime" value="2000"/>
+		<set name="delay" value="1200"/>
+		<set name="castCount" value="2"/>
+		<set name="interval" value="400"/>
+        <set name="reuseDelay" value="10000"/>
+		<set name="implemented" value="true" />
+    </skill>
+	
+	<skill id="67229464" class="3" name="Unchained Anger VI" levels="1">
+        <set name="operateType" value="ACTIVE"/>
+        <set name="skillType" value="PREPARE_MANAHEAL"/>
+		<set name="power" value="517"/>
+		<set name="hpConsume" value="3261"/>
         <set name="targetType" value="TARGET_SELF"/>
 		<set name="rangeType" value="OTHER_SKILL" />
 		<set name="startState" value="1"/>
@@ -1894,6 +1911,21 @@
 			<player owerturned="true" msg="Вы не опрокинуты."/>
 		</cond>
     </skill>
+	
+	<skill id="67239764" class="3" name="Retaliate IX" levels="1">
+        <set name="power" value="931"/>
+        <set name="operateType" value="ACTIVE"/>
+        <set name="skillType" value="OWERTURNED_STRIKE"/>
+        <set name="targetType" value="TARGET_AURA"/>
+        <set name="radius" value="80"/>
+        <set name="delay" value="1000"/>
+		<set name="reuseDelay" value="15000"/>
+        <set name="hitTime" value="2000"/>
+        <set name="implemented" value="true" />
+		<cond>
+			<player owerturned="true" msg="Вы не опрокинуты."/>
+		</cond>
+    </skill>
 
     <skill id="67258964" class="3" name="Vampiric Blow I" levels="13">
         <table name="#operateType">CHARGE ACTIVE</table>
@@ -2245,6 +2277,45 @@
         <set name="hitTime" value="#hitTime"/>
 		<set name="delay" value="#delay"/>
 		<set name="reuseId" value="67289264"/>
+		<set name="castCount" value="#castCount"/>
+		<set name="offsetId" value="12"/>
+		<set name="interval" value="#interval"/>
+		<set name="moveDistance" value="#moveDistance"/>
+		<set name="moveTime" value="500"/>
+        <set name="reuseDelay" value="7000"/>
+		<set name="hpConsume" value="#hpConsume" />
+		<set name="implemented" value="true" />
+		<set name="blockingMove" value="#blockingMove" />
+		<set name="correctableTarget" value="true" />
+		<cond>
+			<using weapon="AXE" msg="Используется только с топором." />
+		</cond>	
+		<cast>
+			<mul stat="runSpd" order="0x50" val="0.5" />	
+		</cast>
+    </skill>
+	
+	<skill id="67289364" class="3" name="Lethal Strike V" levels="13">
+		<table name="#operateType">CHARGE ACTIVE</table>
+        <table name="#skillType">CHARGE CHARGE_STRIKE</table>
+		<table name="#delay">800 500</table>
+		<table name="#hitTime">6000 3000</table>
+		<table name="#interval">800 500</table>
+		<table name="#moveDistance">0 160</table>
+		<table name="#castCount">3 1</table>
+		<table name="#hpConsume">1369 1369 1369 2739 0</table>
+		<table name="#blockingMove">false true</table>
+		<set name="power" value="3092"/>
+		<set name="startPower" value="0.5"/>
+		<set name="chargeMod" value="0.2"/>
+        <set name="operateType" value="#operateType"/>
+        <set name="skillType" value="#skillType"/>
+        <set name="targetType" value="TARGET_ONE_AREA"/>
+        <set name="radius" value="70"/>
+		<set name="range" value="30"/>
+        <set name="hitTime" value="#hitTime"/>
+		<set name="delay" value="#delay"/>
+		<set name="reuseId" value="67289364"/>
 		<set name="castCount" value="#castCount"/>
 		<set name="offsetId" value="12"/>
 		<set name="interval" value="#interval"/>

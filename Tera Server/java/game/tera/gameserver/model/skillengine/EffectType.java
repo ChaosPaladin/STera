@@ -15,6 +15,7 @@ import tera.gameserver.model.skillengine.effects.Debuff;
 import tera.gameserver.model.skillengine.effects.Heal;
 import tera.gameserver.model.skillengine.effects.HealMod;
 import tera.gameserver.model.skillengine.effects.HealOverTime;
+import tera.gameserver.model.skillengine.effects.Invul;
 import tera.gameserver.model.skillengine.effects.ManaHealOverTime;
 import tera.gameserver.model.skillengine.effects.ManaHealOverTimePercent;
 import tera.gameserver.model.skillengine.effects.NoBattleEffect;
@@ -27,14 +28,12 @@ import tera.gameserver.model.skillengine.effects.Stun;
 import tera.gameserver.templates.EffectTemplate;
 import tera.gameserver.templates.SkillTemplate;
 
-
 /**
  * Перечисление типов эффекта.
- *
+ * 
  * @author Ronn
  */
-public enum EffectType
-{
+public enum EffectType {
 	/** баф */
 	BUFF(Buff.class),
 
@@ -73,6 +72,8 @@ public enum EffectType
 	DAMAGE_ABSORPTION(DamageAbsorption.class),
 	/** эффект самовоскрешения */
 	PHEONIX(Pheonix.class),
+	/** эффект неуязвимости */
+	INVUL(Invul.class),
 	/** эффект кансела эффектов */
 	CANCEL_EFFECT(CancelEffect.class);
 
@@ -82,35 +83,27 @@ public enum EffectType
 	/**
 	 * @param constructor конструктор эффекта.
 	 */
-	private EffectType(Class<? extends Effect> effectClass)
-	{
-		try
-		{
+	private EffectType(Class<? extends Effect> effectClass) {
+		try {
 			this.constructor = effectClass.getConstructor(EffectTemplate.class, Character.class, Character.class, SkillTemplate.class);
-		}
-		catch(NoSuchMethodException | SecurityException e)
-		{
+		} catch(NoSuchMethodException | SecurityException e) {
 			throw new IllegalArgumentException();
 		}
 	}
 
 	/**
 	 * Создание нового эффекта.
-	 *
+	 * 
 	 * @param template темплейт эффекта.
 	 * @param effector тот, кто накладывает эффект.
 	 * @param effected тот, на кого накладывают эффект.
 	 * @param skill скил, которым накладывают эффект.
 	 * @return новый экземпляр эффекта.
 	 */
-	public Effect newInstance(EffectTemplate template, Character effector, Character effected, SkillTemplate skill)
-	{
-		try
-		{
+	public Effect newInstance(EffectTemplate template, Character effector, Character effected, SkillTemplate skill) {
+		try {
 			return constructor.newInstance(template, effector, effected, skill);
-		}
-		catch(InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
-		{
+		} catch(InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			return null;
 		}
 	}

@@ -962,6 +962,36 @@
 		</for>
     </skill>
 	
+	<skill id="67369864" class="6" name="Fiery Escape X" levels="1">
+        <set name="power" value="496"/>
+        <set name="operateType" value="ACTIVE"/>
+        <set name="skillType" value="STRIKE"/>
+        <set name="targetType" value="TARGET_AREA"/>
+        <set name="radius" value="60"/>
+		<set name="range" value="20"/>
+        <set name="mpConsume" value="120"/>
+        <set name="hitTime" value="2500"/>
+		<set name="delay" value="200"/>
+		<set name="moveTime" value="1000"/>
+		<set name="moveDelay" value="200"/>
+		<set name="moveDistance" value="-250" />
+        <set name="reuseDelay" value="8000"/>
+		<set name="owerturnMod" value="0.1" />
+		<set name="forceCast" value="true" />
+		<set name="implemented" value="true" />
+		<cond>
+			<and>
+				<using weapon="STAFF" msg="Используется только с посохом."/>
+				<player notBarrier="true" msg="Нельзя использовать около преград." />
+			</and>
+		</cond>
+		<for> 
+			<effect id="800800" time="5" count="1" type="DEBUFF" resistType="weakResist" stackType="speed_down" chance="100" debuff="true" >
+				<mul stat="runSpd" order="0x30" val="0.3" />
+			</effect>
+		</for>
+    </skill>
+	
 	<skill id="67378964" class="6" name="Final Reprisal I" levels="2">
 		<table name="#hasFast">true false</table>
 		<table name="#iconId">67378964 67378994</table>
@@ -1719,6 +1749,22 @@
 			<player owerturned="true" msg="Вы не опрокинуты."/>
 		</cond>
     </skill>
+	
+	<skill id="67359764" class="6" name="Retaliate IX" levels="1">
+        <set name="power" value="931"/>
+        <set name="operateType" value="ACTIVE"/>
+        <set name="skillType" value="OWERTURNED_STRIKE"/>
+        <set name="targetType" value="TARGET_AURA"/>
+        <set name="radius" value="80"/>
+        <set name="delay" value="1000"/>
+		<set name="reuseDelay" value="15000"/>
+        <set name="hitTime" value="1000"/>
+		<set name="owerturnMod" value="0" />
+        <set name="implemented" value="true" />
+		<cond>
+			<player owerturned="true" msg="Вы не опрокинуты."/>
+		</cond>
+    </skill>
 
 	<skill id="67398964" class="6" name="Triple Nemesis I" levels="3">
 		<table name="#hitTime">2100 2100 2800</table>
@@ -2249,6 +2295,28 @@
 		</for>
     </skill>
 	
+	<skill id="67129664" class="6" name="Regeneration Circle VIII" levels="1">
+        <set name="operateType" value="ACTIVE"/>
+        <set name="skillType" value="BUFF"/>
+        <set name="targetType" value="TARGET_AREA_PARTY"/>
+		<set name="rangeType" value="OTHER_SKILL" />
+        <set name="radius" value="220"/>
+		<set name="range" value="150"/>
+		<set name="delay" value="3000"/>
+        <set name="mpConsume" value="500"/>
+        <set name="hitTime" value="5000"/>
+        <set name="reuseDelay" value="20000"/>
+		<set name="maxTargets" value="5"/>
+		<set name="noCaster" value="true" />
+		<set name="implemented" value="true" />
+		<cond>
+			<using weapon="STAFF" msg="Используется только с посохом."/>
+		</cond>	
+		<for>
+			<effect id="800107" time="2" count="5" type="HEAL" stackType="heal_over_time" power="214" />
+		</for>
+    </skill>
+	
 	<skill id="67138964" class="6" name="Healing Circle I" levels="1">
         <set name="operateType" value="ACTIVE"/>
 		<set name="power" value="2645"/>
@@ -2566,6 +2634,26 @@
 		</for>
     </skill>
 	
+	<skill id="67339364" class="6" name="Blessing of Balder V" levels="1">
+        <set name="operateType" value="ACTIVE"/>
+        <set name="skillType" value="BUFF"/>
+        <set name="targetType" value="TARGET_PARTY"/>
+		<set name="rangeType" value="OTHER_SKILL" />
+        <set name="radius" value="220"/>
+		<set name="delay" value="1200"/>
+        <set name="mpConsume" value="625"/>
+        <set name="hitTime" value="2200"/>
+        <set name="reuseDelay" value="5000"/>
+		<set name="maxTargets" value="5"/>
+		<set name="implemented" value="true" />
+		<cond>
+			<using weapon="STAFF" msg="Используется только с посохом."/>
+		</cond>	
+		<for>
+			<effect id="800604" time="2" count="450" type="HEAL_MOD" power="73" stackType="special_heal_over_time" value="0.055" />
+		</for>
+    </skill>
+	
 	<skill id="67438964" class="6" name="Ishara's Lullaby I" levels="11">
 		<table name="#skillType">LOCK_ON LOCK_ON_EFFECT</table>
 		<table name="#operateType">LOCK_ON ACTIVE</table>
@@ -2660,7 +2748,7 @@
 		</cond>	
 		<for>
 			<effect time="0" count="1" type="CANCEL_EFFECT" options="buff" debuff="true" />
-			<effect id="800900" time="3" count="5" type="DAM_OVER_TIME" dynamicCount="true" resistType="damageResist" stackType="dot" chance="100" options="buff" debuff="true" power="136" >
+			<effect id="800900" time="3" count="5" type="DAM_OVER_TIME" stackType="dot" chance="100" options="buff" debuff="true" power="136" >
 				<mul stat="shortReuse" order="0x30" val="2" />
 			</effect>
 		</for>
@@ -2694,7 +2782,7 @@
 		</cond>	
 		<for>
 			<effect time="0" count="1" type="CANCEL_EFFECT" options="buff" debuff="true" />
-			<effect id="800901" time="3" count="5" type="DAM_OVER_TIME" dynamicCount="true" resistType="damageResist" stackType="dot" chance="100" options="buff" debuff="true" power="193" >
+			<effect id="800901" time="3" count="5" type="DAM_OVER_TIME" stackType="dot" chance="100" options="buff" debuff="true" power="193" >
 				<mul stat="shortReuse" order="0x30" val="2" />
 			</effect>
 		</for>
@@ -2728,7 +2816,7 @@
 		</cond>	
 		<for>
 			<effect time="0" count="1" type="CANCEL_EFFECT" options="buff" debuff="true" />
-			<effect id="800902" time="3" count="5" type="DAM_OVER_TIME" dynamicCount="true" resistType="damageResist" stackType="dot" chance="100" debuff="true" power="284" >
+			<effect id="800902" time="3" count="5" type="DAM_OVER_TIME" stackType="dot" chance="100" debuff="true" power="284" >
 				<mul stat="shortReuse" order="0x30" val="2" />
 			</effect>
 		</for>
@@ -2762,7 +2850,7 @@
 		</cond>	
 		<for>
 			<effect time="0" count="1" type="CANCEL_EFFECT" options="buff" debuff="true" />
-			<effect id="800903" time="3" count="5" type="DAM_OVER_TIME" dynamicCount="true" resistType="damageResist" stackType="dot" chance="100" debuff="true" power="410" >
+			<effect id="800903" time="3" count="5" type="DAM_OVER_TIME" stackType="dot" chance="100" debuff="true" power="410" >
 				<mul stat="shortReuse" order="0x30" val="2" />
 			</effect>
 		</for>
@@ -2796,7 +2884,7 @@
 		</cond>	
 		<for>
 			<effect time="0" count="1" type="CANCEL_EFFECT" options="buff" debuff="true" />
-			<effect id="800904" time="3" count="5" type="DAM_OVER_TIME" dynamicCount="true" resistType="damageResist" stackType="dot" chance="100" debuff="true" power="569" >
+			<effect id="800904" time="3" count="5" type="DAM_OVER_TIME" stackType="dot" chance="100" debuff="true" power="569" >
 				<mul stat="shortReuse" order="0x30" val="2" />
 			</effect>
 		</for>
@@ -2830,7 +2918,41 @@
 		</cond>	
 		<for>
 			<effect time="0" count="1" type="CANCEL_EFFECT" options="buff" debuff="true" />
-			<effect id="800904" time="3" count="5" type="DAM_OVER_TIME" dynamicCount="true" resistType="damageResist" stackType="dot" chance="100" debuff="true" power="786" >
+			<effect id="800904" time="3" count="5" type="DAM_OVER_TIME" stackType="dot" chance="100" debuff="true" power="786" >
+				<mul stat="shortReuse" order="0x30" val="2" />
+			</effect>
+		</for>
+    </skill>
+	
+	<skill id="67409564" class="6" name="Plague of Exhaustion VII" levels="11">
+		<table name="#skillType">LOCK_ON LOCK_ON_EFFECT</table>
+		<table name="#operateType">LOCK_ON ACTIVE</table>
+		<table name="#hitTime">5000 5000</table>
+		<table name="#reuseDelay">0 60000</table>
+		<table name="#mpConsume">500 500</table>
+		<table name="#castCount">1 2</table>
+        <set name="operateType" value="#operateType"/>
+        <set name="skillType" value="#skillType"/>
+        <set name="targetType" value="LOCK_ON_WAR"/>
+		<set name="rangeType" value="RANGE_SKILL" />
+        <set name="range" value="470"/>
+		<set name="delay" value="1100"/>
+        <set name="mpConsume" value="#mpConsume"/>
+        <set name="maxTargets" value="4"/>
+        <set name="hitTime" value="#hitTime"/>
+		<set name="castCount" value="#castCount"/>
+		<set name="interval" value="1000"/>
+		<set name="staticInterval" value="true"/>
+        <set name="reuseDelay" value="#reuseDelay"/>
+		<set name="reuseId" value="67409564"/>
+		<set name="blockingMove" value="false"/>
+		<set name="implemented" value="true" />
+		<cond>
+			<using weapon="STAFF" msg="Используется только с посохом."/>
+		</cond>	
+		<for>
+			<effect time="0" count="1" type="CANCEL_EFFECT" options="buff" debuff="true" />
+			<effect id="800905" time="3" count="5" type="DAM_OVER_TIME" stackType="dot" chance="100" debuff="true" power="1145" >
 				<mul stat="shortReuse" order="0x30" val="2" />
 			</effect>
 		</for>
@@ -3307,6 +3429,29 @@
 		</cond>
 		<for>
 			<effect id="800302" time="12" count="1" stackType="absorb_damage" type="DAMAGE_ABSORPTION" power="9803" value="0" >
+				<add stat="owerturnRcpt" order="0x40" val="100" />
+				<add stat="stunRcpt" order="0x40" val="100" />
+			</effect>
+		</for>
+    </skill>
+	
+	<skill id="67329264" class="6" name="Kaia's Shield IV" levels="1">
+        <set name="operateType" value="ACTIVE"/>
+        <set name="skillType" value="BUFF"/>
+        <set name="targetType" value="TARGET_PARTY"/>
+		<set name="rangeType" value="OTHER_SKILL" />
+		<set name="range" value="80"/>
+        <set name="radius" value="520"/>
+        <set name="mpConsume" value="675"/>
+        <set name="hitTime" value="2000"/>
+		<set name="delay" value="1500"/>
+        <set name="reuseDelay" value="75000"/>
+		<set name="implemented" value="true" />
+		<cond>
+			<using weapon="STAFF" msg="Используется только с посохом."/>
+		</cond>
+		<for>
+			<effect id="800303" time="12" count="1" stackType="absorb_damage" type="DAMAGE_ABSORPTION" power="14282" value="0" >
 				<add stat="owerturnRcpt" order="0x40" val="100" />
 				<add stat="stunRcpt" order="0x40" val="100" />
 			</effect>

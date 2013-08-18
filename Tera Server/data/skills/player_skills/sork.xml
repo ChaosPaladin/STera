@@ -1364,6 +1364,39 @@
 		<set name="owerturnMod" value="0.1" />
 		<set name="implemented" value="true" />
     </skill>
+	
+	<skill id="67149664" class="4" name="Arcane Pulse VIII" levels="14">
+        <table name="#operateType">CHARGE ACTIVE</table>
+        <table name="#skillType">CHARGE CHARGE_SINGLE_SLOW_SHOT</table>
+		<table name="#delay">1000 300</table>
+		<table name="#hitTime">6000 2200</table>
+		<table name="#interval">1000 0</table>
+		<table name="#castCount">3 1</table>
+		<table name="#mpConsume">124 124 124 248 0</table>
+		<set name="power" value="3101"/>
+		<set name="startPower" value="0.5"/>
+		<set name="chargeMod" value="0.2"/>
+        <set name="operateType" value="#operateType"/>
+        <set name="skillType" value="#skillType"/>
+        <set name="targetType" value="TARGET_ONE"/>
+		<set name="rangeType" value="RANGE_SKILL" />
+        <set name="radius" value="10"/>
+		<set name="range" value="480"/>
+        <set name="hitTime" value="#hitTime"/>
+		<set name="delay" value="#delay"/>
+		<set name="reuseId" value="67149564"/>
+		<set name="castCount" value="#castCount"/>
+		<set name="offsetId" value="13"/>
+		<set name="speed" value="900"/>
+		<set name="speedOffset" value="-400"/>
+		<set name="interval" value="#interval"/>
+        <set name="reuseDelay" value="10000"/>
+		<set name="mpConsume" value="#mpConsume" />
+		<set name="damageId" value="67149584" />
+		<set name="maxTargets" value="20" />
+		<set name="owerturnMod" value="0.1" />
+		<set name="implemented" value="true" />
+    </skill>
 
 	<skill id="67278964" class="4" name="Painful Trap I" levels="1">
         <set name="operateType" value="ACTIVE"/>
@@ -1862,6 +1895,22 @@
 	
 	<skill id="67249664" class="4" name="Retaliate VIII" levels="1">
         <set name="power" value="547"/>
+        <set name="operateType" value="ACTIVE"/>
+        <set name="skillType" value="OWERTURNED_STRIKE"/>
+        <set name="targetType" value="TARGET_AURA"/>
+        <set name="radius" value="80"/>
+        <set name="delay" value="1000"/>
+		<set name="reuseDelay" value="15000"/>
+        <set name="hitTime" value="2000"/>
+		<set name="owerturnMod" value="0" />
+        <set name="implemented" value="true" />
+		<cond>
+			<player owerturned="true" msg="Вы не опрокинуты."/>
+		</cond>
+    </skill>
+	
+	<skill id="67249764" class="4" name="Retaliate IX" levels="1">
+        <set name="power" value="798"/>
         <set name="operateType" value="ACTIVE"/>
         <set name="skillType" value="OWERTURNED_STRIKE"/>
         <set name="targetType" value="TARGET_AURA"/>
@@ -2391,6 +2440,27 @@
 		</cond>	
 	</skill>
 	
+	<skill id="67229364" class="4" name="Void Pulse V" levels="1">
+		<set name="targetType" value="TARGET_ONE" />
+		<set name="range" value="500"/>
+		<set name="power" value="4086" />
+		<set name="radius" value="10" />
+		<set name="skillType" value="SINGLE_SLOW_SHOT" />
+		<set name="operateType" value="ACTIVE" />
+		<set name="rangeType" value="RANGE_SKILL" />
+		<set name="mpConsume" value="1000" />
+		<set name="speed" value="300" />
+		<set name="hitTime" value="1700" />	
+		<set name="delay" value="900" />	
+		<set name="implemented" value="true" />
+		<set name="reuseDelay" value="15000"/>
+		<set name="owerturnMod" value="0.1" />
+		<set name="damageId" value="67229184" />
+		<cond>
+			<using weapon="DISC" msg="Используется только с диском."/>
+		</cond>	
+	</skill>
+	
 	<skill id="67198964" class="4" name="Overchannel I" levels="1">
         <set name="operateType" value="ACTIVE"/>
         <set name="skillType" value="BUFF"/>
@@ -2624,5 +2694,20 @@
 		<set name="delay" value="9000"/>
         <set name="reuseDelay" value="3600"/>
         <set name="implemented" value="true" />
+    </skill>
+	
+	<skill id="67388964" class="4" name="Stone Skin" levels="1">
+        <set name="operateType" value="ACTIVE"/>
+        <set name="skillType" value="UNAGGRO"/>
+        <set name="targetType" value="TARGET_SELF"/>
+		<set name="rangeType" value="OTHER_SKILL" />
+		<set name="mpConsume" value="500" />
+        <set name="hitTime" value="1000"/>
+		<set name="delay" value="1000"/>
+        <set name="reuseDelay" value="300000"/>
+		<set name="implemented" value="true" />
+        <for>
+			<effect id="501500" time="5" count="1" type="INVUL" stackType="invul" value="0" />
+		</for>
     </skill>
 </list>

@@ -14,7 +14,6 @@ import rlib.logging.Logger;
 import rlib.logging.Loggers;
 import rlib.util.VarTable;
 import rlib.util.random.Random;
-
 import tera.Config;
 import tera.gameserver.manager.RandomManager;
 import tera.gameserver.model.AttackInfo;
@@ -30,17 +29,16 @@ import tera.gameserver.templates.EffectTemplate;
 
 /**
  * Набор формул и функций.
- *
+ * 
  * @author Ronn
  */
-public final class Formulas
-{
+public final class Formulas {
+
 	private static final Logger log = Loggers.getLogger(Formulas.class);
 
 	private static Formulas instance;
 
-	public static Formulas getInstance()
-	{
+	public static Formulas getInstance() {
 		if(instance == null)
 			instance = new Formulas();
 
@@ -74,22 +72,18 @@ public final class Formulas
 	/** функции для НПС */
 	private StatFunc BATTLE_WALK_NPC;
 
-	private Formulas()
-	{
+	private Formulas() {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		factory.setValidating(false);
 		factory.setIgnoringComments(true);
 
 		File file = new File(Config.SERVER_DIR + "/data/base_stats.xml");
 
-		try
-		{
+		try {
 			Document doc = factory.newDocumentBuilder().parse(file);
 
-			for(Node list = doc.getFirstChild(); list != null; list = list.getNextSibling())
-			{
-				for(Node node = list.getFirstChild(); node  != null; node = node.getNextSibling())
-				{
+			for(Node list = doc.getFirstChild(); list != null; list = list.getNextSibling()) {
+				for(Node node = list.getFirstChild(); node != null; node = node.getNextSibling()) {
 					if(node.getNodeType() != Node.ELEMENT_NODE || !"set".equals(node.getNodeName()))
 						continue;
 
@@ -105,9 +99,10 @@ public final class Formulas
 					// значение параметра
 					float value = vars.getFloat("value");
 
-					switch(type)
-					{
-						case "heart" : HEART[order] = value; break;
+					switch(type) {
+						case "heart":
+							HEART[order] = value;
+							break;
 					}
 				}
 			}
@@ -127,9 +122,7 @@ public final class Formulas
 			for(int i = 0, length = HEART.length; i < length; i++)
 				if(HEART[i] == 0F)
 					HEART[i] = 1F;
-		}
-		catch(SAXException | IOException | ParserConfigurationException e)
-		{
+		} catch(SAXException | IOException | ParserConfigurationException e) {
 			Loggers.warning(Formulas.class, e);
 		}
 
@@ -137,28 +130,24 @@ public final class Formulas
 
 		for(PlayerClass cs : PlayerClass.values())
 			for(int i = 1; i < HP_MOD[cs.getId()].length; i++)
-				HP_MOD[cs.getId()][i] = (float) Math.pow(cs.getHpMod(), i  - 1);
+				HP_MOD[cs.getId()][i] = (float) Math.pow(cs.getHpMod(), i - 1);
 
 		for(int i = 0; i < CAST_MOD.length; i++)
 			CAST_MOD[i] = 18000F / (Math.max(i, 1) + 180) / 10;
 
-		ATTACK_PLAYER = new MathFunc(StatType.ATTACK, 0x10, null, null)
-		{
+		ATTACK_PLAYER = new MathFunc(StatType.ATTACK, 0x10, null, null) {
+
 			@Override
-			public float calc(Character attacker, Character attacked, Skill skill, float val)
-			{
+			public float calc(Character attacker, Character attacked, Skill skill, float val) {
 				float total = 0F;
 
-				if(attacker.isPlayer())
-				{
+				if(attacker.isPlayer()) {
 					Equipment equipment = attacker.getEquipment();
 
-					if(equipment != null)
-					{
+					if(equipment != null) {
 						Slot[] slots = equipment.getSlots();
 
-						for(int i = 0, length = slots.length; i < length; i++)
-						{
+						for(int i = 0, length = slots.length; i < length; i++) {
 							ItemInstance item = slots[i].getItem();
 
 							if(item != null)
@@ -171,23 +160,19 @@ public final class Formulas
 			}
 		};
 
-		IMPACT_PLAYER = new MathFunc(StatType.IMPACT, 0x10, null, null)
-		{
+		IMPACT_PLAYER = new MathFunc(StatType.IMPACT, 0x10, null, null) {
+
 			@Override
-			public float calc(Character attacker, Character attacked, Skill skill, float val)
-			{
+			public float calc(Character attacker, Character attacked, Skill skill, float val) {
 				float total = 0F;
 
-				if(attacker.isPlayer())
-				{
+				if(attacker.isPlayer()) {
 					Equipment equipment = attacker.getEquipment();
 
-					if(equipment != null)
-					{
+					if(equipment != null) {
 						Slot[] slots = equipment.getSlots();
 
-						for(int i = 0, length = slots.length; i < length; i++)
-						{
+						for(int i = 0, length = slots.length; i < length; i++) {
 							ItemInstance item = slots[i].getItem();
 
 							if(item != null)
@@ -200,23 +185,19 @@ public final class Formulas
 			}
 		};
 
-		DEFENSE_PLAYER = new MathFunc(StatType.DEFENSE, 0x10, null, null)
-		{
+		DEFENSE_PLAYER = new MathFunc(StatType.DEFENSE, 0x10, null, null) {
+
 			@Override
-			public float calc(Character attacker, Character attacked, Skill skill, float val)
-			{
+			public float calc(Character attacker, Character attacked, Skill skill, float val) {
 				float total = 0F;
 
-				if(attacker.isPlayer())
-				{
+				if(attacker.isPlayer()) {
 					Equipment equipment = attacker.getEquipment();
 
-					if(equipment != null)
-					{
+					if(equipment != null) {
 						Slot[] slots = equipment.getSlots();
 
-						for(int i = 0, length = slots.length; i < length; i++)
-						{
+						for(int i = 0, length = slots.length; i < length; i++) {
 							ItemInstance item = slots[i].getItem();
 
 							if(item != null)
@@ -229,23 +210,19 @@ public final class Formulas
 			}
 		};
 
-		BALANCE_PLAYER = new MathFunc(StatType.BALANCE, 0x10, null, null)
-		{
+		BALANCE_PLAYER = new MathFunc(StatType.BALANCE, 0x10, null, null) {
+
 			@Override
-			public float calc(Character attacker, Character attacked, Skill skill, float val)
-			{
+			public float calc(Character attacker, Character attacked, Skill skill, float val) {
 				float total = 0F;
 
-				if(attacker.isPlayer())
-				{
+				if(attacker.isPlayer()) {
 					Equipment equipment = attacker.getEquipment();
 
-					if(equipment != null)
-					{
+					if(equipment != null) {
 						Slot[] slots = equipment.getSlots();
 
-						for(int i = 0, length = slots.length; i < length; i++)
-						{
+						for(int i = 0, length = slots.length; i < length; i++) {
 							ItemInstance item = slots[i].getItem();
 
 							if(item != null)
@@ -258,11 +235,10 @@ public final class Formulas
 			}
 		};
 
-		STAMINA_HP = new MathFunc(StatType.MAX_HP, 0x50, null, null)
-		{
+		STAMINA_HP = new MathFunc(StatType.MAX_HP, 0x50, null, null) {
+
 			@Override
-			public float calc(Character attacker, Character attacked, Skill skill, float val)
-			{
+			public float calc(Character attacker, Character attacked, Skill skill, float val) {
 				if(!attacker.isPlayer())
 					return val;
 
@@ -272,11 +248,10 @@ public final class Formulas
 			}
 		};
 
-		STAMINA_MP = new MathFunc(StatType.MAX_MP, 0x50, null, null)
-		{
+		STAMINA_MP = new MathFunc(StatType.MAX_MP, 0x50, null, null) {
+
 			@Override
-			public float calc(Character attacker, Character attacked, Skill skill, float val)
-			{
+			public float calc(Character attacker, Character attacked, Skill skill, float val) {
 				if(!attacker.isPlayer())
 					return val;
 
@@ -286,11 +261,10 @@ public final class Formulas
 			}
 		};
 
-		LEVEL_MOD_HP_PLAYER = new MathFunc(StatType.MAX_HP, 0x10, null, null)
-		{
+		LEVEL_MOD_HP_PLAYER = new MathFunc(StatType.MAX_HP, 0x10, null, null) {
+
 			@Override
-			public float calc(Character attacker, Character attacked, Skill skill, float val)
-			{
+			public float calc(Character attacker, Character attacked, Skill skill, float val) {
 				if(!attacker.isPlayer())
 					return val;
 
@@ -300,11 +274,10 @@ public final class Formulas
 			}
 		};
 
-		LEVEL_MOD_REGEN_HP_PLAYER = new MathFunc(StatType.REGEN_HP, 0x10, null, null)
-		{
+		LEVEL_MOD_REGEN_HP_PLAYER = new MathFunc(StatType.REGEN_HP, 0x10, null, null) {
+
 			@Override
-			public float calc(Character attacker, Character attacked, Skill skill, float val)
-			{
+			public float calc(Character attacker, Character attacked, Skill skill, float val) {
 				if(!attacker.isPlayer())
 					return val;
 
@@ -314,16 +287,15 @@ public final class Formulas
 			}
 		};
 
-		BATTLE_WALK_NPC =  new MathFunc(StatType.RUN_SPEED, 0x50, null, null)
-		{
+		BATTLE_WALK_NPC = new MathFunc(StatType.RUN_SPEED, 0x50, null, null) {
+
 			@Override
-			public float calc(Character attacker, Character attacked, Skill skill, float val)
-			{
+			public float calc(Character attacker, Character attacked, Skill skill, float val) {
 				if(!attacker.isNpc())
 					return val;
 
 				if(!attacker.isBattleStanced())
-					val = attacker.isSummon()? val * 2 : val / 2;
+					val = attacker.isSummon() ? val * 2 : val / 2;
 
 				return val;
 			}
@@ -335,24 +307,21 @@ public final class Formulas
 	/**
 	 * @param character персонаж, которому нужно добавить базовые функции.
 	 */
-	public void addFuncsToNewCharacter(Character character)
-	{
-		//TODO
+	public void addFuncsToNewCharacter(Character character) {
+		// TODO
 	}
 
 	/**
 	 * @param npc нпс, которому нужно добавить базовые функции.
 	 */
-	public void addFuncsToNewNpc(Character npc)
-	{
+	public void addFuncsToNewNpc(Character npc) {
 		BATTLE_WALK_NPC.addFuncTo(npc);
 	}
 
 	/**
 	 * @param player игрок, которому нужно добавить базовые функции.
 	 */
-	public void addFuncsToNewPlayer(Player player)
-	{
+	public void addFuncsToNewPlayer(Player player) {
 		ATTACK_PLAYER.addFuncTo(player);
 		IMPACT_PLAYER.addFuncTo(player);
 		DEFENSE_PLAYER.addFuncTo(player);
@@ -365,15 +334,14 @@ public final class Formulas
 
 	/**
 	 * Рассчет атаки персонажа скилом.
-	 *
+	 * 
 	 * @param info контейнер инфы об атаке.
 	 * @param skill атакующий скил.
 	 * @param attacker атакующий персонаж.
 	 * @param attacked атакуемый персонаж.
 	 * @return результат атаки.
 	 */
-	public AttackInfo calcDamageSkill(AttackInfo info, Skill skill, Character attacker, Character attacked)
-	{
+	public AttackInfo calcDamageSkill(AttackInfo info, Skill skill, Character attacker, Character attacked) {
 		// получаем менеджер рандома
 		RandomManager randomManager = RandomManager.getInstance();
 
@@ -389,7 +357,7 @@ public final class Formulas
 		// делим на защиту
 		info.divDamage(Math.max(1, attacked.getDefense(attacker, skill)));
 
-		//рассчитывает крит удар
+		// рассчитывает крит удар
 		{
 			// получаем шанс
 			float chance = attacker.getCritRate(attacked, skill);
@@ -411,7 +379,7 @@ public final class Formulas
 		if(info.isCrit())
 			info.mulDamage(attacker.getCritDamage(attacked, skill));
 
-		//проверка на неуязвимость
+		// проверка на неуязвимость
 		if(attacked.isInvul())
 			info.setDamage(0);
 
@@ -423,22 +391,20 @@ public final class Formulas
 			// делаем рандомную модификацию
 			info.setDamage(info.getDamage() * 100 / rand.nextInt(95, 105));
 
-		//рассчитываем опрокидывание
+		// рассчитываем опрокидывание
 		info.setOwerturn(!info.isBlocked() && skill.isCanOwerturn() && calcOwerturn(attacker, attacked, skill));
-
 		return info;
 	}
 
 	/**
 	 * Рассчет прохождения эффекта.
-	 *
+	 * 
 	 * @param attacker атакующий.
 	 * @param attacked атакуемый.
 	 * @param effect эффект.
 	 * @return проходит ли эффект.
 	 */
-	public float calcEffect(Character attacker, Character attacked, EffectTemplate effect, Skill skill)
-	{
+	public float calcEffect(Character attacker, Character attacked, EffectTemplate effect, Skill skill) {
 		// получаем базовый шанс эффекта
 		int chance = effect.getChance();
 
@@ -471,13 +437,10 @@ public final class Formulas
 		// получаем рандоминайзер
 		Random rand = randomManager.getEffectRandom();
 
-		if(rand.chance(chance))
-		{
+		if(rand.chance(chance)) {
 			attacker.sendMessage("Шанс эффекта " + chance + " %. Успех!");
 			return mod;
-		}
-		else
-		{
+		} else {
 			attacker.sendMessage("Шанс эффекта " + chance + " %. Провал!");
 			return -1;
 		}
@@ -485,14 +448,13 @@ public final class Formulas
 
 	/**
 	 * Рассчет опракидывания.
-	 *
+	 * 
 	 * @param attacker атакующий.
 	 * @param attacked атакуемый.
 	 * @param skill ударный скил.
 	 * @return опрокинул ли.
 	 */
-	public boolean calcOwerturn(Character attacker, Character attacked, Skill skill)
-	{
+	public boolean calcOwerturn(Character attacker, Character attacked, Skill skill) {
 		ResistType resistType = ResistType.owerturnResist;
 
 		if(!resistType.checkCondition(attacker, attacked))
@@ -515,13 +477,12 @@ public final class Formulas
 
 	/**
 	 * Рассчет времени каста.
-	 *
+	 * 
 	 * @param hitTime базовое время каста.
 	 * @param caster тот, кто кастует.
 	 * @return итоговое время каста.
 	 */
-	public int castTime(int hitTime, Character caster)
-	{
+	public int castTime(int hitTime, Character caster) {
 		if(hitTime < 1)
 			return 0;
 
@@ -530,13 +491,12 @@ public final class Formulas
 
 	/**
 	 * Рассчет шанса сбора ресурса.
-	 *
+	 * 
 	 * @param req требуемый уровень ресурса.
 	 * @param level текущий уровень игрока.
 	 * @return шанс сбора.
 	 */
-	public int getChanceCollect(int req, int level)
-	{
+	public int getChanceCollect(int req, int level) {
 		return Math.max(65 + req - level, 95);
 	}
 }

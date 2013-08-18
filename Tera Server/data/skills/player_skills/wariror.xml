@@ -1218,6 +1218,33 @@
 		</for>
     </skill>
 	
+	<skill id="67289864" class="0" name="Combative Strike X" levels="1">
+        <set name="power" value="933"/>
+        <set name="operateType" value="ACTIVE"/>
+        <set name="skillType" value="STRIKE"/>
+		<set name="skillName" value="COMBATIVE_STRIKE" />
+        <set name="targetType" value="TARGET_ONE_AREA"/>
+        <set name="range" value="40"/>
+		<set name="radius" value="40"/>
+		<set name="moveDistance" value="150" />
+		<set name="moveTime" value="400" />
+		<set name="moveDelay" value="150" />
+        <set name="hpConsume" value="3824"/>
+        <set name="hitTime" value="2000"/>
+		<set name="delay" value="600"/>
+        <set name="reuseDelay" value="3000"/>
+		<set name="correctableTarget" value="true" />
+		<set name="implemented" value="true" />
+		<cond>
+			<using weapon="TWIN_SWORDS" msg="Используется только с дуалами."/>
+		</cond>
+		<for>
+			<effect id="101200" time="15" count="1" type="DEBUFF" stackType="defense_factor_down" resistType="weakResist" chance="100" debuff="true" >
+				<mul stat="def" order="0x30" val="0.9" />
+			</effect>
+		</for>
+    </skill>
+	
 	<skill id="67298964" class="0" name="Rising Fury I" levels="2">
 		<table name="#hitTime">1500 2500</table>
 		<table name="#delay">50 700</table>
@@ -1929,6 +1956,22 @@
 		</cond>
     </skill>
 	
+	<skill id="67239764" class="0" name="Retaliate IX" levels="1">
+        <set name="power" value="1131"/>
+        <set name="operateType" value="ACTIVE"/>
+        <set name="skillType" value="OWERTURNED_STRIKE"/>
+        <set name="targetType" value="TARGET_AURA"/>
+        <set name="radius" value="80"/>
+        <set name="delay" value="500"/>
+		<set name="reuseDelay" value="15000"/>
+        <set name="hitTime" value="2000"/>
+		<set name="owerturnMod" value="0" />
+        <set name="implemented" value="true" />
+		<cond>
+			<player owerturned="true" msg="Вы не опрокинуты."/>
+		</cond>
+    </skill>
+	
 	<skill id="67138964" class="0" name="Torrent of Blows I" levels="1">
         <set name="power" value="56"/>
 		<set name="aggroPoint" value="1000"/>
@@ -2099,6 +2142,34 @@
 	
 	<skill id="67139564" class="0" name="Torrent of Blows VII" levels="1">
         <set name="power" value="541"/>
+        <set name="aggroPoint" value="7000"/>
+        <set name="operateType" value="ACTIVE"/>
+        <set name="skillType" value="STRIKE"/>
+        <set name="targetType" value="TARGET_AURA"/>
+        <set name="radius" value="70"/>
+        <set name="mpConsume" value="300"/>
+        <set name="hitTime" value="3000"/>
+        <set name="reuseDelay" value="7000"/>
+		<set name="moveDistance" value="80" />
+		<set name="moveTime" value="1500" />
+		<set name="delay" value="900"/>
+		<set name="interval" value="900;100;300"/>
+        <set name="castCount" value="3"/>
+		<set name="owerturnMod" value="0.2" />
+		<set name="correctableTarget" value="true" />
+		<set name="implemented" value="true" />
+        <cond>
+			<using weapon="TWIN_SWORDS" msg="Используется только с дуалами."/>
+		</cond>
+		<cast>
+			<mul stat="def" order="0x50" val="1.5" />	
+			<add stat="owerturnRcpt" order="0x40" val="50" />	
+			<add stat="stunRcpt" order="0x40" val="50" />	
+		</cast>
+    </skill>
+	
+	<skill id="67139664" class="0" name="Torrent of Blows VIII" levels="1">
+        <set name="power" value="790"/>
         <set name="aggroPoint" value="7000"/>
         <set name="operateType" value="ACTIVE"/>
         <set name="skillType" value="STRIKE"/>
@@ -3618,6 +3689,32 @@
 		</cond>
     </skill>
 	
+	<skill id="67269464" class="0" name="Charging Slash VI" levels="1">
+        <set name="power" value="792"/>
+        <set name="aggroPoint" value="6000"/>
+        <set name="operateType" value="ACTIVE"/>
+        <set name="skillType" value="STRIKE"/>
+		<set name="skillName" value="CHARGING_SLASH" />
+        <set name="targetType" value="TARGET_ONE_AREA"/>
+        <set name="radius" value="45"/>
+		<set name="range" value="45"/>
+        <set name="mpConsume" value="240"/>
+        <set name="hitTime" value="1300"/>
+        <set name="reuseDelay" value="12000"/>
+		<set name="damageId" value="67138964" />
+		<set name="moveDistance" value="500" />
+		<set name="moveTime" value="1300"/>
+		<set name="moveDelay" value="0"/>
+		<set name="owerturnMod" value="0.1" />
+		<set name="rush" value="true" />
+		<set name="staticCast" value="true" />
+		<set name="castToMove" value="true" />
+		<set name="implemented" value="true" />
+		<cond>
+			<using weapon="TWIN_SWORDS" msg="Используется только с дуалами."/>
+		</cond>
+    </skill>
+	
 	<skill id="67308964" class="0" name="Deadly Gamble" levels="1">
         <set name="operateType" value="ACTIVE"/>
         <set name="skillType" value="BUFF"/>
@@ -3679,9 +3776,80 @@
 			<using weapon="TWIN_SWORDS" msg="Используется только с дуалами."/>
 		</cond>
 		<for>
+			<effect id="100900" time="2" count="1" type="STUN" chance="80" stackType="stun" debuff="true" >
+				<mul stat="runSpd" order="0x50" val="0" />
+			</effect>
+		</for>
+    </skill>
+	
+	<skill id="67408964" class="0" name="Scythe" levels="1">
+        <set name="power" value="226"/>
+        <set name="operateType" value="ACTIVE"/>
+        <set name="skillType" value="STRIKE"/>
+        <set name="targetType" value="TARGET_AURA"/>
+        <set name="radius" value="70"/>
+        <set name="mpConsume" value="219"/>
+        <set name="hitTime" value="3000"/>
+        <set name="reuseDelay" value="12000"/>
+		<set name="moveDistance" value="160" />
+		<set name="moveDelay" value="700" />
+		<set name="moveTime" value="1000" />
+		<set name="delay" value="900"/>
+		<set name="interval" value="900;200;"/>
+        <set name="castCount" value="3"/>
+		<set name="owerturnMod" value="0.2" />
+		<set name="correctableTarget" value="true" />
+		<set name="implemented" value="true" />
+        <cond>
+			<using weapon="TWIN_SWORDS" msg="Используется только с дуалами."/>
+		</cond>
+    </skill>
+	
+	<skill id="67338964" class="0" name="Staggering Counter" levels="1">
+        <set name="power" value="788"/>
+        <set name="operateType" value="ACTIVE"/>
+        <set name="skillType" value="STRIKE"/>
+        <set name="targetType" value="TARGET_AURA"/>
+        <set name="radius" value="60"/>
+        <set name="mpConsume" value="250"/>
+        <set name="hitTime" value="2500"/>
+        <set name="reuseDelay" value="15000"/>
+		<set name="moveDistance" value="60" />
+		<set name="moveDelay" value="0" />
+		<set name="moveTime" value="400" />
+		<set name="delay" value="400"/>
+		<set name="owerturnMod" value="0.2" />
+		<set name="correctableTarget" value="true" />
+		<set name="implemented" value="true" />
+         <cond>
+			<and>
+				<using weapon="TWIN_SWORDS" msg="Используется только с дуалами."/>
+				<has effectId="100700" msg="Отсутствует эффект Staggering Counter Active." />
+			</and>
+		</cond>
+		<for>
 			<effect id="101100" time="2" count="1" type="STUN" chance="80" stackType="stun" debuff="true" >
 				<mul stat="runSpd" order="0x50" val="0" />
 			</effect>
 		</for>
     </skill>
+	
+	<skill id="11020" class="0" name="Staggering Reposte" levels="1">
+        <set name="operateType" value="PASSIVE"/>
+        <set name="skillType" value="EFFECT"/>
+        <set name="targetType" value="TARGET_SELF"/>
+		<set name="implemented" value="true" />
+		<for>
+			<chance name="UseSkill" chance="100" id="67119885" class="0" attacked="true" owerturned="true" />
+		</for>
+    </skill> 
+	
+	<skill id="67119885" class="0" name="Staggering Reposte Active" levels="1">
+        <set name="operateType" value="ACTIVE"/>
+        <set name="skillType" value="BUFF"/>
+        <set name="targetType" value="TARGET_SELF"/>
+		<for>
+			<effect id="100700" time="3" type="BUFF" />
+		</for>
+    </skill>  
 </list>

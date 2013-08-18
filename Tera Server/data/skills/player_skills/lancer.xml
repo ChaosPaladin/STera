@@ -2008,6 +2008,22 @@
 			<player owerturned="true" msg="Вы не опрокинуты."/>
 		</cond>
     </skill>
+	
+	<skill id="67219764" class="1" name="Retaliate IX" levels="1">
+        <set name="power" value="1131"/>
+        <set name="operateType" value="ACTIVE"/>
+        <set name="skillType" value="OWERTURNED_STRIKE"/>
+        <set name="targetType" value="TARGET_AURA"/>
+        <set name="radius" value="80"/>
+		<set name="delay" value="1000"/>
+		<set name="reuseDelay" value="15000"/>
+        <set name="hitTime" value="2000"/>
+		<set name="owerturnMod" value="0" />
+        <set name="implemented" value="true" />
+		<cond>
+			<player owerturned="true" msg="Вы не опрокинуты."/>
+		</cond>
+    </skill>
 
     <skill id="67148964" class="1" name="Challenging Shout I" levels="1">
         <set name="power" value="5000"/>
@@ -2119,6 +2135,24 @@
 	
 	<skill id="67149564" class="1" name="Challenging Shout VII" levels="1">
         <set name="power" value="30000"/>
+        <set name="operateType" value="ACTIVE"/>
+        <set name="skillType" value="AGGRO"/>
+        <set name="targetType" value="TARGET_AURA"/>
+		<set name="rangeType" value="OTHER_SKILL" />
+		<set name="radius" value="280"/>
+        <set name="mpConsume" value="300"/>
+        <set name="hitTime" value="3500"/>
+		<set name="delay" value="1600"/>
+        <set name="reuseDelay" value="10000"/>
+		<set name="owerturnMod" value="0.1" />
+		<set name="implemented" value="true" />
+		<cond>
+			<using weapon="LANCE" msg="Используется только с копьем."/>
+		</cond>
+    </skill>
+	
+	<skill id="67149664" class="1" name="Challenging Shout VIII" levels="1">
+        <set name="power" value="40000"/>
         <set name="operateType" value="ACTIVE"/>
         <set name="skillType" value="AGGRO"/>
         <set name="targetType" value="TARGET_AURA"/>
@@ -2267,6 +2301,22 @@
 		<set name="implemented" value="true" />
         <for>
 			<effect id="201303" time="10" count="1" type="DAMAGE_ABSORPTION" stackType="absorb_damage" power="8845" value="50" />
+		</for>
+    </skill>
+	
+	<skill id="67329364" class="1" name="Iron Will V" levels="1">
+        <set name="operateType" value="ACTIVE"/>
+        <set name="skillType" value="BUFF"/>
+        <set name="targetType" value="TARGET_SELF"/>
+		<set name="rangeType" value="OTHER_SKILL" />
+		<set name="mpConsume" value="250" />
+        <set name="hitTime" value="1500"/>
+		<set name="delay" value="1000"/>
+        <set name="reuseDelay" value="20000"/>
+		<set name="blockingMove" value="false" />
+		<set name="implemented" value="true" />
+        <for>
+			<effect id="201304" time="10" count="1" type="DAMAGE_ABSORPTION" stackType="absorb_damage" power="12387" value="100" />
 		</for>
     </skill>
 	
@@ -2431,6 +2481,28 @@
         <for>
 			<effect id="200700" time="15" count="1" type="BUFF" stackType="attask_speed_up" >
 				<mul stat="atkSpd" order="0x30" val="1.2" />
+			</effect>
+		</for>
+    </skill>
+	
+	<skill id="67348964" class="1" name="Chained Leash" levels="1">
+        <set name="power" value="180"/>
+        <set name="operateType" value="ACTIVE"/>
+        <set name="skillType" value="LEASH"/>
+        <set name="targetType" value="TARGET_RAIL"/>
+		<set name="rangeType" value="RANGE_SKILL" />
+		<set name="radius" value="60"/>
+		<set name="range" value="360"/>
+        <set name="mpConsume" value="350"/>
+        <set name="hitTime" value="2100"/>
+		<set name="delay" value="1000"/>
+        <set name="reuseDelay" value="60000"/>
+		<set name="owerturnMod" value="0"/>
+		<set name="maxTargets" value="6"/>
+		<set name="implemented" value="true" />
+		<for>
+			<effect id="200100" time="2" count="1" type="STUN" chance="80" stackType="stun" debuff="true" >
+				<mul stat="runSpd" order="0x50" val="0" />
 			</effect>
 		</for>
     </skill>
