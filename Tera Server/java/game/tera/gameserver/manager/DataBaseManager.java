@@ -81,7 +81,7 @@ import com.jolbox.bonecp.BoneCPConfig;
  */
 public final class DataBaseManager {
 
-	private static final Logger log = Loggers.getLogger(DataBaseManager.class);
+	private static final Logger LOGGER = Loggers.getLogger(DataBaseManager.class);
 
 	private static final String UPDATE_ITEM = "UPDATE `items` SET `item_count`=?, `owner_id`=?, `location`=?, `index`=?, `has_crystal`=?, `autor`=?, `bonus_id`=?, `enchant_level`=?, `owner_name`=? WHERE `object_id`=? LIMIT 1";
 	private static final String UPDATE_DATA_ITEM = "UPDATE `items` SET `item_count`=?, `has_crystal`=?, `autor`=?, `bonus_id`=?, `enchant_level`=?, `owner_name`=?  WHERE `object_id`=? LIMIT 1";
@@ -234,7 +234,7 @@ public final class DataBaseManager {
 
 			return !rset.next();
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
@@ -264,7 +264,7 @@ public final class DataBaseManager {
 			statement.setInt(2, state.getQuestId());
 			statement.execute();
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -301,7 +301,7 @@ public final class DataBaseManager {
 
 			return newAccount;
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -328,7 +328,7 @@ public final class DataBaseManager {
 
 			return true;
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -406,7 +406,7 @@ public final class DataBaseManager {
 
 			return true;
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -440,7 +440,7 @@ public final class DataBaseManager {
 
 			return true;
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -469,7 +469,7 @@ public final class DataBaseManager {
 
 			return true;
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -502,7 +502,7 @@ public final class DataBaseManager {
 
 			return true;
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -555,7 +555,7 @@ public final class DataBaseManager {
 
 			return true;
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -587,7 +587,7 @@ public final class DataBaseManager {
 			statement.setLong(4, 0);
 			statement.execute();
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -618,7 +618,7 @@ public final class DataBaseManager {
 
 			return true;
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -648,7 +648,7 @@ public final class DataBaseManager {
 
 			return count > 0 ? PlayerDeleteResult.SUCCESSFUL : PlayerDeleteResult.FAILED;
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -681,7 +681,7 @@ public final class DataBaseManager {
 
 			return true;
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -707,7 +707,7 @@ public final class DataBaseManager {
 
 			return true;
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -734,7 +734,7 @@ public final class DataBaseManager {
 
 			return true;
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -764,7 +764,7 @@ public final class DataBaseManager {
 			statement.setInt(3, date.getQuestId());
 			statement.execute();
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -817,13 +817,13 @@ public final class DataBaseManager {
 				rset = statement.executeQuery("SELECT * FROM `characters` WHERE `object_id`= " + objectId + " LIMIT 1");
 
 				if(!rset.next()) {
-					log.warning("not found player for " + objectId);
+					LOGGER.warning("not found player for " + objectId);
 					return null;
 				}
 
 				// если несходится аккаунт, выходим
 				if(!rset.getString("account_name").equalsIgnoreCase(account.getName())) {
-					log.warning("incorrect account for player");
+					LOGGER.warning("incorrect account for player");
 					return null;
 				}
 
@@ -890,7 +890,7 @@ public final class DataBaseManager {
 				// устанавливаем ее
 				player.setAppearance(appearance, false);
 			else {
-				log.warning("not found appearance for objectId " + objectId);
+				LOGGER.warning("not found appearance for objectId " + objectId);
 
 				// получаем расу игрока
 				Race race = player.getRace();
@@ -919,7 +919,7 @@ public final class DataBaseManager {
 
 					// если его нет, пропускаем
 					if(skill == null) {
-						log.warning("not found skill id " + id + " class " + classId);
+						LOGGER.warning("not found skill id " + id + " class " + classId);
 						continue;
 					}
 
@@ -947,7 +947,7 @@ public final class DataBaseManager {
 
 						// если скила такого неет, сообщаем
 						if(skill == null)
-							log.warning("not found skill id " + id + " class " + classId);
+							LOGGER.warning("not found skill id " + id + " class " + classId);
 						else
 							// иначе добавляем игроку
 							player.addSkills(skill, false);
@@ -961,22 +961,17 @@ public final class DataBaseManager {
 				DBUtils.closeResultSet(rset);
 			}
 
-			// ссылка на инвентарь
 			Inventory inventory = null;
 
-			// загрузка инвенторя
 			{
-				// запрашиваем данные об инвенторе игрока
 				rset = statement.executeQuery("SELECT * FROM `character_inventors` WHERE `owner_id` = " + objectId + " LIMIT 1");
 
-				// если есть, создаем с указанными данными инвентарь
-				if(rset.next())
+				if(rset.next()) {
 					inventory = PlayerInventory.newInstance(player, rset.getInt("level"));
-				else
-					// иначе создаем новый
+				} else {
 					inventory = PlayerInventory.newInstance(player);
+				}
 
-				// закрываем результат
 				DBUtils.closeResultSet(rset);
 			}
 
@@ -995,68 +990,49 @@ public final class DataBaseManager {
 			// добавляем его игроку
 			player.setBank(bank);
 
-			// получаем локальный список итемов
 			Array<ItemInstance> items = local.getNextItemList();
 
-			// загрузка итемов
 			{
-				// запрашиваем все итемы, принадлежащие этому игроку
 				rset = statement.executeQuery("SELECT * FROM `items` WHERE `owner_id` = " + objectId + " AND `location` < " + ItemLocation.BANK.ordinal());
 
-				// загружаем итемы из результата запроса
 				loadItems(rset, items);
 
-				// закрываем результат
 				DBUtils.closeResultSet(rset);
 
-				// запрашиваем итемы в банке, принадлежащие другому игроку с
-				// этого же аккаунта
 				rset = statement.executeQuery("SELECT * FROM `items` WHERE `owner_id` = " + account.getBankId() + " AND `location` = " + ItemLocation.BANK.ordinal());
 
-				// загружаем итемы из результата запроса
 				loadItems(rset, items);
 
-				// получаем массив итемов игрока
 				ItemInstance[] array = items.array();
 
-				// получаем таблицу итемов
 				ItemTable itemTable = ItemTable.getInstance();
 
-				// перебираем их
 				for(int i = 0, length = items.size(); i < length; i++) {
-					// получаем итем
+
 					ItemInstance item = array[i];
 
-					// получаем список кристалов в нем
 					CrystalList crystals = item.getCrystals();
 
-					// если списка нет, значит в него нельзя их вставлять и
-					// значит пропускаем
-					if(crystals == null)
+					if(crystals == null) {
 						continue;
+					}
 
-					// закрываем предыдущий результат
 					DBUtils.closeResultSet(rset);
 
-					// запрашиваем кристалы, вставленные в этот итем
 					rset = statement.executeQuery("SELECT * FROM `items` WHERE `owner_id` = " + item.getObjectId() + " AND `location` = " + ItemLocation.CRYSTAL.ordinal() + " LIMIT "
 							+ item.getSockets());
 
-					// если такие есть
 					while(rset.next()) {
-						// получаем темплейт итема
+
 						ItemTemplate template = itemTable.getItem(rset.getInt("item_id"));
 
-						// если его нет, пропускаем
 						if(template == null) {
-							log.warning("not found item " + rset.getInt("item_id"));
+							LOGGER.warning("not found item " + rset.getInt("item_id"));
 							continue;
 						}
 
-						// создаем новый инстанс с указанным ид
 						CrystalInstance crystal = (CrystalInstance) template.newInstance(rset.getInt("object_id"));
 
-						// вносим данные об итеме
 						crystal.setOwnerId(item.getObjectId());
 						crystal.setIndex(rset.getInt("index"));
 						crystal.setLocation(ItemLocation.VALUES[rset.getInt("location")]);
@@ -1065,24 +1041,19 @@ public final class DataBaseManager {
 						crystal.setBonusId(rset.getInt("bonus_id"));
 						crystal.setAutor(rset.getString("autor"));
 
-						// добалвяем в список кристалов
 						crystals.put(crystal, null, null);
 					}
 				}
 
-				// закрываем результат
 				DBUtils.closeResultSet(rset);
 			}
 
-			// получаем массив всех доступных итемов
 			ItemInstance[] array = items.array();
 
-			// перебираем их
 			for(int i = 0, length = items.size(); i < length; i++) {
-				// получаем итем
+
 				ItemInstance item = array[i];
 
-				// вставляем его в соотвествующий контейнер
 				switch(item.getLocation()) {
 					case INVENTORY:
 						inventory.setItem(item, item.getIndex());
@@ -1094,27 +1065,45 @@ public final class DataBaseManager {
 						bank.setItem(item.getIndex(), item);
 						break;
 					default:
-						log.warning("incorrect location for item " + item);
+						LOGGER.warning("incorrect location for item " + item);
 				}
 			}
 
-			// выдача ожидающихся итемов
 			{
-				// запрашиваем список ожидающих итемов
-				rset = statement.executeQuery("SELECT * FROM `wait_items` WHERE `char_name` = '" + player.getName() + "';");
+				rset = statement.executeQuery("SELECT `item_id`, `item_count`, `enchant_level`, `order` FROM `wait_items` WHERE `char_name` = '" + player.getName() + "';");
 
-				// если такие есть
-				while(rset.next())
-					// если успешно итем выдался
-					if(inventory.addItem(rset.getInt("item_id"), rset.getInt("item_count"), "wait_items"))
-						// удаляем его из таблицы
-						deleteWaitItem(rset.getInt("order"));
+				ItemTable itemTable = ItemTable.getInstance();
 
-				// закрываем результат
+				while(rset.next()) {
+
+					ItemTemplate template = itemTable.getItem(rset.getInt(1));
+
+					if(template == null) {
+						continue;
+					}
+
+					ItemInstance item = template.newInstance();
+
+					if(item == null) {
+						continue;
+					}
+
+					if(item.isStackable()) {
+						item.setItemCount(rset.getInt(2));
+					}
+
+					item.setEnchantLevel(rset.getInt(3));
+
+					updateItem(item);
+
+					if(inventory.putItem(item)) {
+						deleteWaitItem(rset.getInt(4));
+					}
+				}
+
 				DBUtils.closeResultSet(rset);
 			}
 
-			// закрузка эффектов
 			{
 				rset = statement.executeQuery("SELECT * FROM `character_save_effects` WHERE `object_id` = " + objectId);
 
@@ -1199,7 +1188,7 @@ public final class DataBaseManager {
 
 					// если такого в таблице квестов нет, сообщаем
 					if(quest == null) {
-						log.warning("not found quest for id " + rset.getInt("quest_id"));
+						LOGGER.warning("not found quest for id " + rset.getInt("quest_id"));
 						continue;
 					}
 
@@ -1267,7 +1256,7 @@ public final class DataBaseManager {
 			// загрузка друзей игрока
 			loadFriends(objectId, player.getFriendList());
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
@@ -1367,7 +1356,7 @@ public final class DataBaseManager {
 
 			return storeSettingsAndHotKeys(player);
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -1406,7 +1395,7 @@ public final class DataBaseManager {
 			// возвращаем кол-во
 			return number;
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
@@ -1443,7 +1432,7 @@ public final class DataBaseManager {
 			statement.setLong(3, spawn);
 			statement.execute();
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -1468,7 +1457,7 @@ public final class DataBaseManager {
 			statement.setString(3, Strings.EMPTY);
 			statement.execute();
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -1493,7 +1482,7 @@ public final class DataBaseManager {
 
 			return true;
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -1521,7 +1510,7 @@ public final class DataBaseManager {
 			statement.setString(3, value);
 			statement.execute();
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -1579,7 +1568,7 @@ public final class DataBaseManager {
 			statement.setInt(37, appearance.getMothGape());
 			statement.execute();
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -1638,7 +1627,7 @@ public final class DataBaseManager {
 
 			return statement.executeUpdate() > 0;
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -1709,9 +1698,9 @@ public final class DataBaseManager {
 				return appearance;
 			}
 
-			log.warning("not found appearance for " + objectId);
+			LOGGER.warning("not found appearance for " + objectId);
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
@@ -1737,7 +1726,7 @@ public final class DataBaseManager {
 			statement.setInt(3, 0);
 			statement.execute();
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -1763,7 +1752,7 @@ public final class DataBaseManager {
 
 			return true;
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -1789,7 +1778,7 @@ public final class DataBaseManager {
 			statement.setString(2, value);
 			statement.execute();
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -1816,7 +1805,7 @@ public final class DataBaseManager {
 
 			return !rset.next();
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
@@ -1845,7 +1834,7 @@ public final class DataBaseManager {
 
 			return !rset.next();
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
@@ -1884,7 +1873,7 @@ public final class DataBaseManager {
 				table.put(type, Wraps.newLongWrap(rset.getLong("spawn"), true));
 			}
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
@@ -1922,7 +1911,7 @@ public final class DataBaseManager {
 				friendList.addFriend(info);
 			}
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
@@ -1952,7 +1941,7 @@ public final class DataBaseManager {
 
 			friendList.prepare();
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
@@ -1972,7 +1961,7 @@ public final class DataBaseManager {
 
 				// если его нет, пропускаем
 				if(template == null) {
-					log.warning("not found item " + rset.getInt("item_id"));
+					LOGGER.warning("not found item " + rset.getInt("item_id"));
 					continue;
 				}
 
@@ -1998,7 +1987,7 @@ public final class DataBaseManager {
 				items.add(item);
 			}
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		}
 	}
 
@@ -2023,7 +2012,7 @@ public final class DataBaseManager {
 			while(rset.next())
 				table.put(rset.getString("var_name"), Wraps.newIntegerWrap(Integer.parseInt(rset.getString("var_value")), true));
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
@@ -2066,7 +2055,7 @@ public final class DataBaseManager {
 			}
 
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
@@ -2100,7 +2089,7 @@ public final class DataBaseManager {
 					region.addRegisterGuild(guild);
 			}
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
@@ -2125,7 +2114,7 @@ public final class DataBaseManager {
 			while(rset.next())
 				variables.put(rset.getString("var_name"), rset.getString("var_value"));
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
@@ -2149,7 +2138,7 @@ public final class DataBaseManager {
 			statement.setInt(2, friendId);
 			statement.execute();
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -2173,7 +2162,7 @@ public final class DataBaseManager {
 			statement.setInt(2, guild.getId());
 			statement.execute();
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -2195,7 +2184,7 @@ public final class DataBaseManager {
 			statement.setInt(1, guild.getObjectId());
 			statement.execute();
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -2217,7 +2206,7 @@ public final class DataBaseManager {
 			statement.setInt(1, guild.getObjectId());
 			statement.execute();
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -2246,7 +2235,7 @@ public final class DataBaseManager {
 
 			return true;
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -2279,7 +2268,7 @@ public final class DataBaseManager {
 
 			return true;
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -2305,7 +2294,7 @@ public final class DataBaseManager {
 			statement.setString(2, name);
 			statement.execute();
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -2332,7 +2321,7 @@ public final class DataBaseManager {
 			statement.setInt(2, quest.getId());
 			statement.execute();
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -2354,7 +2343,7 @@ public final class DataBaseManager {
 			statement.setString(1, name);
 			statement.execute();
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -2384,7 +2373,7 @@ public final class DataBaseManager {
 			if(rset.next())
 				account = Account.valueOf(accountName, rset.getString(1), rset.getString(2), rset.getString(3), rset.getString(4), rset.getString(5), rset.getLong(6), rset.getLong(7), rset.getInt(8));
 		} catch(Exception e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
@@ -2414,7 +2403,7 @@ public final class DataBaseManager {
 			if(rset.next())
 				return rset.getInt("bank_id");
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -2442,7 +2431,7 @@ public final class DataBaseManager {
 			rset = statement.executeQuery();
 
 			if(!rset.next()) {
-				log.warning("not found player face for " + objectId);
+				LOGGER.warning("not found player face for " + objectId);
 				return null;
 			}
 
@@ -2486,7 +2475,7 @@ public final class DataBaseManager {
 
 			return face;
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
@@ -2530,7 +2519,7 @@ public final class DataBaseManager {
 			for(ItemInstance item : items)
 				bank.setItem(item.getIndex(), item);
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
@@ -2574,7 +2563,7 @@ public final class DataBaseManager {
 				guild.addMember(member);
 			}
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
@@ -2603,7 +2592,7 @@ public final class DataBaseManager {
 			while(rset.next())
 				guild.addRank(GuildRank.newInstance(rset.getString("rank_name"), GuildRankLaw.valueOf(rset.getInt("law")), rset.getInt("order")));
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
@@ -2634,7 +2623,7 @@ public final class DataBaseManager {
 						new Guild(rset.getString("name"), rset.getString("title"), rset.getString("message"), rset.getInt("id"), rset.getInt("level"), new GuildIcon(rset.getString("icon_name"), rset
 								.getBytes("icon"))));
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
@@ -2674,7 +2663,7 @@ public final class DataBaseManager {
 				playerList.add(playerPreview);
 			}
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
@@ -2702,7 +2691,7 @@ public final class DataBaseManager {
 			while(rset.next())
 				playerNames.add(rset.getString(1));
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
@@ -2729,7 +2718,7 @@ public final class DataBaseManager {
 
 			// если не нашли персонажа
 			if(!rset.next()) {
-				log.warning("not found player for " + objectId);
+				LOGGER.warning("not found player for " + objectId);
 				return null;
 			}
 
@@ -2782,7 +2771,7 @@ public final class DataBaseManager {
 
 			return playerPreview;
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
@@ -2817,7 +2806,7 @@ public final class DataBaseManager {
 			while(rset.next())
 				state.setVar(rset.getString("name"), Wraps.newIntegerWrap(rset.getInt("value"), true));
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
@@ -2851,7 +2840,7 @@ public final class DataBaseManager {
 				reuses.put(reuse.getSkillId(), reuse);
 			}
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
@@ -2891,7 +2880,7 @@ public final class DataBaseManager {
 				player.addSkill(skill, false);
 			}
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
@@ -2937,7 +2926,7 @@ public final class DataBaseManager {
 
 			return true;
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeConnection(con);
 		}
@@ -2969,7 +2958,7 @@ public final class DataBaseManager {
 
 			return true;
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -3003,7 +2992,7 @@ public final class DataBaseManager {
 			statement.setInt(4, wrap.getInt());
 			statement.execute();
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -3028,7 +3017,7 @@ public final class DataBaseManager {
 			statement.setString(3, account.getName());
 			statement.execute();
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -3056,7 +3045,7 @@ public final class DataBaseManager {
 			statement.setInt(3, template.getTemplateType());
 			statement.execute();
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -3090,7 +3079,7 @@ public final class DataBaseManager {
 
 			return true;
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -3122,7 +3111,7 @@ public final class DataBaseManager {
 			statement.setString(8, account.getName());
 			statement.execute();
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -3157,7 +3146,7 @@ public final class DataBaseManager {
 
 			return true;
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -3188,7 +3177,7 @@ public final class DataBaseManager {
 
 			return true;
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -3222,7 +3211,7 @@ public final class DataBaseManager {
 
 			return true;
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -3253,7 +3242,7 @@ public final class DataBaseManager {
 
 			return true;
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -3282,7 +3271,7 @@ public final class DataBaseManager {
 
 			return true;
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -3321,7 +3310,7 @@ public final class DataBaseManager {
 
 			return true;
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -3354,7 +3343,7 @@ public final class DataBaseManager {
 
 			return true;
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -3385,7 +3374,7 @@ public final class DataBaseManager {
 
 			return true;
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -3417,7 +3406,7 @@ public final class DataBaseManager {
 
 			return true;
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -3449,7 +3438,7 @@ public final class DataBaseManager {
 
 			return true;
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -3480,7 +3469,7 @@ public final class DataBaseManager {
 
 			return true;
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -3505,7 +3494,7 @@ public final class DataBaseManager {
 			statement.setInt(2, region.getId());
 			statement.execute();
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -3528,7 +3517,7 @@ public final class DataBaseManager {
 			statement.setInt(2, region.getId());
 			statement.execute();
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -3557,7 +3546,7 @@ public final class DataBaseManager {
 
 			return true;
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -3588,7 +3577,7 @@ public final class DataBaseManager {
 
 			return true;
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -3616,7 +3605,7 @@ public final class DataBaseManager {
 			statement.setString(3, name);
 			statement.execute();
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -3645,7 +3634,7 @@ public final class DataBaseManager {
 
 			return true;
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -3677,7 +3666,7 @@ public final class DataBaseManager {
 			statement.setInt(4, state.getQuestId());
 			statement.execute();
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -3701,7 +3690,7 @@ public final class DataBaseManager {
 			statement.setString(2, name);
 			statement.execute();
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -3731,7 +3720,7 @@ public final class DataBaseManager {
 
 			statement.execute();
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -3756,7 +3745,7 @@ public final class DataBaseManager {
 
 			statement.execute();
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -3783,7 +3772,7 @@ public final class DataBaseManager {
 
 			return statement.executeUpdate() > 0;
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCS(con, statement);
 		}
@@ -3813,7 +3802,7 @@ public final class DataBaseManager {
 			if(rset.next())
 				return rset.getInt(1);
 		} catch(SQLException e) {
-			log.warning(e);
+			LOGGER.warning(e);
 		} finally {
 			DBUtils.closeDatabaseCSR(con, statement, rset);
 		}
