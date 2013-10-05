@@ -17,6 +17,7 @@ import tera.gameserver.model.npc.spawn.RegionWarSpawn;
 import tera.gameserver.model.npc.spawn.Spawn;
 import tera.gameserver.model.npc.summons.DefaultSummon;
 import tera.gameserver.model.npc.summons.PlayerSummon;
+import tera.gameserver.model.npc.summons.SmokeSummon;
 import tera.gameserver.templates.NpcTemplate;
 import tera.util.Location;
 
@@ -25,8 +26,7 @@ import tera.util.Location;
  * 
  * @author Ronn
  */
-public enum NpcType
-{
+public enum NpcType {
 	/** --------------------------- OTHER NPC ------------------------- */
 
 	/** дружественный нпс */
@@ -77,19 +77,17 @@ public enum NpcType
 	/** стандартная модель суммона */
 	DEFAULT_SUMMON(DefaultSummon.class),
 	/** игрокоподобный суммон */
-	PLAYER_SUMMON(PlayerSummon.class), ;
+	PLAYER_SUMMON(PlayerSummon.class),
+	/** реализация тени */
+	SMOKE_SUMMON(SmokeSummon.class), ;
 
 	/** кноструктор НПС */
 	private Constructor<? extends Npc> constructor;
 
-	private NpcType(Class<? extends Npc> type)
-	{
-		try
-		{
+	private NpcType(Class<? extends Npc> type) {
+		try {
 			this.constructor = type.getConstructor(int.class, NpcTemplate.class);
-		}
-		catch(NoSuchMethodException | SecurityException e)
-		{
+		} catch(NoSuchMethodException | SecurityException e) {
 			Loggers.warning(this, e);
 		}
 	}
@@ -101,14 +99,10 @@ public enum NpcType
 	 * @param template шаблон нпс.
 	 * @return новый нпс.
 	 */
-	public Npc newInstance(int objectId, NpcTemplate template)
-	{
-		try
-		{
+	public Npc newInstance(int objectId, NpcTemplate template) {
+		try {
 			return constructor.newInstance(objectId, template);
-		}
-		catch(InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
-		{
+		} catch(InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			throw new IllegalArgumentException(e);
 		}
 	}
@@ -126,10 +120,8 @@ public enum NpcType
 	 * @param aiClass исполняющий класс АИ.
 	 * @return новый спавн.
 	 */
-	public Spawn newSpawn(Node node, VarTable vars, NpcTemplate template, Location location, int respawn, int random, int minRadius, int maxRadius, ConfigAI config, NpcAIClass aiClass)
-	{
-		switch(this)
-		{
+	public Spawn newSpawn(Node node, VarTable vars, NpcTemplate template, Location location, int respawn, int random, int minRadius, int maxRadius, ConfigAI config, NpcAIClass aiClass) {
+		switch(this) {
 			case RAID_BOSS:
 				return new BossSpawn(node, vars, template, location, respawn, random, minRadius, maxRadius, config, aiClass);
 			case REGION_WAR_SHOP:

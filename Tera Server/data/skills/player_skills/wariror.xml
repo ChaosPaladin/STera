@@ -3463,9 +3463,12 @@
         <set name="hitTime" value="2000"/>
 		<set name="delay" value="1000"/>
         <set name="reuseDelay" value="50000"/>
+		<set name="blockingMove" value="false" />
 		<set name="summonId" value="1010100"/>
 		<set name="summonType" value="1023"/>
-		<set name="blockingMove" value="false" />
+		<set name="configAI" value="smoke_aggressor" />
+		<set name="aiClass" value="DEFAULT_SUMMON" />
+		<set name="lifeTime" value="20000" />
 		<set name="implemented" value="true" />
     </skill>
 	
@@ -3478,9 +3481,12 @@
         <set name="hitTime" value="2000"/>
 		<set name="delay" value="1000"/>
         <set name="reuseDelay" value="50000"/>
+		<set name="blockingMove" value="false" />
 		<set name="summonId" value="1010101"/>
 		<set name="summonType" value="1023"/>
-		<set name="blockingMove" value="false" />
+		<set name="configAI" value="smoke_aggressor" />
+		<set name="aiClass" value="DEFAULT_SUMMON" />
+		<set name="lifeTime" value="20000" />
 		<set name="implemented" value="true" />
     </skill>
 	
@@ -3493,9 +3499,12 @@
         <set name="hitTime" value="2000"/>
 		<set name="delay" value="1000"/>
         <set name="reuseDelay" value="50000"/>
+		<set name="blockingMove" value="false" />
 		<set name="summonId" value="1010102"/>
 		<set name="summonType" value="1023"/>
-		<set name="blockingMove" value="false" />
+		<set name="configAI" value="smoke_aggressor" />
+		<set name="aiClass" value="DEFAULT_SUMMON" />
+		<set name="lifeTime" value="20000" />
 		<set name="implemented" value="true" />
     </skill>
 	
@@ -3508,9 +3517,12 @@
         <set name="hitTime" value="2000"/>
 		<set name="delay" value="1900"/>
         <set name="reuseDelay" value="50000"/>
+		<set name="blockingMove" value="false" />
 		<set name="summonId" value="1010103"/>
 		<set name="summonType" value="1023"/>
-		<set name="blockingMove" value="false" />
+		<set name="configAI" value="smoke_aggressor" />
+		<set name="aiClass" value="DEFAULT_SUMMON" />
+		<set name="lifeTime" value="20000" />
 		<set name="implemented" value="true" />
     </skill>
 	
@@ -3523,9 +3535,12 @@
         <set name="hitTime" value="2000"/>
 		<set name="delay" value="1900"/>
         <set name="reuseDelay" value="50000"/>
+		<set name="blockingMove" value="false" />
 		<set name="summonId" value="1010104"/>
 		<set name="summonType" value="1023"/>
-		<set name="blockingMove" value="false" />
+		<set name="configAI" value="smoke_aggressor" />
+		<set name="aiClass" value="DEFAULT_SUMMON" />
+		<set name="lifeTime" value="20000" />
 		<set name="implemented" value="true" />
     </skill>
 	
@@ -3538,9 +3553,12 @@
         <set name="hitTime" value="2000"/>
 		<set name="delay" value="1900"/>
         <set name="reuseDelay" value="50000"/>
+		<set name="blockingMove" value="false" />
 		<set name="summonId" value="1010105"/>
 		<set name="summonType" value="1023"/>
-		<set name="blockingMove" value="false" />
+		<set name="configAI" value="smoke_aggressor" />
+		<set name="aiClass" value="DEFAULT_SUMMON" />
+		<set name="lifeTime" value="20000" />
 		<set name="implemented" value="true" />
     </skill>
 	
@@ -3553,9 +3571,30 @@
         <set name="hitTime" value="2000"/>
 		<set name="delay" value="1900"/>
         <set name="reuseDelay" value="50000"/>
+		<set name="blockingMove" value="false" />
 		<set name="summonId" value="1010106"/>
 		<set name="summonType" value="1023"/>
+		<set name="configAI" value="smoke_aggressor" />
+		<set name="aiClass" value="DEFAULT_SUMMON" />
+		<set name="lifeTime" value="20000" />
+		<set name="implemented" value="true" />
+    </skill>
+
+    <skill id="67349664" class="0" name="Smoke Aggressor VIII" levels="1">
+        <set name="operateType" value="ACTIVE"/>
+        <set name="skillType" value="SPAWN_SMOKE_SUMMON"/>
+        <set name="targetType" value="TARGET_SELF"/>
+		<set name="rangeType" value="OTHER_SKILL" />
+        <set name="mpСonsume" value="200"/>
+        <set name="hitTime" value="2000"/>
+		<set name="delay" value="1900"/>
+        <set name="reuseDelay" value="50000"/>
 		<set name="blockingMove" value="false" />
+		<set name="summonId" value="1010107"/>
+		<set name="summonType" value="1023"/>
+		<set name="configAI" value="smoke_aggressor" />
+		<set name="aiClass" value="DEFAULT_SUMMON" />
+		<set name="lifeTime" value="20000" />
 		<set name="implemented" value="true" />
     </skill>
 	
@@ -3828,6 +3867,7 @@
 			</and>
 		</cond>
 		<for>
+			<effect time="0" count="1" type="TURN" />
 			<effect id="101100" time="2" count="1" type="STUN" chance="80" stackType="stun" debuff="true" >
 				<mul stat="runSpd" order="0x50" val="0" />
 			</effect>

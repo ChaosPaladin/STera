@@ -9,88 +9,93 @@ import tera.gameserver.templates.NpcTemplate;
 
 /**
  * Модель теневого сумона.
- *
+ * 
  * @author Ronn
  */
-public class SmokeSummon extends Summon
-{
+public class SmokeSummon extends DefaultSummon {
+
 	/** функция лимита хп */
 	private final Func maxHpFunc;
 
 	/** максимальне хп сумона */
 	private int maxHp;
 
-	public SmokeSummon(int objectId, NpcTemplate template)
-	{
+	public SmokeSummon(int objectId, NpcTemplate template) {
 		super(objectId, template);
 
-		//функция определения макс. хп сумона
-		maxHpFunc = new StatFunc()
-		{
+		maxHpFunc = new StatFunc() {
 
 			@Override
-			public void addFuncTo(Character owner)
-			{
+			public void addFuncTo(Character owner) {
 				owner.addStatFunc(this);
 			}
 
 			@Override
-			public float calc(Character attacker, Character attacked, Skill skill, float val)
-			{
-				if(owner == null)
+			public float calc(Character attacker, Character attacked, Skill skill, float val) {
+
+				Character owner = getOwner();
+
+				if(owner == null) {
 					return val;
+				}
 
 				return maxHp;
 			}
 
 			@Override
-			public int compareTo(StatFunc func)
-			{
+			public int compareTo(StatFunc func) {
 				return 0x90 - func.getOrder();
 			}
 
 			@Override
-			public int getOrder()
-			{
+			public int getOrder() {
 				return 0x90;
 			}
 
 			@Override
-			public StatType getStat()
-			{
+			public StatType getStat() {
 				return StatType.MAX_HP;
 			}
 
 			@Override
-			public void removeFuncTo(Character owner)
-			{
+			public void removeFuncTo(Character owner) {
 				owner.removeStatFunc(this);
 			}
 		};
 
-		// добавляем функцию сумону
 		maxHpFunc.addFuncTo(this);
 	}
 
 	@Override
-	public int getTemplateId()
-	{
-		// владелец самона
+	public int getTemplateId() {
+
 		Character owner = getOwner();
 
-		// формирование ид сумона в зависимости от владельца
-		if(owner != null)
+		if(owner != null) {
 			return owner.getTemplateId() * 100;
+		}
 
 		return super.getTemplateId();
 	}
 
-	/*@Override
-	public void spawnMe(Player owner)
-	{
-		// формирование максимума хп
-		maxHp = Math.max((int) (owner.getMaxHp() * 20 / 100 * 7.5F), 1);
-		// спавним
-		super.spawnMe(owner);
-	}*/
+	@Override
+	public void spawnMe() {
+
+		Character owner = getOwner();
+
+		if(owner != null) {
+			setMaxHp(Math.max((int) (owner.getMaxHp() * 20 / 100 * 7.5F), 1));
+		} else {
+			setMaxHp(1);
+		}
+
+		setCurrentHp(getMaxHp());
+		setCurrentMp(getMaxMp());
+
+		super.spawnMe();
+	}
+
+	public void setMaxHp(int maxHp) {
+		this.maxHp = maxHp;
+	}
 }

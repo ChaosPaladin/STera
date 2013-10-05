@@ -109,6 +109,7 @@
 			<next id="240500" minLevel="42" price="48238" />
 			<next id="240600" minLevel="48" price="110298" />
 			<next id="240700" minLevel="54" price="241180" />
+			<next id="240800" minLevel="60" price="441966" />
 		</skill>
 
 		<skill id="250100" name="Order to Attack" minLevel="18" price="0" />
@@ -592,6 +593,7 @@
 
 		<skill id="200100" name="Auto" minLevel="58" price="380650" />
 
+		<skill id="240100" name="Evasive Smash" minLevel="60" price="441966" />
 	</class>
 
 	<class id="4" >

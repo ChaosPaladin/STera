@@ -40,7 +40,7 @@ public class ManaHealOverTime extends AbstractEffect
 
 		if(effected == null || effector == null)
 		{
-			log.warning(this, new Exception("not found effected or effector"));
+			LOGGER.warning(this, new Exception("not found effected or effector"));
 			return false;
 		}
 

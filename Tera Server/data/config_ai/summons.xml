@@ -371,6 +371,49 @@
 			</think>
 		</thinks>
 	</config>
+
+	<config name="smoke_aggressor" >
+		<intervals default="1000" >
+			<interval state="WAIT" val="1000" />
+			<interval state="RETURN_TO_HOME" val="1000" />
+			<interval state="IN_BATTLE" val="500" />
+		</intervals>
+		
+		<tasks>
+			<task state="WAIT" factory="SummonWaitTaskFactory" >
+				<set name="randomWalkMinRange" val="50" />
+				<set name="randomWalkMaxRange" val="150" />
+				<set name="randomWalkMinDelay" val="5000" />
+				<set name="randomWalkMaxDelay" val="10000" />
+			</task>
+
+			<task state="RETURN_TO_HOME" factory="SummonReturnTaskFactory" />
+			
+			<task state="IN_BATTLE" factory="SummonBattleTaskFactory" groupChance="0" >
+				<set name="SHORT_ATTACK" val="100" />
+				<set name="LONG_ATTACK" val="30" />
+				<set name="JUMP" val="90" />
+			</task>
+		</tasks>
+		
+		<thinks>
+			<think state="WAIT" action="SummonWaitAction" >
+				<set name="maxDistance" val="600" />
+				<set name="randomWalkMinDelay" val="5000" />
+				<set name="randomWalkMaxDelay" val="10000" />
+			</think>
+			
+			<think state="RETURN_TO_HOME" action="SummonReturnAction" >
+				<set name="distanceToSpawnLoc" val="40" />
+				<set name="distanceToTeleport" val="5000" />
+			</think>
+
+			<think state="IN_BATTLE" action="SummonBattleAction" >
+				<set name="battleMaxRange" val="3000" />
+				<set name="reactionMaxRange" val="2000" />
+			</think>
+		</thinks>
+	</config>
 </list>
 
 

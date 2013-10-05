@@ -5,7 +5,6 @@ import java.util.concurrent.ScheduledFuture;
 import rlib.logging.Logger;
 import rlib.logging.Loggers;
 import rlib.util.SafeTask;
-
 import tera.gameserver.manager.ExecutorManager;
 import tera.gameserver.model.Character;
 import tera.gameserver.model.ai.npc.ConfigAI;
@@ -18,9 +17,9 @@ import tera.util.Location;
 /**
  * @author Ronn
  */
-public class SummonSpawn extends SafeTask implements Spawn
-{
-	private static final Logger log = Loggers.getLogger(SummonSpawn.class);
+public class SummonSpawn extends SafeTask implements Spawn {
+
+	private static final Logger LOGGER = Loggers.getLogger(SummonSpawn.class);
 
 	/** шаблон сумона */
 	private final NpcTemplate template;
@@ -46,8 +45,7 @@ public class SummonSpawn extends SafeTask implements Spawn
 	/** ссылка на задачу спавна */
 	private volatile ScheduledFuture<SummonSpawn> schedule;
 
-	public SummonSpawn(NpcTemplate template, ConfigAI configAI, NpcAIClass aiClass, int lifeTime)
-	{
+	public SummonSpawn(NpcTemplate template, ConfigAI configAI, NpcAIClass aiClass, int lifeTime) {
 		this.template = template;
 		this.configAI = configAI;
 		this.aiClass = aiClass;
@@ -56,215 +54,153 @@ public class SummonSpawn extends SafeTask implements Spawn
 	}
 
 	@Override
-	public void doDie(Npc npc)
-	{
-		if(!npc.isSummon())
+	public void doDie(Npc npc) {
+		if(!npc.isSummon()) {
 			return;
+		}
 
-		// запоминаем убитого сумона
 		setDead((Summon) npc);
-
-		// зануляем отспавненного сумона
 		setSpawned(null);
-
-		// завершение деспавна
-		despawn();
+		deSpawn();
 	}
 
 	@Override
-	public Location getLocation()
-	{
+	public Location getLocation() {
 		return location;
 	}
 
 	@Override
-	public int getTemplateId()
-	{
+	public int getTemplateId() {
 		return template.getTemplateId();
 	}
 
 	@Override
-	public int getTemplateType()
-	{
+	public int getTemplateType() {
 		return template.getTemplateType();
 	}
 
 	@Override
-	public void setLocation(Location location)
-	{
+	public void setLocation(Location location) {
 		this.location.set(location);
 	}
 
 	@Override
-	public synchronized void start()
-	{
-		// получаем отспавненного сумона
+	public synchronized void start() {
+
 		Summon spawned = getSpawned();
 
-		// если он есть, выходим
-		if(spawned != null)
-		{
-			log.warning(this, "found duplicate spawn!");
+		if(spawned != null) {
+			LOGGER.warning(this, "found duplicate spawn!");
 			return;
 		}
 
-		// получаем нового владельца
 		Character owner = getOwner();
 
-		// если его нет, выходим
-		if(owner == null)
+		if(owner == null) {
 			return;
+		}
 
-		// получаем позицию спавна
 		Location location = getLocation();
 
 		Summon summon = getDead();
 
-		if(summon != null)
-		{
-			// финишируем его смерть
+		if(summon != null) {
 			summon.finishDead();
-
-			// реинициализируем
 			summon.reinit();
-
-			// запоминаем владельца
 			summon.setOwner(owner);
-
-			// спавним
 			summon.spawnMe(location);
-		}
-		else
-		{
-			// создаем нового суммона
+		} else {
 			summon = (Summon) template.newInstance();
-
-			// запоминаем владельца
 			summon.setOwner(owner);
-
-			// запоминаем спавн
 			summon.setSpawn(this);
-
-			// создаем новое АИ
 			summon.setAi(aiClass.newInstance(summon, configAI));
-
-			// спавним
 			summon.spawnMe(location);
 		}
 
-		// обнуляем мертвого сумона
 		setDead(null);
-
-		// запроминаем отспавненного
 		setSpawned(summon);
-
-		// вносим суммона
 		owner.setSummon(summon);
 
-		// получаем исполнительного менеджера
 		ExecutorManager executorManager = ExecutorManager.getInstance();
-
-		// создаем и запоминаем задачу по деспавну
 		setSchedule(executorManager.scheduleGeneral(this, lifeTime));
 	}
 
 	@Override
-	public synchronized void stop()
-	{
-		// получаем ссылку на задачу деспавна
+	public synchronized void stop() {
+
 		ScheduledFuture<SummonSpawn> schedule = getSchedule();
 
-		// если ссылка есть
-		if(schedule != null)
-		{
-			// отменяем задачу
+		if(schedule != null) {
 			schedule.cancel(true);
-			// зануляем ссылку;
 			setSchedule(null);
 		}
 
-		// получаем отспавненного суммона
 		Summon spawned = getSpawned();
 
-		// если есть такой
-		if(spawned != null)
-			// удаляем его
+		if(spawned != null) {
 			spawned.remove();
+		}
 	}
 
 	/**
 	 * @return владелец сумона.
 	 */
-	public Character getOwner()
-	{
+	public Character getOwner() {
 		return owner;
 	}
 
 	/**
 	 * @param owner владелец сумона.
 	 */
-	public void setOwner(Character owner)
-	{
+	public void setOwner(Character owner) {
 		this.owner = owner;
 	}
 
 	/**
 	 * @param dead мертвый сумон.
 	 */
-	public void setDead(Summon dead)
-	{
+	public void setDead(Summon dead) {
 		this.dead = dead;
 	}
 
 	/**
 	 * @param spawned отспавненный суммон.
 	 */
-	public void setSpawned(Summon spawned)
-	{
+	public void setSpawned(Summon spawned) {
 		this.spawned = spawned;
 	}
 
 	/**
 	 * @return отспавненный суммон.
 	 */
-	public Summon getSpawned()
-	{
+	public Summon getSpawned() {
 		return spawned;
 	}
 
-	public Summon getDead()
-	{
+	public Summon getDead() {
 		return dead;
 	}
 
 	@Override
-	protected void runImpl()
-	{
-		despawn();
+	protected void runImpl() {
+		deSpawn();
 	}
 
 	/**
 	 * Деспавн суммона.
 	 */
-	private synchronized void despawn()
-	{
-		// получаем отспавненного суммона
+	private synchronized void deSpawn() {
+
 		Summon spawned = getSpawned();
 
-		// если есть такой
-		if(spawned != null)
-			// удаляем его
+		if(spawned != null) {
 			spawned.remove();
+		}
 
-		// получаем ссылку на задачу деспавна
 		ScheduledFuture<SummonSpawn> schedule = getSchedule();
 
-		// если ссылка есть
-		if(schedule != null)
-		{
-			// отменяем задачу
+		if(schedule != null) {
 			schedule.cancel(true);
-			// зануляем ссылку;
 			setSchedule(null);
 		}
 	}
@@ -272,22 +208,19 @@ public class SummonSpawn extends SafeTask implements Spawn
 	/**
 	 * @returnс сылка на задачу деспавна сумона.
 	 */
-	public ScheduledFuture<SummonSpawn> getSchedule()
-	{
+	public ScheduledFuture<SummonSpawn> getSchedule() {
 		return schedule;
 	}
 
 	/**
 	 * @param schedule ссылка на задачу деспавна сумона.
 	 */
-	public void setSchedule(ScheduledFuture<SummonSpawn> schedule)
-	{
+	public void setSchedule(ScheduledFuture<SummonSpawn> schedule) {
 		this.schedule = schedule;
 	}
 
 	@Override
-	public Location[] getRoute()
-	{
+	public Location[] getRoute() {
 		return null;
 	}
 }

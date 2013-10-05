@@ -11,6 +11,7 @@ import tera.gameserver.model.skillengine.effects.CharmBuff;
 import tera.gameserver.model.skillengine.effects.DamOverTime;
 import tera.gameserver.model.skillengine.effects.DamOverTimePercent;
 import tera.gameserver.model.skillengine.effects.DamageAbsorption;
+import tera.gameserver.model.skillengine.effects.DamageTransfer;
 import tera.gameserver.model.skillengine.effects.Debuff;
 import tera.gameserver.model.skillengine.effects.Heal;
 import tera.gameserver.model.skillengine.effects.HealMod;
@@ -25,6 +26,7 @@ import tera.gameserver.model.skillengine.effects.Pheonix;
 import tera.gameserver.model.skillengine.effects.Root;
 import tera.gameserver.model.skillengine.effects.SkillBlocking;
 import tera.gameserver.model.skillengine.effects.Stun;
+import tera.gameserver.model.skillengine.effects.Turn;
 import tera.gameserver.templates.EffectTemplate;
 import tera.gameserver.templates.SkillTemplate;
 
@@ -74,6 +76,10 @@ public enum EffectType {
 	PHEONIX(Pheonix.class),
 	/** эффект неуязвимости */
 	INVUL(Invul.class),
+	/** эффект разворота */
+	TURN(Turn.class),
+	/** эффект трансфера урона */
+	DAMAGE_TRANSFER(DamageTransfer.class),
 	/** эффект кансела эффектов */
 	CANCEL_EFFECT(CancelEffect.class);
 

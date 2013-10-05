@@ -51,14 +51,14 @@ public abstract class AbstractAura extends AbstractEffect
 		// если нет эффктеда, выходим
 		if(effected == null)
 		{
-			log.warning(this, new Exception("not found effected"));
+			LOGGER.warning(this, new Exception("not found effected"));
 			return;
 		}
 
 		// если нет эффектора, выходим
 		if(effector == null)
 		{
-			log.warning(this, new Exception("not found effector"));
+			LOGGER.warning(this, new Exception("not found effector"));
 			return;
 		}
 
@@ -68,7 +68,7 @@ public abstract class AbstractAura extends AbstractEffect
 		// если его нет, выходим
 		if(effectList == null)
 		{
-			log.warning(this, new Exception("not found effect list."));
+			LOGGER.warning(this, new Exception("not found effect list."));
 			return;
 		}
 
@@ -145,7 +145,7 @@ public abstract class AbstractAura extends AbstractEffect
 					break;
 				}
 				default:
-					log.warning(this, new Exception("incorrect effect state " + state));
+					LOGGER.warning(this, new Exception("incorrect effect state " + state));
 			}
 		}
 		finally

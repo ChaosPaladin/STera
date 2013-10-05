@@ -1,103 +1,114 @@
 package tera.gameserver.model.skillengine.classes;
 
+import rlib.util.VarTable;
+import rlib.util.array.Array;
+import tera.gameserver.manager.ObjectEventManager;
 import tera.gameserver.model.Character;
+import tera.gameserver.model.ai.npc.ConfigAI;
+import tera.gameserver.model.ai.npc.NpcAIClass;
+import tera.gameserver.model.npc.Npc;
+import tera.gameserver.model.npc.spawn.SummonSpawn;
+import tera.gameserver.model.npc.summons.Summon;
+import tera.gameserver.tables.ConfigAITable;
+import tera.gameserver.tables.NpcTable;
+import tera.gameserver.templates.NpcTemplate;
 import tera.gameserver.templates.SkillTemplate;
 
 /**
  * Скил для спавна тени варриора.
- *
+ * 
  * @author Ronn
  */
-public class SpawnSmokeSummon extends AbstractSkill
-{
-	public SpawnSmokeSummon(SkillTemplate template)
-	{
+public class SpawnSmokeSummon extends AbstractSkill {
+
+	/** спавн суммона */
+	private volatile SummonSpawn spawn;
+
+	public SpawnSmokeSummon(SkillTemplate template) {
 		super(template);
 	}
 
 	@Override
-	public void useSkill(Character character, float targetX, float targetY, float targetZ)
-	{
+	public void useSkill(Character character, float targetX, float targetY, float targetZ) {
 		super.useSkill(character, targetX, targetY, targetZ);
 
-		// если кастующий не игрок, выходим
-		if(!character.isPlayer())
+		if(!character.isPlayer()) {
 			return;
+		}
 
-		/*// получаем таблицу сумонов
-		SummonTable summonTable = SummonTable.getInstance();
-
-		// получаем темплейт сумона
-		SummonTemplate temp = summonTable.getSummon(template.getSummonId(), template.getSummonType());
-
-		// если такого нет, выходим
-		if(temp == null)
-			return;
-
-		// получаем затрачиваемое хп
 		int consume = character.getMaxHp() * 20 / 100;
 
-		// если не хватает
-		if(character.getCurrentHp() <= consume + 2)
-		{
+		if(character.getCurrentHp() <= consume + 2) {
 			character.sendMessage("У вас не достаточно HP.");
 			return;
 		}
 
-		// отнимаем ХП
-		character.setCurrentHp(character.getCurrentHp() - consume);
+		SummonSpawn spawn = getspawn();
 
-		// получаем менеджера событий
-		ObjectEventManager eventManager = ObjectEventManager.getInstance();
+		if(spawn == null) {
+			character.sendMessage("Этот суммон не реализован.");
+			return;
+		}
 
-		// обновляем хп
-		eventManager.notifyHpChanged(character);
-
-		// получаем сумона
 		Summon summon = character.getSummon();
 
-		// если уже есть вызванный
-		if(summon != null)
-			// удаляем его
+		if(summon != null) {
 			summon.remove();
+		}
 
-		// создаем нового
-		summon = temp.newInstance();
+		spawn.setOwner(character);
+		spawn.getLocation().setXYZHC(character.getX(), character.getY(), character.getZ(), character.getHeading(), character.getContinentId());
+		spawn.start();
 
-		// если не получилось создать, выходим
-		if(summon == null)
-			return;
+		summon = character.getSummon();
 
-		// устанавливаем ид континента
-		summon.setContinentId(character.getContinentId());
+		character.setCurrentHp(character.getCurrentHp() - consume);
 
-		// спавним сумона
-		summon.spawnMe((Player) character);
+		ObjectEventManager eventManager = ObjectEventManager.getInstance();
+		eventManager.notifyHpChanged(character);
 
-		// получаем список сагренных нпс
 		Array<Npc> hateList = character.getLocalHateList();
 
-		// получаем их массив
-		Npc[] npcs = hateList.array();
+		for(Npc npc : hateList.array()) {
+			if(npc == null) {
+				break;
+			}
 
-		// перебираем нпс
-		for(int i = 0, length = hateList.size(); i < length; i++)
-		{
-			// получаем нпс
-			Npc npc = npcs[i];
-
-			// если нпс нет, прпускаем
-			if(npc == null)
-				continue;
-
-			// узнаем сколько хейта у него
 			long hate = Math.max(npc.getAggro(character), 1);
 
-			// удаляем кастера из агр листа
 			npc.removeAggro(character);
-
-			// переносим агр на сумона
 			npc.addAggro(summon, hate, false);
-		}*/
+		}
+	}
+
+	protected SummonSpawn getspawn() {
+		if(spawn == null) {
+			synchronized(this) {
+				if(spawn == null) {
+
+					NpcTable npcTable = NpcTable.getInstance();
+
+					NpcTemplate temp = npcTable.getTemplate(template.getSummonId(), template.getSummonType());
+
+					if(temp == null) {
+						return null;
+					}
+
+					ConfigAITable configTable = ConfigAITable.getInstance();
+
+					VarTable vars = template.getVars();
+
+					ConfigAI configAI = configTable.getConfig(vars.getString("configAI", null));
+
+					if(configAI == null) {
+						return null;
+					}
+
+					spawn = new SummonSpawn(temp, configAI, vars.getEnum("aiClass", NpcAIClass.class), template.getLifeTime());
+				}
+			}
+		}
+
+		return spawn;
 	}
 }

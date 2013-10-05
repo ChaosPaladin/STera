@@ -42,7 +42,7 @@ public class DamOverTime extends AbstractEffect
 		// если его нет, выходим
 		if(effected == null || effector == null)
 		{
-			log.warning(this, new Exception("not found effector of effected"));
+			LOGGER.warning(this, new Exception("not found effector of effected"));
 			return false;
 		}
 

@@ -2489,4 +2489,37 @@
         <set name="reuseDelay" value="3600"/>
         <set name="implemented" value="true" />
     </skill>
+    
+    <!--   <skill id="67348964" class="3" name="Evasive Smash" levels="13">
+		<table name="#operateType">CHARGE ACTIVE</table>
+        <table name="#skillType">CHARGE CHARGE_STRIKE</table>
+		<table name="#delay">800 500</table>
+		<table name="#hitTime">6000 2900</table>
+		<table name="#interval">800 500</table>
+		<table name="#moveDistance">0 100</table>
+		<table name="#castCount">1 1</table>
+		<table name="#mpConsume">100 150 0</table>
+		<set name="power" value="89"/>
+		<set name="chargeMod" value="0.1"/>
+        <set name="operateType" value="#operateType"/>
+        <set name="skillType" value="#skillType"/>
+        <set name="targetType" value="TARGET_ONE_AREA"/>
+		<set name="range" value="50"/>
+		<set name="radius" value="50" />
+        <set name="hitTime" value="#hitTime"/>
+		<set name="delay" value="#delay"/>
+		<set name="reuseId" value="67348964"/>
+		<set name="castCount" value="#castCount"/>
+		<set name="offsetId" value="12"/>
+		<set name="interval" value="#interval"/>
+		<set name="moveDistance" value="#moveDistance"/>
+		<set name="moveTime" value="500"/>
+        <set name="reuseDelay" value="3000"/>
+		<set name="mpConsume" value="#mpConsume" />
+		<set name="correctableTarget" value="true" />
+		<set name="implemented" value="true" />
+		<cond>
+			<using weapon="AXE" msg="Используется только с топором." />
+		</cond>	
+    </skill> -->
 </list>

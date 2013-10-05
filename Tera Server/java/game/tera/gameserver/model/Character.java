@@ -3141,18 +3141,32 @@ public abstract class Character extends TObject implements Synchronized {
 	 * @param info информация об атаке.
 	 */
 	public void onDamage(Character attacker, Skill skill, AttackInfo info) {
-		if(damageListeners.isEmpty())
+
+		Array<DamageListener> listeners = getDamageListeners();
+
+		if(listeners.isEmpty()) {
 			return;
-
-		damageListeners.readLock();
-		try {
-			DamageListener[] array = damageListeners.array();
-
-			for(int i = 0, length = damageListeners.size(); i < length; i++)
-				array[i].onDamage(attacker, this, info, skill);
-		} finally {
-			damageListeners.readUnlock();
 		}
+
+		listeners.readLock();
+		try {
+
+			for(DamageListener listener : listeners.array()) {
+
+				if(listener == null) {
+					break;
+				}
+
+				listener.onDamage(attacker, this, info, skill);
+			}
+
+		} finally {
+			listeners.readUnlock();
+		}
+	}
+
+	public Array<DamageListener> getDamageListeners() {
+		return damageListeners;
 	}
 
 	/**
