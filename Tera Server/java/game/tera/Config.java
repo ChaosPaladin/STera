@@ -22,8 +22,8 @@ import com.jolbox.bonecp.BoneCPConfig;
  * @author Ronn
  * @created 11.03.2012
  */
-public final class Config
-{
+public final class Config {
+
 	/**
 	 * ---------------------------- Настройки аккаунтов
 	 * ----------------------------------
@@ -385,6 +385,19 @@ public final class Config
 	/** максимальный уровень для твМ */
 	public static int EVENT_EB_MAX_LEVEL;
 
+	/** время регистрации на TDM */
+	public static int EVENT_TDM_REGISTER_TIME;
+	/** время боя на TDM */
+	public static int EVENT_TDM_BATTLE_TIME;
+	/** минимальное кол-в игроков на TDM */
+	public static int EVENT_TDM_MIN_PLAYERS;
+	/** максимальное кол-во игроков на TDM */
+	public static int EVENT_TDM_MAX_PLAYERS;
+	/** минимальный уровень для TDM */
+	public static int EVENT_TDM_MIN_LEVEL;
+	/** максимальный уровень для TDM */
+	public static int EVENT_TDM_MAX_LEVEL;
+
 	/** сколько денег за 1 очко славы */
 	public static int EVENT_HERO_POINT_TO_GOLD;
 
@@ -423,35 +436,30 @@ public final class Config
 	public static String SERVER_DIR;
 
 	/** конфигурация для гео движка */
-	public static GeoConfig GEO_CONFIG = new GeoConfig()
-	{
+	public static GeoConfig GEO_CONFIG = new GeoConfig() {
+
 		@Override
-		public int getOffsetX()
-		{
+		public int getOffsetX() {
 			return GEO_ENGINE_OFFSET_X;
 		}
 
 		@Override
-		public int getOffsetY()
-		{
+		public int getOffsetY() {
 			return GEO_ENGINE_OFFSET_Y;
 		}
 
 		@Override
-		public int getQuardHeight()
-		{
+		public int getQuardHeight() {
 			return GEO_ENGINE_QUARD_HEIGHT;
 		}
 
 		@Override
-		public int getQuardSize()
-		{
+		public int getQuardSize() {
 			return GEO_ENGINE_QUARD_SIZE;
 		}
 
 		@Override
-		public int getSplit()
-		{
+		public int getSplit() {
 			return 0;
 		}
 	};
@@ -464,8 +472,7 @@ public final class Config
 	 * @param name проверяемое имя.
 	 * @return проходит ли проверку для сервера.
 	 */
-	public static final boolean checkName(String name)
-	{
+	public static final boolean checkName(String name) {
 		Matcher metcher = namePattern.matcher(name);
 
 		return metcher.matches();
@@ -474,8 +481,7 @@ public final class Config
 	/**
 	 * инициализация конфига
 	 */
-	public static void init()
-	{
+	public static void init() {
 		// получаем расположение сборки сервера
 		SERVER_DIR = Util.getRootPath();
 
@@ -629,6 +635,12 @@ public final class Config
 		EVENT_EB_MAX_PLAYERS = vars.getInteger("EVENT_EB_MAX_PLAYERS");
 		EVENT_EB_MIN_LEVEL = vars.getInteger("EVENT_EB_MIN_LEVEL");
 		EVENT_EB_MAX_LEVEL = vars.getInteger("EVENT_EB_MAX_LEVEL");
+		EVENT_TDM_REGISTER_TIME = vars.getInteger("EVENT_TDM_REGISTER_TIME");
+		EVENT_TDM_BATTLE_TIME = vars.getInteger("EVENT_TDM_BATTLE_TIME");
+		EVENT_TDM_MIN_PLAYERS = vars.getInteger("EVENT_TDM_MIN_PLAYERS");
+		EVENT_TDM_MAX_PLAYERS = vars.getInteger("EVENT_TDM_MAX_PLAYERS");
+		EVENT_TDM_MIN_LEVEL = vars.getInteger("EVENT_TDM_MIN_LEVEL");
+		EVENT_TDM_MAX_LEVEL = vars.getInteger("EVENT_TDM_MAX_LEVEL");
 		EVENT_HERO_POINT_TO_GOLD = vars.getInteger("EVENT_HERO_POINT_TO_GOLD");
 
 		AI_MAX_ACTIVE_RANGE = vars.getInteger("AI_MAX_ACTIVE_RANGE");
@@ -692,18 +704,15 @@ public final class Config
 	 * 
 	 * @param files
 	 */
-	private static void parseFiles(File[] files, VarTable vars)
-	{
+	private static void parseFiles(File[] files, VarTable vars) {
 		// пробегаемся по всем файлам в папке конфига
-		for(File file : files)
-		{
+		for(File file : files) {
 			// если фаил скрытый, пропускаем
 			if(file.isHidden())
 				continue;
 
 			// если папка дефолт, пропускаем
-			if(file.isDirectory() && !file.getName().contains("defaults"))
-			{
+			if(file.isDirectory() && !file.getName().contains("defaults")) {
 				parseFiles(file.listFiles(), vars);
 				continue;
 			}
@@ -717,8 +726,7 @@ public final class Config
 	/**
 	 * Перезагрузка конфига.
 	 */
-	public static void reload()
-	{
+	public static void reload() {
 		// создаем новую табицу статов
 		VarTable vars = VarTable.newInstance();
 
@@ -797,8 +805,7 @@ public final class Config
 		Loggers.info("Config", "reloaded.");
 	}
 
-	private Config()
-	{
+	private Config() {
 		throw new IllegalArgumentException();
 	}
 }
