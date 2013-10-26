@@ -643,4 +643,9 @@ public final class TeamDeathMatch extends AbstractAutoEvent {
 	public Array<Player> getSecondTeam() {
 		return secondTeam;
 	}
+
+	@Override
+	protected boolean isNeedShowPlayerCount() {
+		return false;
+	};
 }
