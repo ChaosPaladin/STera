@@ -47,6 +47,11 @@ public class UserCommand extends AbstractCommand {
 	public void execution(String command, Player player, String values) {
 		switch(command) {
 			case "event_reg": {
+
+				if(values == null) {
+					return;
+				}
+
 				EventManager eventManager = EventManager.getInstance();
 				eventManager.registerPlayer(values, player);
 				break;

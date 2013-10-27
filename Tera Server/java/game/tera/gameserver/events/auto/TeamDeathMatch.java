@@ -15,6 +15,7 @@ import tera.gameserver.manager.EventManager;
 import tera.gameserver.manager.ExecutorManager;
 import tera.gameserver.model.Character;
 import tera.gameserver.model.MessageType;
+import tera.gameserver.model.MoveType;
 import tera.gameserver.model.TObject;
 import tera.gameserver.model.World;
 import tera.gameserver.model.npc.Npc;
@@ -27,6 +28,7 @@ import tera.gameserver.model.npc.spawn.Spawn;
 import tera.gameserver.model.playable.Player;
 import tera.gameserver.network.serverpackets.AppledEffect;
 import tera.gameserver.network.serverpackets.CancelEffect;
+import tera.gameserver.network.serverpackets.CharDead;
 import tera.gameserver.tables.WorldZoneTable;
 import tera.util.Location;
 
@@ -285,17 +287,23 @@ public final class TeamDeathMatch extends AbstractAutoEvent {
 
 					Location location = points[Rnd.nextInt(0, points.length - 1)];
 
+					killed.sendMessage("Вы воскресните через 5 секунд.");
 					killed.setStamina(killed.getMaxStamina());
 					killed.setCurrentHp(killed.getMaxHp());
 					killed.setCurrentMp(killed.getMaxMp());
-					killed.updateInfo();
-					killed.teleToLocation(location);
+					killed.updateHp();
+					killed.updateMp();
+					killed.updateStamina();
+					killed.broadcastPacket(CharDead.getInstance(killed, false));
+					killed.setXYZ(location.getX(), location.getY(), location.getZ());
+					killed.broadcastMove(killed.getX(), killed.getY(), killed.getZ(), killed.getHeading(), MoveType.STOP, killed.getX(), killed.getY(), killed.getZ(), true);
+
 				} finally {
 					unlock();
 				}
 			}
 
-		}, 3000);
+		}, 5000);
 	}
 
 	@Override
