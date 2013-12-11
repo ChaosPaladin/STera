@@ -172,6 +172,8 @@ public final class Config {
 	public static int WORLD_MAX_SKILL_DESYNC;
 	/** шанс заточки предмета */
 	public static int WORLD_ENCHANT_ITEM_CHANCE;
+	/** минимальный уровень цели для возможности слить в пк */
+	public static int WORLD_MIN_TARGET_LEVEL_FOR_PK;
 
 	/** глобальный модификатор отката мили скилов */
 	public static float WORLD_SHORT_SKILL_REUSE_MOD;
@@ -567,6 +569,7 @@ public final class Config {
 		WORLD_MAX_SKILL_DESYNC = vars.getInteger("WORLD_MAX_SKILL_DESYNC") * vars.getInteger("WORLD_MAX_SKILL_DESYNC");
 		WORLD_PLAYER_MAX_LEVEL = vars.getInteger("WORLD_PLAYER_MAX_LEVEL");
 		WORLD_CHANCE_DELETE_CRYSTAL = vars.getInteger("WORLD_CHANCE_DELETE_CRYSTAL", 13);
+		WORLD_MIN_TARGET_LEVEL_FOR_PK = vars.getInteger("WORLD_MIN_TARGET_LEVEL_FOR_PK");
 
 		WORLD_SHORT_SKILL_REUSE_MOD = vars.getFloat("WORLD_SHORT_SKILL_REUSE_MOD");
 		WORLD_RANGE_SKILL_REUSE_MOD = vars.getFloat("WORLD_RANGE_SKILL_REUSE_MOD");

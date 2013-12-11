@@ -593,7 +593,7 @@ public final class Player extends Playable implements Nameable, Identified {
 				return false;
 			}
 
-			return isPvPMode() || target.isPvPMode();
+			return (isPvPMode() && target.getLevel() > Config.WORLD_MIN_TARGET_LEVEL_FOR_PK && !player.hasPremium()) || player.isPvPMode();
 		}
 
 		Npc npc = target.getNpc();
@@ -817,8 +817,9 @@ public final class Player extends Playable implements Nameable, Identified {
 
 			checkPK(killer);
 
-			if(!killer.isEvent())
+			if(!killer.isEvent()) {
 				killer.addPvPCount();
+			}
 
 			World.addKilledPlayers();
 		}
