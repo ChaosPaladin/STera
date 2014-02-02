@@ -129,7 +129,7 @@ public class EnchantItemDialog extends AbstractActionDialog {
 		ALKAHEST_TABLE.put(15, Arrays.toIntegerArray(0, 6));
 		ALKAHEST_TABLE.put(446, Arrays.toIntegerArray(6, 9));
 		ALKAHEST_TABLE.put(448, Arrays.toIntegerArray(6, 9));
-		// ALKAHEST_TABLE.put(447, Arrays.toIntegerArray(9, 12));
+		ALKAHEST_TABLE.put(447, Arrays.toIntegerArray(9, 12));
 	}
 
 	public static EnchantItemDialog newInstance(Player player) {
