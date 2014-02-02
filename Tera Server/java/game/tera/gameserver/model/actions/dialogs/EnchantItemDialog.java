@@ -133,10 +133,12 @@ public class EnchantItemDialog extends AbstractActionDialog {
 	}
 
 	public static EnchantItemDialog newInstance(Player player) {
+
 		EnchantItemDialog dialog = (EnchantItemDialog) ActionDialogType.ENCHANT_ITEM_DIALOG.newInstance();
 
-		if(dialog == null)
+		if(dialog == null) {
 			dialog = new EnchantItemDialog();
+		}
 
 		dialog.actor = player;
 		dialog.enemy = player;
@@ -164,13 +166,15 @@ public class EnchantItemDialog extends AbstractActionDialog {
 
 			Player actor = getActor();
 
-			if(actor == null)
+			if(actor == null) {
 				return false;
+			}
 
 			Inventory inventory = actor.getInventory();
 
-			if(inventory == null)
+			if(inventory == null) {
 				return false;
+			}
 
 			inventory.lock();
 			try {
@@ -178,30 +182,35 @@ public class EnchantItemDialog extends AbstractActionDialog {
 				ItemInstance target = getSource();
 				ItemInstance source = inventory.getItemForObjectId(target.getObjectId());
 
-				if(source == null)
+				if(source == null) {
 					return false;
+				}
 
 				target = getConsume();
 
 				ItemInstance consume = inventory.getItemForObjectId(target.getObjectId());
 
-				if(consume == null || consume == source || !consume.isEnchantable() || consume.getExtractable() < source.getExtractable())
+				if(consume == null || consume == source || !source.isEnchantable() || consume.getExtractable() < source.getExtractable()) {
 					return false;
+				}
 
-				if(!source.getClass().isInstance(consume))
+				if(!source.getClass().isInstance(consume)) {
 					return false;
+				}
 
 				target = getAlkahest();
 
 				ItemInstance alkahest = inventory.getItemForItemId(target.getItemId());
 
-				if(alkahest == null || alkahest.getItemCount() < source.getExtractable())
+				if(alkahest == null || alkahest.getItemCount() < source.getExtractable()) {
 					return false;
+				}
 
 				int[] range = ALKAHEST_TABLE.get(alkahest.getItemId());
 
-				if(source.getEnchantLevel() < range[0] || source.getEnchantLevel() >= range[1])
+				if(source.getEnchantLevel() < range[0] || source.getEnchantLevel() >= range[1]) {
 					return false;
+				}
 
 				int chance = CHANE_TABLE[source.getEnchantLevel()][consume.getRank().ordinal()];
 
@@ -220,13 +229,11 @@ public class EnchantItemDialog extends AbstractActionDialog {
 
 				inventory.removeItem(alkahest.getItemId(), source.getExtractable());
 
-				if(fail)
+				if(fail) {
 					actor.sendPacket(EnchantResult.getFail(), false);
-				else {
+				} else {
 					source.setEnchantLevel(source.getEnchantLevel() + 1);
-
 					manager.updateItem(source);
-
 					actor.sendPacket(EnchantResult.getSuccessful(), false);
 				}
 
@@ -308,10 +315,12 @@ public class EnchantItemDialog extends AbstractActionDialog {
 	 * Обновление диалога.
 	 */
 	private void updateDialog() {
+
 		Player actor = getActor();
 
-		if(actor != null)
+		if(actor != null) {
 			actor.sendPacket(EnchatItemInfo.getInstance(this), true);
+		}
 	}
 
 	/**
@@ -323,26 +332,32 @@ public class EnchantItemDialog extends AbstractActionDialog {
 	public int getItemId(int index) {
 		switch(index) {
 			case SOURCE_ITEM_INDEX: {
+
 				ItemInstance source = getSource();
 
-				if(source != null)
+				if(source != null) {
 					return source.getItemId();
+				}
 
 				break;
 			}
 			case CONSUME_ITEM_INDEX: {
+
 				ItemInstance consume = getConsume();
 
-				if(consume != null)
+				if(consume != null) {
 					return consume.getItemId();
+				}
 
 				break;
 			}
 			case ALKAHEST_ITEM_INDEX: {
+
 				ItemInstance alkahest = getAlkahest();
 
-				if(alkahest != null)
+				if(alkahest != null) {
 					return alkahest.getItemId();
+				}
 
 				break;
 			}
@@ -360,26 +375,32 @@ public class EnchantItemDialog extends AbstractActionDialog {
 	public int getObjectId(int index) {
 		switch(index) {
 			case SOURCE_ITEM_INDEX: {
+
 				ItemInstance source = getSource();
 
-				if(source != null)
+				if(source != null) {
 					return source.getObjectId();
+				}
 
 				break;
 			}
 			case CONSUME_ITEM_INDEX: {
+
 				ItemInstance consume = getConsume();
 
-				if(consume != null)
+				if(consume != null) {
 					return consume.getObjectId();
+				}
 
 				break;
 			}
 			case ALKAHEST_ITEM_INDEX: {
+
 				ItemInstance alkahest = getAlkahest();
 
-				if(alkahest != null)
+				if(alkahest != null) {
 					return alkahest.getObjectId();
+				}
 
 				break;
 			}
@@ -396,15 +417,19 @@ public class EnchantItemDialog extends AbstractActionDialog {
 	 */
 	public int getNeedItemCount(int index) {
 		switch(index) {
-			case SOURCE_ITEM_INDEX:
+			case SOURCE_ITEM_INDEX: {
 				return 1;
-			case CONSUME_ITEM_INDEX:
+			}
+			case CONSUME_ITEM_INDEX: {
 				return 1;
+			}
 			case ALKAHEST_ITEM_INDEX: {
+
 				ItemInstance source = getSource();
 
-				if(source != null)
+				if(source != null) {
 					return source.getExtractable();
+				}
 
 				break;
 			}
@@ -423,10 +448,12 @@ public class EnchantItemDialog extends AbstractActionDialog {
 	 */
 	public boolean isEnchantItem(int index) {
 		switch(index) {
-			case SOURCE_ITEM_INDEX:
+			case SOURCE_ITEM_INDEX: {
 				return true;
-			default:
+			}
+			default: {
 				return false;
+			}
 		}
 	}
 
@@ -550,13 +577,15 @@ public class EnchantItemDialog extends AbstractActionDialog {
 
 		Player actor = getActor();
 
-		if(actor == null)
+		if(actor == null) {
 			return null;
+		}
 
 		Inventory inventory = actor.getInventory();
 
-		if(objectId != 0)
+		if(objectId != 0) {
 			return inventory.getItemForObjectId(objectId);
+		}
 
 		return inventory.getItemForItemId(itemId);
 	}
@@ -570,10 +599,12 @@ public class EnchantItemDialog extends AbstractActionDialog {
 	public int getEnchantLevel(int index) {
 
 		if(index == SOURCE_ITEM_INDEX) {
+
 			ItemInstance source = getSource();
 
-			if(source != null)
+			if(source != null) {
 				return source.getEnchantLevel();
+			}
 		}
 
 		return 0;

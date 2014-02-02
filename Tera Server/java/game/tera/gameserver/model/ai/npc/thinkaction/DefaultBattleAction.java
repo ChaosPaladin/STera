@@ -5,7 +5,6 @@ import org.w3c.dom.Node;
 import rlib.util.Rnd;
 import rlib.util.VarTable;
 import rlib.util.array.Array;
-
 import tera.gameserver.manager.PacketManager;
 import tera.gameserver.model.Character;
 import tera.gameserver.model.NpcAIState;
@@ -21,11 +20,11 @@ import tera.util.LocalObjects;
 
 /**
  * Базовая модель генератора действий в бою.
- *
+ * 
  * @author Ronn
  */
-public class DefaultBattleAction extends AbstractThinkAction
-{
+public class DefaultBattleAction extends AbstractThinkAction {
+
 	/** пакет сообщений при смене цели боя */
 	protected final MessagePackage switchTargetMessages;
 
@@ -42,12 +41,10 @@ public class DefaultBattleAction extends AbstractThinkAction
 	/** максимум для скольких нпс цель может быть топ агром */
 	protected final int maxMostHated;
 
-	public DefaultBattleAction(Node node)
-	{
+	public DefaultBattleAction(Node node) {
 		super(node);
 
-		try
-		{
+		try {
 			// парсим параметры
 			VarTable vars = VarTable.newInstance(node, "set", "name", "val");
 
@@ -63,9 +60,7 @@ public class DefaultBattleAction extends AbstractThinkAction
 			MessagePackageTable messageTable = MessagePackageTable.getInstance();
 
 			this.switchTargetMessages = messageTable.getPackage(vars.getString("switchTargetMessages", ConfigAI.DEFAULT_SWITCH_TARGET_MESSAGES));
-		}
-		catch(Exception e)
-		{
+		} catch(Exception e) {
 			log.warning(this, e);
 			throw new IllegalArgumentException(e);
 		}
@@ -74,233 +69,163 @@ public class DefaultBattleAction extends AbstractThinkAction
 	/**
 	 * @return радиус ведения боя.
 	 */
-	protected final int getBattleMaxRange()
-	{
+	protected final int getBattleMaxRange() {
 		return battleMaxRange;
 	}
 
 	/**
 	 * @return % хп, который является критическим.
 	 */
-	protected final int getCriticalHp()
-	{
+	protected final int getCriticalHp() {
 		return criticalHp;
 	}
 
 	/**
 	 * @return максимальное число топ агров для цели.
 	 */
-	protected final int getMaxMostHated()
-	{
+	protected final int getMaxMostHated() {
 		return maxMostHated;
 	}
 
 	/**
 	 * @return радиус реакции НПС на врагов.
 	 */
-	protected final int getReactionMaxRange()
-	{
+	protected final int getReactionMaxRange() {
 		return reactionMaxRange;
 	}
 
 	/**
 	 * @return шанс входа в состояние ярости.
 	 */
-	protected final int getRearRate()
-	{
+	protected final int getRearRate() {
 		return rearRate;
 	}
 
 	/**
 	 * @return шанс входа в состояние убегания.
 	 */
-	protected final int getRunAwayRate()
-	{
+	protected final int getRunAwayRate() {
 		return runAwayRate;
 	}
 
 	@Override
-	public <A extends Npc> void think(NpcAI<A> ai, A actor, LocalObjects local, ConfigAI config, long currentTime)
-	{
-		// если нпс мертв
-		if(actor.isDead())
-		{
-			// очищаем задания
+	public <A extends Npc> void think(NpcAI<A> ai, A actor, LocalObjects local, ConfigAI config, long currentTime) {
+
+		if(actor.isDead()) {
 			ai.clearTaskList();
-			// очищаем агр лист
 			actor.clearAggroList();
-			// переводим в режим ожидания
 			ai.setNewState(NpcAIState.WAIT);
-			// выходим
 			return;
 		}
 
-		// если нпс щас что-то делает, выходим
-		if(actor.isTurner() || actor.isCastingNow())
+		if(actor.isTurner() || actor.isCastingNow()) {
 			return;
+		}
 
-		// если НПС был оглушен/опрокинут
-		if(actor.isStuned() || actor.isOwerturned())
-		{
-			// если есть задачи
-			if(ai.isWaitingTask())
-				// отменяем их
+		if(actor.isStuned() || actor.isOwerturned()) {
+
+			if(ai.isWaitingTask()) {
 				ai.clearTaskList();
+			}
 
-			// выходим
 			return;
 		}
 
-		// если актор вышел за пределы максимального радиуса атаки
-		if(!actor.isInRangeZ(actor.getSpawnLoc(), getReactionMaxRange()))
-		{
-			// очищаем задания
+		if(!actor.isInRangeZ(actor.getSpawnLoc(), getReactionMaxRange())) {
 			ai.clearTaskList();
-			// очищаем агр лист
 			actor.clearAggroList();
-			// переводим в режим возврпщения домой
 			ai.setNewState(NpcAIState.RETURN_TO_HOME);
-			// отправляем иконку думания
 			PacketManager.showNotifyIcon(actor, NotifyType.NOTICE_THINK);
-			// обновляем время отправки иконки
 			ai.setLastNotifyIcon(currentTime);
-			// выходим
 			return;
 		}
 
-		// получаем топовый агр
 		Character mostHated = actor.getMostHated();
 
-		// если такого нету, но актор агрессивный
-		if(mostHated == null && actor.isAggressive())
-		{
-			// получаем текущий регион НПС
+		if(mostHated == null && actor.isAggressive()) {
+
 			WorldRegion region = actor.getCurrentRegion();
 
-			// если регион есть
-			if(region != null)
-			{
-				// получаем список персонажей
+			if(region != null) {
+
 				Array<Character> charList = local.getNextCharList();
 
-				// собираем сведения о целях вокруг
 				World.getAround(Character.class, charList, actor, actor.getAggroRange());
 
-				// получаем массив целей
 				Character[] array = charList.array();
 
-				// перебираем потенциальные цели
-				for(int i = 0, length = charList.size(); i < length; i++)
-				{
-					// получаем потенциальную цель
+				for(int i = 0, length = charList.size(); i < length; i++) {
+
 					Character target = array[i];
 
-					// если на цель возможна агрессия и цель в зоне агра
-					if(ai.checkAggression(target))
-						// добавляем в агр лист
+					if(ai.checkAggression(target)) {
 						actor.addAggro(target, 1, false);
+					}
 				}
 			}
 		}
 
-		// еще раз пробуем получить главного агр персонажа
 		mostHated = actor.getMostHated();
 
-		// если главная цель отсутствует, выходим
-		if(mostHated == null)
-		{
-			// очищаем задания
+		if(mostHated == null) {
 			ai.clearTaskList();
-			// очищаем агр лист
 			actor.clearAggroList();
-			// переводим в режим возврпщения домой
 			ai.setNewState(NpcAIState.RETURN_TO_HOME);
-			// отправляем иконку думания
 			PacketManager.showNotifyIcon(actor, NotifyType.NOTICE_THINK);
-			// обновляем время отправки иконки
 			ai.setLastNotifyIcon(currentTime);
-			// выходим
 			return;
 		}
 
-		// получаем текущую цель АИ
 		Character target = ai.getTarget();
 
-		// если цель выходит за радиус боевых действий
-		if(mostHated.isDead() || !mostHated.isInRange(actor.getSpawnLoc(), getBattleMaxRange()))
-		{
-			// удаляем его с агр листа
+		if(mostHated.isDead() || !mostHated.isInRange(actor.getSpawnLoc(), getBattleMaxRange())) {
 			actor.removeAggro(mostHated);
-			// очищаем задания
 			ai.clearTaskList();
-			// выходим
 			return;
 		}
 
-		// если у НПС критический уровень хп
-		if(actor.getCurrentHpPercent() < getCriticalHp())
-		{
-			// расчитываем шанс
+		if(actor.getCurrentHpPercent() < getCriticalHp()) {
+
 			int rate = Rnd.nextInt(0, 100000);
 
-			// если он выпал на ярость
-			if(rate <= getRearRate())
-			{
-				// очищаем задания
+			if(rate < getRearRate()) {
 				ai.clearTaskList();
-				// переводим в режим ярости
 				ai.setNewState(NpcAIState.IN_RAGE);
-				// отправляем иконку ярости
 				PacketManager.showNotifyIcon(actor, NotifyType.READ_REAR);
-				// обновляем время отправки иконки
 				ai.setLastNotifyIcon(currentTime);
-				// выходим
 				return;
 			}
 
-			// если он выпал на сбегание
-			if(rate <= getRunAwayRate())
-			{
-				// очищаем задания
-				ai.clearTaskList();
-				// переводим в режим убегания
-				ai.setNewState(NpcAIState.IN_RUN_AWAY);
-				// выходим
+			// if(rate < getRunAwayRate()) {
+			// ai.clearTaskList();
+			// ai.setNewState(NpcAIState.IN_RUN_AWAY);
+			// return;
+			// }
+		}
+
+		if(mostHated != target) {
+			ai.setTarget(mostHated);
+		}
+
+		if(ai.isWaitingTask()) {
+			if(ai.doTask(actor, currentTime, local)) {
 				return;
 			}
 		}
 
-		// если топ агр не является текущей целью АИ
-		if(mostHated != target)
-			// обновляем текущую цель АИ
-			ai.setTarget(mostHated);
-
-		// если есть ожидающие задания
-		if(ai.isWaitingTask())
-			// выполняем и если это небыло последнее задание
-			if(ai.doTask(actor, currentTime, local))
-				// выходим
-				return;
-
-		// если нпс щас что-то делает, выходим
-		if(actor.isTurner() || actor.isCastingNow() || actor.isStuned() || actor.isOwerturned() || actor.isMoving())
+		if(actor.isTurner() || actor.isCastingNow() || actor.isStuned() || actor.isOwerturned() || actor.isMoving()) {
 			return;
+		}
 
-		// если давно не оторбажали иконку думания
-		if(currentTime - ai.getLastNotifyIcon() > 15000)
-		{
-			// отправляем иконку думания
+		if(currentTime - ai.getLastNotifyIcon() > 15000) {
 			PacketManager.showNotifyIcon(actor, NotifyType.YELLOW_QUESTION);
-			// обновляем время отправки иконки
 			ai.setLastNotifyIcon(currentTime);
 		}
 
-		// создаем новое задание
 		ai.getCurrentFactory().addNewTask(ai, actor, local, config, currentTime);
 
-		// если есть ожидающие задания
-		if(ai.isWaitingTask())
-			// выполняем
+		if(ai.isWaitingTask()) {
 			ai.doTask(actor, currentTime, local);
+		}
 	}
 }
