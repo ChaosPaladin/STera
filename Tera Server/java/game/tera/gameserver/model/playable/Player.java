@@ -826,13 +826,9 @@ public final class Player extends Playable implements Nameable, Identified {
 
 		destroyCrystals(attacker);
 
-		if(isPK()) {
-			// TODO
+		if(isPK() && attacker != this) {
+			dropItems();
 		}
-		// если игрок ПК и это не суицид
-		// if(isPK() && attacker != this)
-		// дропаем итемы
-		// dropItems();
 
 		broadcastPacket(CharDead.getInstance(this, true));
 		sendPacket(PlayerDeadWindow.getInstance(), true);
